@@ -1,0 +1,21 @@
+[package]
+name = "boulder_derive"
+version = "0.1.0"
+authors = ["Ed Smith <ed.smith@collabora.com>"]
+edition = "2021"
+license = "Apache-2.0 OR MIT"
+description = "Macros for the boulder crate"
+repository = "https://github.com/eds-collabora/boulder-rs"
+keywords = ["builder", "generator", "testing"]
+categories = [ "rust-patterns" ]
+
+[lib]
+proc-macro = true
+
+[dependencies]
+syn = { version="1.0", features=["full"] }
+quote = "1.0"
+proc-macro2 = "1.0"
+
+[dev-dependencies]
+boulder = { path = "../boulder" }

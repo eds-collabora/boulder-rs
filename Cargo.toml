@@ -1,0 +1,6 @@
+[workspace]
+members = [
+  "boulder",
+  "boulder_derive",
+  "test_suite",
+]
