@@ -1,6 +1,6 @@
 [package]
 name = "boulder_derive"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Ed Smith <ed.smith@collabora.com>"]
 edition = "2021"
 license = "Apache-2.0 OR MIT"
@@ -8,6 +8,7 @@ description = "Macros for the boulder crate"
 repository = "https://github.com/eds-collabora/boulder-rs"
 keywords = ["builder", "generator", "testing"]
 categories = [ "rust-patterns" ]
+readme = "../README.md"
 
 [lib]
 proc-macro = true

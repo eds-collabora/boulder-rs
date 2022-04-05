@@ -1,6 +1,6 @@
 [package]
 name = "boulder"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Ed Smith <ed.smith@collabora.com>"]
 edition = "2021"
 license = "Apache-2.0 OR MIT"
@@ -8,6 +8,7 @@ description = "Like a builder, but heavier."
 repository = "https://github.com/eds-collabora/boulder-rs"
 keywords = ["builder", "generator", "testing"]
 categories = [ "rust-patterns" ]
+readme = "../README.md"
 
 [dependencies]
 boulder_derive = { version="0.1.0", path = "../boulder_derive" }
