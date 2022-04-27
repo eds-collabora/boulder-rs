@@ -3,7 +3,7 @@
 
 use std::any::Any;
 
-//mod persian_rug;
+mod persian_rug;
 
 use boulder::{Buildable, Builder, Generatable, Generator};
 
