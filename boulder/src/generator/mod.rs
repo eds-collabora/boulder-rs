@@ -1,15 +1,23 @@
-use core::ops::{Deref, DerefMut};
-use std::rc::Rc;
-use std::sync::{Arc, Mutex};
-
 pub mod generators;
 
-/// Something which can generate a sequence of objects of type
-/// `Output`.
+/// Something which can generate a sequence of objects of some type.
+///
+/// The only required function in this trait is
+/// ['generate'](Generator::generate) which creates a new object,
+/// mutating the generator as a byproduct. Most generators will allow
+/// customisation of the sequence of produced objects in some way.
+///
+/// An object implementing this trait will be automatically created
+/// for you as part of the [`macro@Generatable`] derive macro. That
+/// generator will have a method for each field of the result type, to
+/// allow you to set a generator for the field. It will produce a
+/// default sequence (as configured by the attributes placed on the
+/// type) for every field that is not customised.
 pub trait Generator
 where
     Self: 'static,
 {
+    /// The output type.
     type Output;
     /// Make a new object.
     ///
@@ -36,17 +44,25 @@ where
     fn generate(&mut self) -> Self::Output;
 }
 
-/// A type that has an associated default `Generator`
+/// A type that has an associated default [`Generator`]
 ///
-/// The convenient way to implement this trait is via the
-/// `Generatable` derive macro.
+/// This trait is implemented via the [`macro@Generatable`] derive
+/// macro. It cannot be directly implemented because the library
+/// itself provides a blanket implementation from a more complex
+/// underlying trait `MiniGeneratable`, which is not currently
+/// documented.
+///
+/// This restriction may be removed in a future version; much of the
+/// complexity in this module stems from lacking generic associated
+/// types on stable.
 pub trait Generatable {
+    /// A default choice of [`Generator`] for this type.
     type Generator: Generator<Output = Self>;
     /// Return this object's generator.
     ///
     /// Example
     /// ```rust
-    /// use boulder::{Generatable, Generator, gen};
+    /// use boulder::{Generatable, Generator};
     ///
     /// struct FooGenerator {
     ///   a: i32
@@ -78,248 +94,44 @@ pub trait Generatable {
     fn generator() -> Self::Generator;
 }
 
-impl<T> Generatable for Option<T>
-where
-    T: Generatable,
-{
-    type Generator = OptionGenerator<<T as Generatable>::Generator>;
-    fn generator() -> Self::Generator {
-        OptionGenerator(T::generator())
-    }
-}
-
-pub struct OptionGenerator<T>(T);
-
-impl<T> Deref for OptionGenerator<T> {
-    type Target = T;
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl<T> DerefMut for OptionGenerator<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
-    }
-}
-
-impl<T> Generator for OptionGenerator<T>
-where
-    T: Generator,
-{
-    type Output = Option<<T as Generator>::Output>;
-    fn generate(&mut self) -> Self::Output {
-        Some(self.0.generate())
-    }
-}
-
-impl<T> IntoIterator for OptionGenerator<T>
-where
-    T: Generator,
-{
-    type Item = Option<<T as Generator>::Output>;
-    type IntoIter = GeneratorIterator<Self>;
-    fn into_iter(self) -> Self::IntoIter {
-        Self::IntoIter::new(self)
-    }
-}
-
-impl<'a, T> IntoIterator for &'a mut OptionGenerator<T>
-where
-    T: Generator,
-{
-    type Item = Option<<T as Generator>::Output>;
-    type IntoIter = GeneratorMutIterator<'a, OptionGenerator<T>>;
-    fn into_iter(self) -> Self::IntoIter {
-        Self::IntoIter::new(self)
-    }
-}
-
-impl<T> Generatable for Rc<T>
-where
-    T: Generatable,
-{
-    type Generator = RcGenerator<<T as Generatable>::Generator>;
-    fn generator() -> Self::Generator {
-        RcGenerator(T::generator())
-    }
-}
-
-pub struct RcGenerator<T>(T);
-
-impl<T> Deref for RcGenerator<T> {
-    type Target = T;
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl<T> DerefMut for RcGenerator<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
-    }
-}
-
-impl<T> Generator for RcGenerator<T>
-where
-    T: Generator,
-{
-    type Output = Rc<<T as Generator>::Output>;
-    fn generate(&mut self) -> Self::Output {
-        Rc::new(self.0.generate())
-    }
-}
-
-impl<T> IntoIterator for RcGenerator<T>
-where
-    T: Generator,
-{
-    type Item = Rc<<T as Generator>::Output>;
-    type IntoIter = GeneratorIterator<Self>;
-    fn into_iter(self) -> Self::IntoIter {
-        Self::IntoIter::new(self)
-    }
-}
-
-impl<'a, T> IntoIterator for &'a mut RcGenerator<T>
-where
-    T: Generator,
-{
-    type Item = Rc<<T as Generator>::Output>;
-    type IntoIter = GeneratorMutIterator<'a, RcGenerator<T>>;
-    fn into_iter(self) -> Self::IntoIter {
-        Self::IntoIter::new(self)
-    }
-}
-
-impl<T> Generatable for Arc<T>
-where
-    T: Generatable,
-{
-    type Generator = ArcGenerator<<T as Generatable>::Generator>;
-    fn generator() -> Self::Generator {
-        ArcGenerator(T::generator())
-    }
-}
-
-pub struct ArcGenerator<T>(T);
-
-impl<T> Deref for ArcGenerator<T> {
-    type Target = T;
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl<T> DerefMut for ArcGenerator<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
-    }
-}
-
-impl<T> Generator for ArcGenerator<T>
-where
-    T: Generator,
-{
-    type Output = Arc<<T as Generator>::Output>;
-    fn generate(&mut self) -> Self::Output {
-        Arc::new(self.0.generate())
-    }
-}
-
-impl<T> IntoIterator for ArcGenerator<T>
-where
-    T: Generator,
-{
-    type Item = Arc<<T as Generator>::Output>;
-    type IntoIter = GeneratorIterator<Self>;
-    fn into_iter(self) -> Self::IntoIter {
-        Self::IntoIter::new(self)
-    }
-}
-
-impl<'a, T> IntoIterator for &'a mut ArcGenerator<T>
-where
-    T: Generator,
-{
-    type Item = Arc<<T as Generator>::Output>;
-    type IntoIter = GeneratorMutIterator<'a, ArcGenerator<T>>;
-    fn into_iter(self) -> Self::IntoIter {
-        Self::IntoIter::new(self)
-    }
-}
-
-impl<T> Generatable for Mutex<T>
-where
-    T: Generatable,
-{
-    type Generator = MutexGenerator<<T as Generatable>::Generator>;
-    fn generator() -> Self::Generator {
-        MutexGenerator(T::generator())
-    }
-}
-
-pub struct MutexGenerator<T>(T);
-
-impl<T> Deref for MutexGenerator<T> {
-    type Target = T;
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl<T> DerefMut for MutexGenerator<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
-    }
-}
-
-impl<T> Generator for MutexGenerator<T>
-where
-    T: Generator,
-{
-    type Output = Mutex<<T as Generator>::Output>;
-    fn generate(&mut self) -> Self::Output {
-        Mutex::new(self.0.generate())
-    }
-}
-
-impl<T> IntoIterator for MutexGenerator<T>
-where
-    T: Generator,
-{
-    type Item = Mutex<<T as Generator>::Output>;
-    type IntoIter = GeneratorIterator<Self>;
-    fn into_iter(self) -> Self::IntoIter {
-        Self::IntoIter::new(self)
-    }
-}
-
-impl<'a, T> IntoIterator for &'a mut MutexGenerator<T>
-where
-    T: Generator,
-{
-    type Item = Mutex<<T as Generator>::Output>;
-    type IntoIter = GeneratorMutIterator<'a, MutexGenerator<T>>;
-    fn into_iter(self) -> Self::IntoIter {
-        Self::IntoIter::new(self)
-    }
-}
-
-pub use boulder_derive::Generatable;
-
 /// An owning iterator for any generator.
 ///
-/// It makes any generator into an infinite sequence. One reason not
-/// to use this type is that it prevents modifying the generator
-/// mid-sequence.
+/// This type converts any generator into an iterator over an infinite
+/// sequence.
+///
+/// Example:
+/// ```rust
+/// use boulder::{Generatable, Generator, GeneratorIterator, Inc};
+///
+/// #[derive(Generatable)]
+/// struct Foo {
+///    #[boulder(generator=Inc(1))]
+///    a: i32
+/// }
+///
+/// let g = Foo::generator();
+/// let mut iter = GeneratorIterator::new(g);
+/// let f1 = iter.next().unwrap();
+/// let f2 = iter.next().unwrap();
+/// let mut g = iter.into_inner();
+/// assert_eq!(f1.a, 1);
+/// assert_eq!(f2.a, 2);
+/// let f3 = g.generate();
+/// assert_eq!(f3.a, 3);
+/// ```
 pub struct GeneratorIterator<T> {
     gen: T,
 }
 
 impl<T> GeneratorIterator<T> {
+    /// Create a new iterator from the given generator.
     pub fn new(generator: T) -> Self {
         Self { gen: generator }
+    }
+
+    /// Retrieve the original generator, destroying the iterator.
+    pub fn into_inner(self) -> T {
+        self.gen
     }
 }
 
@@ -335,9 +147,29 @@ where
 
 /// A non-owning iterator for any generator.
 ///
-/// It makes any generator into an infinite sequence. Using this type
-/// prevents modifying the generator mid-sequence, but permits
-/// re-using it once the desired values have been extracted.
+/// This type is an iterator over the infinite sequence of values
+/// produced by a generator. This type holds a mutable reference to
+/// the generator, but does not take ownership.
+///
+/// Example:
+/// ```rust
+/// use boulder::{Generatable, Generator, GeneratorMutIterator, Inc};
+///
+/// #[derive(Generatable)]
+/// struct Foo {
+///    #[boulder(generator=Inc(1))]
+///    a: i32
+/// }
+///
+/// let mut g = Foo::generator();
+/// let mut iter = GeneratorMutIterator::new(&mut g);
+/// let f1 = iter.next().unwrap();
+/// let f2 = iter.next().unwrap();
+/// assert_eq!(f1.a, 1);
+/// assert_eq!(f2.a, 2);
+/// let f3 = g.generate();
+/// assert_eq!(f3.a, 3);
+/// ```
 pub struct GeneratorMutIterator<'a, T> {
     gen: &'a mut T,
 }
@@ -355,5 +187,78 @@ where
     type Item = U;
     fn next(&mut self) -> Option<Self::Item> {
         Some(self.gen.generate())
+    }
+}
+
+pub use boulder_derive::Generatable;
+
+#[doc(hidden)]
+pub mod guts {
+    use super::Generatable;
+    pub use super::Generator as MiniGenerator;
+
+    use std::cell::{Cell, RefCell};
+    use std::rc::Rc;
+    use std::sync::{Arc, Mutex};
+
+    pub trait MiniGeneratable<T>: Sized {
+        type Generator: MiniGenerator<Output = Self>;
+        fn mini_generator() -> Self::Generator;
+    }
+
+    impl<T> Generatable for T
+    where
+        T: BoulderBase,
+        T: MiniGeneratable<<T as BoulderBase>::Base>,
+    {
+        type Generator = <T as MiniGeneratable<<T as BoulderBase>::Base>>::Generator;
+        fn generator() -> Self::Generator {
+            <T as MiniGeneratable<<T as BoulderBase>::Base>>::mini_generator()
+        }
+    }
+    pub trait BoulderBase {
+        type Base;
+    }
+
+    impl<T> BoulderBase for Option<T>
+    where
+        T: BoulderBase,
+    {
+        type Base = <T as BoulderBase>::Base;
+    }
+
+    impl<T> BoulderBase for Arc<T>
+    where
+        T: BoulderBase,
+    {
+        type Base = <T as BoulderBase>::Base;
+    }
+
+    impl<T> BoulderBase for Rc<T>
+    where
+        T: BoulderBase,
+    {
+        type Base = <T as BoulderBase>::Base;
+    }
+
+    impl<T> BoulderBase for RefCell<T>
+    where
+        T: BoulderBase,
+    {
+        type Base = <T as BoulderBase>::Base;
+    }
+
+    impl<T> BoulderBase for Cell<T>
+    where
+        T: BoulderBase,
+    {
+        type Base = <T as BoulderBase>::Base;
+    }
+
+    impl<T> BoulderBase for Mutex<T>
+    where
+        T: BoulderBase,
+    {
+        type Base = <T as BoulderBase>::Base;
     }
 }

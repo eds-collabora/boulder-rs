@@ -1,6 +1,6 @@
 [package]
 name = "test_suite"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 authors = ["Ed Smith <ed.smith@collabora.com>"]
 publish = false
@@ -9,4 +9,5 @@ license = "Apache-2.0 OR MIT"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-boulder = { path="../boulder" }
+boulder = { path="../boulder", features=["persian-rug"] }
+persian-rug = { version="0.1" }

@@ -28,7 +28,7 @@ pub(crate) fn repeat_macro(call: RepeatCall) -> pm2::TokenStream {
             let mut items = Vec::new();
             #items
 
-            ::boulder::gen::Repeat::new(items)
+            ::boulder::Repeat::new(items)
         }
     };
 
