@@ -1,4 +1,5 @@
-use core::ops::{Deref, DerefMut};
+use std::borrow::Cow;
+use std::cell::{Cell, RefCell};
 use std::rc::Rc;
 use std::sync::{Arc, Mutex};
 
@@ -74,143 +75,201 @@ pub trait Buildable {
     fn builder() -> Self::Builder;
 }
 
+#[doc(hidden)]
+pub trait Converter<From> {
+    type Output;
+    fn convert(self, input: From) -> Self::Output;
+}
+
+#[doc(hidden)]
+pub struct SelfConverter;
+
+impl<T> Converter<T> for SelfConverter {
+    type Output = T;
+    fn convert(self, input: T) -> T {
+        input
+    }
+}
+
+#[doc(hidden)]
+pub trait OptionBuildable: Sized {
+    type Builder: Builder<Result = Option<Self>>;
+    fn option_builder() -> Self::Builder;
+}
+
 impl<T> Buildable for Option<T>
 where
-    T: Buildable,
+    T: OptionBuildable,
 {
-    type Builder = OptionBuilder<<T as Buildable>::Builder>;
+    type Builder = <T as OptionBuildable>::Builder;
     fn builder() -> Self::Builder {
-        OptionBuilder(T::builder())
+        T::option_builder()
     }
 }
 
-pub struct OptionBuilder<T>(T);
+#[doc(hidden)]
+pub struct OptionConverter;
 
-impl<T> Deref for OptionBuilder<T> {
-    type Target = T;
-    fn deref(&self) -> &Self::Target {
-        &self.0
+impl<T> Converter<T> for OptionConverter {
+    type Output = Option<T>;
+    fn convert(self, input: T) -> Option<T> {
+        Some(input)
     }
 }
 
-impl<T> DerefMut for OptionBuilder<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
-    }
-}
-
-impl<T> Builder for OptionBuilder<T>
-where
-    T: Builder,
-{
-    type Result = Option<<T as Builder>::Result>;
-    fn build(self) -> Self::Result {
-        Some(self.0.build())
-    }
+#[doc(hidden)]
+pub trait RcBuildable: Sized {
+    type Builder: Builder<Result = Rc<Self>>;
+    fn rc_builder() -> Self::Builder;
 }
 
 impl<T> Buildable for Rc<T>
 where
-    T: Buildable,
+    T: RcBuildable,
 {
-    type Builder = RcBuilder<<T as Buildable>::Builder>;
+    type Builder = <T as RcBuildable>::Builder;
     fn builder() -> Self::Builder {
-        RcBuilder(T::builder())
+        T::rc_builder()
     }
 }
 
-pub struct RcBuilder<T>(T);
+#[doc(hidden)]
+pub struct RcConverter;
 
-impl<T> Deref for RcBuilder<T> {
-    type Target = T;
-    fn deref(&self) -> &Self::Target {
-        &self.0
+impl<T> Converter<T> for RcConverter {
+    type Output = Rc<T>;
+    fn convert(self, input: T) -> Rc<T> {
+        Rc::new(input)
     }
 }
 
-impl<T> DerefMut for RcBuilder<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
-    }
-}
-
-impl<T> Builder for RcBuilder<T>
-where
-    T: Builder,
-{
-    type Result = Rc<<T as Builder>::Result>;
-    fn build(self) -> Self::Result {
-        Rc::new(self.0.build())
-    }
+#[doc(hidden)]
+pub trait ArcBuildable: Sized {
+    type Builder: Builder<Result = Arc<Self>>;
+    fn arc_builder() -> Self::Builder;
 }
 
 impl<T> Buildable for Arc<T>
 where
-    T: Buildable,
+    T: ArcBuildable,
 {
-    type Builder = ArcBuilder<<T as Buildable>::Builder>;
+    type Builder = <T as ArcBuildable>::Builder;
     fn builder() -> Self::Builder {
-        ArcBuilder(T::builder())
+        T::arc_builder()
     }
 }
 
-pub struct ArcBuilder<T>(T);
+#[doc(hidden)]
+pub struct ArcConverter;
 
-impl<T> Deref for ArcBuilder<T> {
-    type Target = T;
-    fn deref(&self) -> &Self::Target {
-        &self.0
+impl<T> Converter<T> for ArcConverter {
+    type Output = Arc<T>;
+    fn convert(self, input: T) -> Arc<T> {
+        Arc::new(input)
     }
 }
 
-impl<T> DerefMut for ArcBuilder<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
-    }
-}
-
-impl<T> Builder for ArcBuilder<T>
-where
-    T: Builder,
-{
-    type Result = Arc<<T as Builder>::Result>;
-    fn build(self) -> Self::Result {
-        Arc::new(self.0.build())
-    }
+#[doc(hidden)]
+pub trait MutexBuildable: Sized {
+    type Builder: Builder<Result = Mutex<Self>>;
+    fn mutex_builder() -> Self::Builder;
 }
 
 impl<T> Buildable for Mutex<T>
 where
-    T: Buildable,
+    T: MutexBuildable,
 {
-    type Builder = MutexBuilder<<T as Buildable>::Builder>;
+    type Builder = <T as MutexBuildable>::Builder;
     fn builder() -> Self::Builder {
-        MutexBuilder(T::builder())
+        T::mutex_builder()
     }
 }
 
-pub struct MutexBuilder<T>(T);
+#[doc(hidden)]
+pub struct MutexConverter;
 
-impl<T> Deref for MutexBuilder<T> {
-    type Target = T;
-    fn deref(&self) -> &Self::Target {
-        &self.0
+impl<T> Converter<T> for MutexConverter {
+    type Output = Mutex<T>;
+    fn convert(self, input: T) -> Mutex<T> {
+        Mutex::new(input)
     }
 }
 
-impl<T> DerefMut for MutexBuilder<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
-    }
+#[doc(hidden)]
+pub trait RefCellBuildable: Sized {
+    type Builder: Builder<Result = RefCell<Self>>;
+    fn ref_cell_builder() -> Self::Builder;
 }
 
-impl<T> Builder for MutexBuilder<T>
+impl<T> Buildable for RefCell<T>
 where
-    T: Builder,
+    T: RefCellBuildable,
 {
-    type Result = Mutex<<T as Builder>::Result>;
-    fn build(self) -> Self::Result {
-        Mutex::new(self.0.build())
+    type Builder = <T as RefCellBuildable>::Builder;
+    fn builder() -> Self::Builder {
+        T::ref_cell_builder()
+    }
+}
+
+#[doc(hidden)]
+pub struct RefCellConverter;
+
+impl<T> Converter<T> for RefCellConverter {
+    type Output = RefCell<T>;
+    fn convert(self, input: T) -> RefCell<T> {
+        RefCell::new(input)
+    }
+}
+
+#[doc(hidden)]
+pub trait CellBuildable: Sized {
+    type Builder: Builder<Result = Cell<Self>>;
+    fn cell_builder() -> Self::Builder;
+}
+
+impl<T> Buildable for Cell<T>
+where
+    T: CellBuildable,
+{
+    type Builder = <T as CellBuildable>::Builder;
+    fn builder() -> Self::Builder {
+        T::cell_builder()
+    }
+}
+
+#[doc(hidden)]
+pub struct CellConverter;
+
+impl<T> Converter<T> for CellConverter {
+    type Output = Cell<T>;
+    fn convert(self, input: T) -> Cell<T> {
+        Cell::new(input)
+    }
+}
+
+#[doc(hidden)]
+pub trait BoxBuildable: Sized {
+    type Builder: Builder<Result = Box<Self>>;
+    fn box_builder() -> Self::Builder;}
+
+
+impl<T> Buildable for Box<T>
+where
+    T: BoxBuildable,
+{
+    type Builder = <T as BoxBuildable>::Builder;
+    fn builder() -> Self::Builder {
+        T::box_builder()
+    }
+}
+
+#[doc(hidden)]
+pub struct BoxConverter;
+
+impl<T> Converter<T> for BoxConverter {
+    type Output = Box<T>;
+    fn convert(self, input: T) -> Box<T> {
+        Box::new(input)
     }
 }
 

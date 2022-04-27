@@ -65,9 +65,14 @@
 //! assert_eq!(bar2.b, "hello-6-foo".to_string());
 //! ```
 
-mod builder;
+pub mod builder;
 mod generator;
 
 pub use self::builder::{Buildable, Builder};
 pub use self::generator::{generators as gen, Generatable, Generator};
 pub use self::generator::{GeneratorIterator, GeneratorMutIterator};
+
+#[cfg(feature = "persian-rug")]
+pub mod persian_rug;
+#[cfg(feature = "persian-rug")]
+pub use self::persian_rug::{BuildableWithPersianRug, BuilderWithPersianRug};

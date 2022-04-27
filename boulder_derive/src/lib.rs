@@ -85,7 +85,7 @@ use proc_macro::{self, TokenStream};
 /// ```
 #[proc_macro_derive(Buildable, attributes(boulder))]
 pub fn builder(input: TokenStream) -> TokenStream {
-    builder::derive_builder(syn::parse_macro_input!(input)).into()
+    builder::derive_buildable(syn::parse_macro_input!(input)).into()
 }
 
 /// Derive the `Generatable` trait for a type, creating a suitable
@@ -236,4 +236,11 @@ pub fn string_pattern(input: TokenStream) -> TokenStream {
 #[proc_macro]
 pub fn repeat(input: TokenStream) -> TokenStream {
     repeat::repeat_macro(syn::parse_macro_input!(input)).into()
+}
+
+mod persian_rug;
+
+#[proc_macro_derive(BuildableWithPersianRug, attributes(boulder))]
+pub fn buildable_with_persian_rug(input: TokenStream) -> TokenStream {
+    persian_rug::builder::derive_buildable_with_persian_rug(syn::parse_macro_input!(input)).into()
 }

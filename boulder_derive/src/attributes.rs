@@ -16,10 +16,13 @@ impl syn::parse::Parse for AttributeValue {
 
 pub enum AttributeItem {
     Buildable(BTreeMap<syn::Ident, syn::Expr>),
+    BuildableWithContext(BTreeMap<syn::Ident, syn::Expr>),
     Default(syn::Expr),
     Sequence(syn::Expr),
     Generatable(BTreeMap<syn::Ident, syn::Expr>),
+    GeneratableWithContext(BTreeMap<syn::Ident, syn::Expr>),
     Generator(syn::Expr),
+    GeneratorWithContext(syn::Expr),
     SequenceGenerator(syn::Expr),
 }
 
@@ -27,21 +30,25 @@ impl syn::parse::Parse for AttributeItem {
     fn parse(input: syn::parse::ParseStream<'_>) -> syn::Result<Self> {
         let attr: syn::Ident = input.parse()?;
         match attr.to_string().as_str() {
+            //FIXME: DefaultWithContext is a plausible thing
             "default" => {
                 let _: syn::Token![=] = input.parse()?;
                 let value: syn::Expr = input.parse()?;
                 Ok(AttributeItem::Default(value))
             }
-            "buildable" => {
-                if input.lookahead1().peek(syn::token::Paren) {
+            "buildable" | "buildable_with_context" => {
+                let contents = if input.lookahead1().peek(syn::token::Paren) {
                     let content;
                     let _: syn::token::Paren = syn::parenthesized!(content in input);
                     let punc = syn::punctuated::Punctuated::<AttributeValue, syn::Token![,]>::parse_terminated(&content)?;
-                    Ok(AttributeItem::Buildable(BTreeMap::from_iter(
-                        punc.into_iter().map(|x| (x.name, x.value)),
-                    )))
+                    BTreeMap::from_iter(punc.into_iter().map(|x| (x.name, x.value)))
                 } else {
-                    Ok(AttributeItem::Buildable(BTreeMap::new()))
+                    BTreeMap::new()
+                };
+                if attr.to_string().ends_with("with_context") {
+                    Ok(AttributeItem::BuildableWithContext(contents))
+                } else {
+                    Ok(AttributeItem::Buildable(contents))
                 }
             }
             "sequence" => {
@@ -49,21 +56,28 @@ impl syn::parse::Parse for AttributeItem {
                 let value: syn::Expr = input.parse()?;
                 Ok(AttributeItem::Sequence(value))
             }
-            "generator" => {
+            "generator" | "generator_with_context" => {
                 let _: syn::Token![=] = input.parse()?;
                 let value: syn::Expr = input.parse()?;
-                Ok(AttributeItem::Generator(value))
+                if attr.to_string().ends_with("with_context") {
+                    Ok(AttributeItem::GeneratorWithContext(value))
+                } else {
+                    Ok(AttributeItem::Generator(value))
+                }
             }
-            "generatable" => {
-                if input.lookahead1().peek(syn::token::Paren) {
+            "generatable" | "generatable_with_context" => {
+                let contents = if input.lookahead1().peek(syn::token::Paren) {
                     let content;
                     let _: syn::token::Paren = syn::parenthesized!(content in input);
                     let punc = syn::punctuated::Punctuated::<AttributeValue, syn::Token![,]>::parse_terminated(&content)?;
-                    Ok(AttributeItem::Generatable(BTreeMap::from_iter(
-                        punc.into_iter().map(|x| (x.name, x.value)),
-                    )))
+                    BTreeMap::from_iter(punc.into_iter().map(|x| (x.name, x.value)))
                 } else {
-                    Ok(AttributeItem::Generatable(BTreeMap::new()))
+                    BTreeMap::new()
+                };
+                if attr.to_string().ends_with("with_context") {
+                    Ok(AttributeItem::GeneratableWithContext(contents))
+                } else {
+                    Ok(AttributeItem::Generatable(contents))
                 }
             }
             "sequence_generator" => {
@@ -88,6 +102,7 @@ pub enum BuildType {
 pub struct BuilderData {
     pub element: BuildType,
     pub sequence: Option<syn::Expr>,
+    pub needs_context: bool,
 }
 
 pub enum GeneratorType {
@@ -99,6 +114,7 @@ pub enum GeneratorType {
 pub struct GeneratorData {
     pub element: GeneratorType,
     pub sequence: Option<syn::Expr>,
+    pub needs_context: bool,
 }
 
 pub struct BuilderMeta {
@@ -113,16 +129,22 @@ impl syn::parse::Parse for BuilderMeta {
         let mut bd = BuilderData {
             element: BuildType::Default,
             sequence: None,
+            needs_context: false,
         };
         let mut gd = GeneratorData {
             element: GeneratorType::Default,
             sequence: None,
+            needs_context: false,
         };
 
         for item in punc {
             match item {
                 AttributeItem::Buildable(map) => {
                     bd.element = BuildType::Buildable(map);
+                }
+                AttributeItem::BuildableWithContext(map) => {
+                    bd.element = BuildType::Buildable(map);
+                    bd.needs_context = true;
                 }
                 AttributeItem::Default(expr) => {
                     bd.element = BuildType::Value(Box::new(expr));
@@ -133,8 +155,16 @@ impl syn::parse::Parse for BuilderMeta {
                 AttributeItem::Generatable(map) => {
                     gd.element = GeneratorType::Generatable(map);
                 }
+                AttributeItem::GeneratableWithContext(map) => {
+                    gd.element = GeneratorType::Generatable(map);
+                    gd.needs_context = true;
+                }
                 AttributeItem::Generator(expr) => {
                     gd.element = GeneratorType::Generator(Box::new(expr));
+                }
+                AttributeItem::GeneratorWithContext(expr) => {
+                    gd.element = GeneratorType::Generator(Box::new(expr));
+                    gd.needs_context = true;
                 }
                 AttributeItem::SequenceGenerator(expr) => {
                     gd.sequence = Some(expr);

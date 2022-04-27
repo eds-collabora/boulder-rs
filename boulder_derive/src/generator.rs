@@ -15,7 +15,6 @@ pub fn derive_generator(input: syn::DeriveInput) -> pm2::TokenStream {
 
     let mut body = pm2::TokenStream::new();
     let mut methods = pm2::TokenStream::new();
-    let mut option_methods = pm2::TokenStream::new();
     let mut make_body = pm2::TokenStream::new();
     let mut defaults = pm2::TokenStream::new();
 
@@ -73,16 +72,6 @@ pub fn derive_generator(input: syn::DeriveInput) -> pm2::TokenStream {
                     }
                 });
 
-                option_methods.extend(quote::quote! {
-                    pub fn #fieldid<V>(&mut self, generator: V) -> &mut Self
-                    where
-                        V: ::boulder::Generator<Output=#fieldtype>
-                    {
-                        self.inner.#fieldid(generator);
-                        self
-                    }
-                });
-
                 make_body.extend(quote::quote! {
                     #fieldid: self.#fieldid.generate(),
                 });
@@ -135,7 +124,7 @@ pub fn derive_generator(input: syn::DeriveInput) -> pm2::TokenStream {
                                 }
 
                                 static_value.extend(quote::quote!{
-                                    <<#element_type as ::boulder::Buildable>::Builder as ::boulder::Builder>::build(#init),
+                                    <<#element_type as ::boulder::Buildable>::Builder as ::boulder::Builder>::build(#init)
                                 });
                             }
                             BuildType::Value(value) => {

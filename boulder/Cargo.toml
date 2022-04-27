@@ -14,3 +14,8 @@ readme = "../README.md"
 boulder_derive = { version="0.1.0", path = "../boulder_derive" }
 chrono = "0.4"
 num = "0.4"
+persian-rug = { path = "../../persian-rug/persian-rug", optional=true }
+
+[features]
+default = []
+persian-rug = ["dep:persian-rug" ]

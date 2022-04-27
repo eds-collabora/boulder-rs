@@ -9,4 +9,8 @@ license = "Apache-2.0 OR MIT"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-boulder = { path="../boulder" }
+boulder = { path="../boulder", features=["persian-rug"] }
+persian-rug = { path="../../persian-rug/persian-rug" }
+
+# temporary, fixme
+boulder_derive = { path="../boulder_derive" }
