@@ -2,27 +2,6 @@ use proc_macro2 as pm2;
 
 use crate::attributes::*;
 
-fn make_concrete_builder<'a>(
-    generics: impl Iterator<Item = &'a syn::TypeParam>,
-    converter: syn::Path,
-) -> pm2::TokenStream {
-    let mut body = pm2::TokenStream::new();
-
-    for ty in generics {
-        let id = &ty.ident;
-        body.extend(quote::quote! {
-            #id,
-        });
-    }
-    body.extend(quote::quote! {
-        #converter
-    });
-
-    quote::quote! {
-        Builder<#body>
-    }
-}
-
 pub fn derive_buildable(input: syn::DeriveInput) -> pm2::TokenStream {
     let syn::DeriveInput {
         ident,
@@ -35,63 +14,6 @@ pub fn derive_buildable(input: syn::DeriveInput) -> pm2::TokenStream {
     let full_generics = generics.clone();
 
     let (generics, ty_generics, wc) = full_generics.split_for_impl();
-
-    let builder_generics = {
-        let mut g = full_generics.clone();
-
-        g.params.push(syn::GenericParam::Type(
-            syn::parse_quote! { BoulderConverterParam },
-        ));
-        // g.params
-        //     .push(syn::GenericParam::Type(syn::parse_quote! { BoulderResultParam }));
-
-        let wc = g.make_where_clause();
-
-        wc.predicates.push(syn::parse_quote! {
-            BoulderConverterParam: ::boulder::builder::Converter<#ident #ty_generics>
-        });
-
-        g
-    };
-
-    let (builder_generics, builder_ty_generics, builder_wc) = builder_generics.split_for_impl();
-
-    let self_builder_type = make_concrete_builder(
-        full_generics.type_params(),
-        syn::parse_quote! { ::boulder::builder::SelfConverter },
-    );
-    let option_builder_type = make_concrete_builder(
-        full_generics.type_params(),
-        syn::parse_quote! { ::boulder::builder::OptionConverter },
-    );
-    let rc_builder_type = make_concrete_builder(
-        full_generics.type_params(),
-        syn::parse_quote! { ::boulder::builder::RcConverter },
-    );
-    let arc_builder_type = make_concrete_builder(
-        full_generics.type_params(),
-        syn::parse_quote! { ::boulder::builder::ArcConverter },
-    );
-    let mutex_builder_type = make_concrete_builder(
-        full_generics.type_params(),
-        syn::parse_quote! { ::boulder::builder::MutexConverter },
-    );
-    let ref_cell_builder_type = make_concrete_builder(
-        full_generics.type_params(),
-        syn::parse_quote! { ::boulder::builder::RefCellConverter },
-    );
-    let cell_builder_type = make_concrete_builder(
-        full_generics.type_params(),
-        syn::parse_quote! { ::boulder::builder::CellConverter },
-    );
-    let box_builder_type = make_concrete_builder(
-        full_generics.type_params(),
-        syn::parse_quote! { ::boulder::builder::BoxConverter },
-    );
-    let arc_mutex_builder_type = make_concrete_builder(
-        full_generics.type_params(),
-        syn::parse_quote! { ::boulder::builder::ArcMutexConverter },
-    );
 
     let mut body = pm2::TokenStream::new();
     let mut methods = pm2::TokenStream::new();
@@ -165,7 +87,7 @@ pub fn derive_buildable(input: syn::DeriveInput) -> pm2::TokenStream {
                                     }
 
                                     static_value.extend(quote::quote!{
-                                        <<<#fieldtype as std::iter::IntoIterator>::Item as ::boulder::Buildable>::Builder as ::boulder::Builder>::build(#init),
+                                        <<<#fieldtype as std::iter::IntoIterator>::Item as ::boulder::Buildable>::Builder as ::boulder::buiilder::guts::MegaBuilder<<#fieldtype as std::iter::IntoIterator>::Item as ::boulder::Buildable>>::build(#init),
                                     });
                                 }
                                 BuildType::Value(value) => {
@@ -201,7 +123,7 @@ pub fn derive_buildable(input: syn::DeriveInput) -> pm2::TokenStream {
                                 });
                             }
                             defaults.extend(quote::quote! {
-                                #fieldid: <<#fieldtype as ::boulder::Buildable>::Builder as ::boulder::Builder>::build(#init),
+                                #fieldid: <<#fieldtype as ::boulder::Buildable>::Builder as ::boulder::builder::guts::MegaBuilder<#fieldtype>>::build(#init),
                             });
                         }
                         BuildType::Value(value) => defaults.extend(quote::quote! {
@@ -234,17 +156,15 @@ pub fn derive_buildable(input: syn::DeriveInput) -> pm2::TokenStream {
 
     let res = quote::quote! {
         const _: () = {
-            #vis struct Builder #builder_generics #builder_wc {
-                converter: BoulderConverterParam,
+            #vis struct Builder #generics #wc {
                 #body
             }
 
             #[automatically_derived]
-            impl #builder_generics Builder #builder_ty_generics #builder_wc {
-                pub fn new(converter: BoulderConverterParam) -> Self
+            impl #generics Builder #ty_generics #wc {
+                pub fn new() -> Self
                 {
                     Self {
-                        converter,
                         #defaults
                     }
                 }
@@ -253,84 +173,19 @@ pub fn derive_buildable(input: syn::DeriveInput) -> pm2::TokenStream {
             }
 
             #[automatically_derived]
-            impl #builder_generics ::boulder::Builder for Builder #builder_ty_generics #builder_wc {
-                type Result = BoulderConverterParam::Output;
-                fn build(self) -> Self::Result {
-                    self.converter.convert(#ident {
+            impl #generics ::boulder::builder::guts::MegaBuilder<#ident #ty_generics> for Builder #ty_generics #wc {
+                fn build(self) -> #ident #ty_generics {
+                    #ident {
                         #make_body
-                    })
+                    }
                 }
             }
 
             #[automatically_derived]
-            impl #generics ::boulder::Buildable for #ident #ty_generics #wc {
-                type Builder = #self_builder_type;
-                fn builder() -> Self::Builder {
-                    Builder::new(::boulder::builder::SelfConverter)
-                }
-            }
-
-            #[automatically_derived]
-            impl #generics ::boulder::builder::OptionBuildable for #ident #ty_generics #wc {
-                type Builder = #option_builder_type;
-                fn option_builder() -> Self::Builder {
-                    Builder::new(::boulder::builder::OptionConverter)
-                }
-            }
-
-            #[automatically_derived]
-            impl #generics ::boulder::builder::RcBuildable for #ident #ty_generics #wc {
-                type Builder = #rc_builder_type;
-                fn rc_builder() -> Self::Builder {
-                    Builder::new(::boulder::builder::RcConverter)
-                }
-            }
-
-            #[automatically_derived]
-            impl #generics ::boulder::builder::ArcBuildable for #ident #ty_generics #wc {
-                type Builder = #arc_builder_type;
-                fn arc_builder() -> Self::Builder {
-                    Builder::new(::boulder::builder::ArcConverter)
-                }
-            }
-
-            #[automatically_derived]
-            impl #generics ::boulder::builder::MutexBuildable for #ident #ty_generics #wc {
-                type Builder = #mutex_builder_type;
-                fn mutex_builder() -> Self::Builder {
-                    Builder::new(::boulder::builder::MutexConverter)
-                }
-            }
-
-            #[automatically_derived]
-            impl #generics ::boulder::builder::RefCellBuildable for #ident #ty_generics #wc {
-                type Builder = #ref_cell_builder_type;
-                fn ref_cell_builder() -> Self::Builder {
-                    Builder::new(::boulder::builder::RefCellConverter)
-                }
-            }
-
-            #[automatically_derived]
-            impl #generics ::boulder::builder::CellBuildable for #ident #ty_generics #wc {
-                type Builder = #cell_builder_type;
-                fn cell_builder() -> Self::Builder {
-                    Builder::new(::boulder::builder::CellConverter)
-                }
-            }
-
-            #[automatically_derived]
-            impl #generics ::boulder::builder::BoxBuildable for #ident #ty_generics #wc {
-                type Builder = #box_builder_type;
-                fn box_builder() -> Self::Builder {
-                    Builder::new(::boulder::builder::BoxConverter)
-                }
-            }
-
-            #[automatically_derived]
-            impl #generics ::boulder::builder::ArcMutexBuildable for #ident #ty_generics #wc {
-                type Builder = #arc_mutex_builder_type;
-                fn arc_mutex_builder() -> Self::Builder {
-                    Builder::new(::boulder::builder::ArcMutexConverter)
+            impl #generics ::boulder::builder::guts::MegaBuildable<#ident #ty_generics> for #ident #ty_generics #wc {
+                type Builder = Builder #ty_generics;
+                fn builder(_marker: core::marker::PhantomData<#ident #ty_generics>) -> Self::Builder {
+                    Builder::new()
                 }
             }
         };

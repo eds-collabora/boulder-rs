@@ -183,7 +183,7 @@ pub fn builder(input: TokenStream) -> TokenStream {
 /// ```
 #[proc_macro_derive(Generatable, attributes(boulder))]
 pub fn generatable(input: TokenStream) -> TokenStream {
-    generator::derive_generator(syn::parse_macro_input!(input)).into()
+    generator::derive_generatable(syn::parse_macro_input!(input)).into()
 }
 
 /// Make a `Generator` for formatted Strings.

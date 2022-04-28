@@ -2,7 +2,7 @@ use proc_macro2 as pm2;
 
 use crate::attributes::*;
 
-pub fn derive_generator(input: syn::DeriveInput) -> pm2::TokenStream {
+pub fn derive_generatable(input: syn::DeriveInput) -> pm2::TokenStream {
     let syn::DeriveInput {
         ident,
         data,
