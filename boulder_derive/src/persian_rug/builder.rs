@@ -287,6 +287,10 @@ pub fn derive_buildable_with_persian_rug(input: syn::DeriveInput) -> pm2::TokenS
         full_generics.type_params(),
         syn::parse_quote! { ::boulder::persian_rug::OptionConverterWithPersianRug },
     );
+    let option_proxy_builder_type = make_concrete_builder(
+        full_generics.type_params(),
+        syn::parse_quote! { ::boulder::persian_rug::OptionProxyConverterWithPersianRug },
+    );
 
     let res = quote::quote! {
         const _: () = {
@@ -348,6 +352,15 @@ pub fn derive_buildable_with_persian_rug(input: syn::DeriveInput) -> pm2::TokenS
                 type Builder = #option_builder_type;
                 fn option_builder() -> Self::Builder {
                     Builder::new(::boulder::persian_rug::OptionConverterWithPersianRug)
+                }
+            }
+
+            #[automatically_derived]
+            #[persian_rug::constraints(#constraints)]
+            impl #generics ::boulder::persian_rug::OptionProxyBuildableWithPersianRug<#context> for #ident #ty_generics #wc {
+                type Builder = #option_proxy_builder_type;
+                fn option_proxy_builder() -> Self::Builder {
+                    Builder::new(::boulder::persian_rug::OptionProxyConverterWithPersianRug)
                 }
             }
         };

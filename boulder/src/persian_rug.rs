@@ -84,9 +84,9 @@ where
     fn option_builder() -> Self::Builder;
 }
 
-#[persian_rug::constraints(context=C, access(T))]
 impl<C, T> BuildableWithPersianRug<C> for Option<T>
 where
+    C: persian_rug::Context,
     T: OptionBuildableWithPersianRug<C>
 {
     type Builder = <T as OptionBuildableWithPersianRug<C>>::Builder;
@@ -98,8 +98,9 @@ where
 #[doc(hidden)]
 pub struct OptionConverterWithPersianRug;
 
-#[persian_rug::constraints(context=C, access(T))]
 impl<C, T> ConverterWithPersianRug<C, T> for OptionConverterWithPersianRug
+where
+    C: persian_rug::Context
 {
     type Output = Option<T>;
     fn convert<'b, B>(self, input: T, context: B) -> (Option<T>, B)
@@ -110,4 +111,39 @@ impl<C, T> ConverterWithPersianRug<C, T> for OptionConverterWithPersianRug
     }
 }
 
-// FIXME: a thousand impls of wrapper types 
+// So far nesting defeats me; but I only currently care about Option<Proxy<T>>
+pub trait OptionProxyBuildableWithPersianRug<C>: Sized
+where
+    C: persian_rug::Context
+{
+    type Builder: BuilderWithPersianRug<C, Result = Option<persian_rug::Proxy<Self>>>;
+    fn option_proxy_builder() -> Self::Builder;
+}
+
+
+#[persian_rug::constraints(context=C, access(T))]
+impl<C, T> OptionBuildableWithPersianRug<C> for persian_rug::Proxy<T>
+where
+    T: OptionProxyBuildableWithPersianRug<C>,
+    C: persian_rug::Context
+{
+    type Builder = <T as OptionProxyBuildableWithPersianRug<C>>::Builder;
+    fn option_builder() -> Self::Builder {
+        T::option_proxy_builder()
+    }
+}
+
+#[doc(hidden)]
+pub struct OptionProxyConverterWithPersianRug;
+
+#[persian_rug::constraints(context=C, access(T))]
+impl<C, T> ConverterWithPersianRug<C, T> for OptionProxyConverterWithPersianRug
+{
+    type Output = Option<persian_rug::Proxy<T>>;
+    fn convert<'b, B>(self, input: T, mut context: B) -> (Option<persian_rug::Proxy<T>>, B)
+    where
+        B: 'b + persian_rug::Mutator<Context = C>
+    {
+        (Some(context.add(input)), context)
+    }
+}

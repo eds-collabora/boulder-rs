@@ -120,6 +120,16 @@ fn test_box() {
     assert_eq!(w.b, 4i32);
 }
 
+#[test]
+fn test_arc_mutex() {
+    let w = std::sync::Arc::<std::sync::Mutex::<Womble>>::builder()
+        .a("hello")
+        .b(4i16)
+        .build();
+    assert_eq!(std::any::TypeId::of::<std::sync::Arc<std::sync::Mutex<Womble>>>(), w.type_id());
+    assert_eq!(w.lock().unwrap().a, "hello".to_string());
+    assert_eq!(w.lock().unwrap().b, 4i32);
+}
 
 #[derive(Debug, Buildable)]
 pub struct Bodger<U: Buildable>

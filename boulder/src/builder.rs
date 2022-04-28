@@ -272,4 +272,30 @@ impl<T> Converter<T> for BoxConverter {
     }
 }
 
+#[doc(hidden)]
+pub trait ArcMutexBuildable: Sized {
+    type Builder: Builder<Result = Arc<Mutex<Self>>>;
+    fn arc_mutex_builder() -> Self::Builder;
+}
+
+impl<T> ArcBuildable for Mutex<T>
+where
+    T: ArcMutexBuildable,
+{
+    type Builder = <T as ArcMutexBuildable>::Builder;
+    fn arc_builder() -> Self::Builder {
+        T::arc_mutex_builder()
+    }
+}
+
+#[doc(hidden)]
+pub struct ArcMutexConverter;
+
+impl<T> Converter<T> for ArcMutexConverter {
+    type Output = Arc<Mutex<T>>;
+    fn convert(self, input: T) -> Arc<Mutex<T>> {
+        Arc::new(Mutex::new(input))
+    }
+}
+
 pub use boulder_derive::Buildable;

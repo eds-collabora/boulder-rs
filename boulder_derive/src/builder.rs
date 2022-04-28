@@ -88,6 +88,10 @@ pub fn derive_buildable(input: syn::DeriveInput) -> pm2::TokenStream {
         full_generics.type_params(),
         syn::parse_quote! { ::boulder::builder::BoxConverter },
     );
+    let arc_mutex_builder_type = make_concrete_builder(
+        full_generics.type_params(),
+        syn::parse_quote! { ::boulder::builder::ArcMutexConverter },
+    );
 
     let mut body = pm2::TokenStream::new();
     let mut methods = pm2::TokenStream::new();
@@ -319,6 +323,14 @@ pub fn derive_buildable(input: syn::DeriveInput) -> pm2::TokenStream {
                 type Builder = #box_builder_type;
                 fn box_builder() -> Self::Builder {
                     Builder::new(::boulder::builder::BoxConverter)
+                }
+            }
+
+            #[automatically_derived]
+            impl #generics ::boulder::builder::ArcMutexBuildable for #ident #ty_generics #wc {
+                type Builder = #arc_mutex_builder_type;
+                fn arc_mutex_builder() -> Self::Builder {
+                    Builder::new(::boulder::builder::ArcMutexConverter)
                 }
             }
         };

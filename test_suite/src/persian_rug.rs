@@ -77,6 +77,8 @@ fn test_option() {
     let (f1, _) = Option::<Foo2<State2>>::builder()
         .a(5)
         .build(&mut s);
+    
+    let f1 = <State2 as persian_rug::Context>::add(&mut s, f1.unwrap());
     println!("Got foo2 {:?}", f1);
     
     let (b1, _) = Option::<persian_rug::Proxy<Bar2<State2>>>::builder()
