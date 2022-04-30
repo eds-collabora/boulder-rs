@@ -38,7 +38,7 @@ where
     Self: guts::BuilderBase,
 //    Self: guts::MiniBuildable<<Self as guts::BuilderBase>::Base>,
 {
-    type Builder: guts::MiniBuilder<Self>;
+    type Builder: Builder<Result=Self>;
     /// Create a new builder for this type.
     ///
     /// Example
@@ -85,12 +85,13 @@ pub mod guts {
     use std::sync::{Arc, Mutex};
 
     pub trait MiniBuildable<T>: Sized {
-        type Builder: MiniBuilder<Self>;
+        type Builder: MiniBuilder<Result=Self>;
         fn mini_builder() -> Self::Builder;
     }
     
-    pub trait MiniBuilder<T>: Sized {
-        fn build(self) -> T;
+    pub trait MiniBuilder: Sized {
+        type Result;
+        fn build(self) -> Self::Result;
     }
 
     pub trait BuilderBase {
@@ -108,6 +109,16 @@ pub mod guts {
         }
     }
 
+    impl<T> Builder for T
+    where
+        T: MiniBuilder
+    {
+        type Result = <T as MiniBuilder>::Result;
+        fn build(self) -> Self::Result {
+            <Self as MiniBuilder>::build(self)
+        }
+    }
+    
     impl<T> BuilderBase for Option<T>
     where
         T: BuilderBase

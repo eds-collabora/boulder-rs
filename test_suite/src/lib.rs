@@ -57,59 +57,59 @@ fn test_option() {
     assert_eq!(w.as_ref().map(|w| w.b), Some(4i32));
 }
 
-// #[test]
-// fn test_rc() {
-//     let w: std::rc::Rc<Womble> = std::rc::Rc::<Womble>::builder().a("hello").b(4i16).build();
-//     assert_eq!(std::any::TypeId::of::<std::rc::Rc<Womble>>(), w.type_id());
-//     assert_eq!(w.a, "hello".to_string());
-//     assert_eq!(w.b, 4i32);
-// }
+#[test]
+fn test_rc() {
+    let w = std::rc::Rc::<Womble>::builder().a("hello").b(4i16).build();
+    assert_eq!(std::any::TypeId::of::<std::rc::Rc<Womble>>(), w.type_id());
+    assert_eq!(w.a, "hello".to_string());
+    assert_eq!(w.b, 4i32);
+}
 
-// #[test]
-// fn test_arc() {
-//     let w: std::sync::Arc<Womble> = std::sync::Arc::<Womble>::builder()
-//         .a("hello")
-//         .b(4i16)
-//         .build();
-//     assert_eq!(std::any::TypeId::of::<std::sync::Arc<Womble>>(), w.type_id());
-//     assert_eq!(w.a, "hello".to_string());
-//     assert_eq!(w.b, 4i32);
-// }
+#[test]
+fn test_arc() {
+    let w = std::sync::Arc::<Womble>::builder()
+        .a("hello")
+        .b(4i16)
+        .build();
+    assert_eq!(std::any::TypeId::of::<std::sync::Arc<Womble>>(), w.type_id());
+    assert_eq!(w.a, "hello".to_string());
+    assert_eq!(w.b, 4i32);
+}
 
-// #[test]
-// fn test_mutex() {
-//     let w: std::sync::Mutex<Womble> = std::sync::Mutex::<Womble>::builder()
-//         .a("hello")
-//         .b(4i16)
-//         .build();
-//     assert_eq!(std::any::TypeId::of::<std::sync::Mutex<Womble>>(), w.type_id());
-//     assert_eq!(w.lock().unwrap().a, "hello".to_string());
-//     assert_eq!(w.lock().unwrap().b, 4i32);
-// }
+#[test]
+fn test_mutex() {
+    let w = std::sync::Mutex::<Womble>::builder()
+        .a("hello")
+        .b(4i16)
+        .build();
+    assert_eq!(std::any::TypeId::of::<std::sync::Mutex<Womble>>(), w.type_id());
+    assert_eq!(w.lock().unwrap().a, "hello".to_string());
+    assert_eq!(w.lock().unwrap().b, 4i32);
+}
 
-// #[test]
-// fn test_ref_cell() {
-//     let w: std::cell::RefCell<Womble> = std::cell::RefCell::<Womble>::builder()
-//         .a("hello")
-//         .b(4i16)
-//         .build();
-//     assert_eq!(std::any::TypeId::of::<std::cell::RefCell<Womble>>(), w.type_id());
-//     assert_eq!(w.borrow().a, "hello".to_string());
-//     assert_eq!(w.borrow().b, 4i32);
-// }
+#[test]
+fn test_ref_cell() {
+    let w = std::cell::RefCell::<Womble>::builder()
+        .a("hello")
+        .b(4i16)
+        .build();
+    assert_eq!(std::any::TypeId::of::<std::cell::RefCell<Womble>>(), w.type_id());
+    assert_eq!(w.borrow().a, "hello".to_string());
+    assert_eq!(w.borrow().b, 4i32);
+}
 
-// #[test]
-// fn test_cell() {
-//     let w: std::cell::Cell<Womble> = std::cell::Cell::<Womble>::builder()
-//         .a("hello")
-//         .b(4i16)
-//         .build();
+#[test]
+fn test_cell() {
+    let w = std::cell::Cell::<Womble>::builder()
+        .a("hello")
+        .b(4i16)
+        .build();
 
-//     assert_eq!(std::any::TypeId::of::<std::cell::Cell<Womble>>(), w.type_id());
-//     let w_contents = w.into_inner();
-//     assert_eq!(w_contents.a, "hello".to_string());
-//     assert_eq!(w_contents.b, 4i32);
-// }
+    assert_eq!(std::any::TypeId::of::<std::cell::Cell<Womble>>(), w.type_id());
+    let w_contents = w.into_inner();
+    assert_eq!(w_contents.a, "hello".to_string());
+    assert_eq!(w_contents.b, 4i32);
+}
 
 // #[test]
 // fn test_box() {
@@ -122,16 +122,16 @@ fn test_option() {
 //     assert_eq!(w.b, 4i32);
 // }
 
-// #[test]
-// fn test_arc_mutex() {
-//     let w: std::sync::Arc<std::sync::Mutex::<Womble>>  = std::sync::Arc::<std::sync::Mutex::<Womble>>::builder()
-//         .a("hello")
-//         .b(4i16)
-//         .build();
-//     assert_eq!(std::any::TypeId::of::<std::sync::Arc<std::sync::Mutex<Womble>>>(), w.type_id());
-//     assert_eq!(w.lock().unwrap().a, "hello".to_string());
-//     assert_eq!(w.lock().unwrap().b, 4i32);
-// }
+#[test]
+fn test_arc_mutex() {
+    let w = std::sync::Arc::<std::sync::Mutex::<Womble>>::builder()
+        .a("hello")
+        .b(4i16)
+        .build();
+    assert_eq!(std::any::TypeId::of::<std::sync::Arc<std::sync::Mutex<Womble>>>(), w.type_id());
+    assert_eq!(w.lock().unwrap().a, "hello".to_string());
+    assert_eq!(w.lock().unwrap().b, 4i32);
+}
 
 #[derive(Debug, Buildable)]
 pub struct Bodger<U: Buildable>
