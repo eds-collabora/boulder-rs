@@ -7,7 +7,7 @@ use std::any::Any;
 
 use boulder::{Buildable, /* Builder,*/ Generatable, Generator};
 
-use boulder::builder::guts::{MegaBuilder};
+use boulder::builder::guts::{MiniBuilder};
 
 fn foo(a: i16) -> i16 {
     a + 6
@@ -21,52 +21,6 @@ pub struct Womble {
     b: i32,
 }
 
-// const _: () = {
-//     pub struct Builder {
-//         a: String,
-//         b: i32,
-//     }
-//     #[automatically_derived]
-//     impl Builder {
-//         pub fn new() -> Self {
-//             Self {
-//                 a: ("hullo").into(),
-//                 b: (foo(1)).into(),
-//             }
-//         }
-//         pub fn a<S>(mut self, value: S) -> Self
-//         where
-//             S: Into<String>,
-//         {
-//             self.a = value.into();
-//             self
-//         }
-//         pub fn b<S>(mut self, value: S) -> Self
-//         where
-//             S: Into<i32>,
-//         {
-//             self.b = value.into();
-//             self
-//         }
-//     }
-//     #[automatically_derived]
-//     impl ::boulder::builder::guts::MegaBuilder<Womble> for Builder {
-//         fn build(self) -> Womble {
-//             Womble {
-//                 a: self.a,
-//                 b: self.b,
-//             }
-//         }
-//     }
-//     #[automatically_derived]
-//     impl ::boulder::builder::guts::MegaBuildable<Womble> for Womble {
-//         type Builder = Builder;
-//         fn builder(_marker: core::marker::PhantomData<Womble>) -> Self::Builder {
-//             Builder::new()
-//         }
-//     }
-// };
-
 #[derive(Debug, Buildable)] // 
 pub struct Badger {
     #[boulder(buildable(a="hallo", b=foo(5)))]
@@ -75,71 +29,19 @@ pub struct Badger {
     v: Womble,
 }
 
-// const _: () = {
-//     pub struct Builder {
-//         w: Womble,
-//         v: Womble,
-//     }
-//     #[automatically_derived]
-//     impl Builder {
-//         pub fn new() -> Self {
-//             Self {
-//                 w: <<Womble as ::boulder::Buildable>::Builder as ::boulder::Builder>::build(
-//                     <Womble as ::boulder::Buildable>::builder()
-//                         .a("hallo")
-//                         .b(foo(5)),
-//                 ),
-//                 v: <<Womble as ::boulder::Buildable>::Builder as ::boulder::Builder>::build(
-//                     <Womble as ::boulder::Buildable>::builder(),
-//                 ),
-//             }
-//         }
-//         pub fn w<S>(mut self, value: S) -> Self
-//         where
-//             S: Into<Womble>,
-//         {
-//             self.w = value.into();
-//             self
-//         }
-//         pub fn v<S>(mut self, value: S) -> Self
-//         where
-//             S: Into<Womble>,
-//         {
-//             self.v = value.into();
-//             self
-//         }
-//     }
-//     #[automatically_derived]
-//     impl ::boulder::builder::guts::MegaBuilder<Badger> for Builder {
-//         fn build(self) -> Badger {
-//             Badger {
-//                 w: self.w,
-//                 v: self.v,
-//             }
-//         }
-//     }
-//     #[automatically_derived]
-//     impl ::boulder::builder::guts::MegaBuildable<Badger> for Badger {
-//         type Builder = Builder;
-//         fn builder(_marker: core::marker::PhantomData<Badger>) -> Self::Builder {
-//             Builder::new()
-//         }
-//     }
-// };
-
 #[test]
 fn test_simple() {
-    let w: Womble = Womble::builder().a("hello").b(4i16).build();
+    let w = Womble::builder().a("hello").b(4i16).build();
     assert_eq!(std::any::TypeId::of::<Womble>(), w.type_id());
     assert_eq!(w.a, "hello".to_string());
     assert_eq!(w.b, 4i32);
 
-    let w: Womble = Womble::builder().build();
+    let w = Womble::builder().build();
     assert_eq!(std::any::TypeId::of::<Womble>(), w.type_id());
     assert_eq!(w.a, "hullo".to_string());
     assert_eq!(w.b, 7i32);
 
-    let b: Badger = Badger::builder().build();
+    let b = Badger::builder().build();
     assert_eq!(std::any::TypeId::of::<Badger>(), b.type_id());
     assert_eq!(b.w.a, "hallo".to_string());
     assert_eq!(b.w.b, 11i32);
@@ -149,87 +51,87 @@ fn test_simple() {
 
 #[test]
 fn test_option() {
-    let w: Option<Womble> = Option::<Womble>::builder().a("hello").b(4i16).build();
+    let w = Option::<Womble>::builder().a("hello").b(4i16).build();
     assert_eq!(std::any::TypeId::of::<Option<Womble>>(), w.type_id());
     assert_eq!(w.as_ref().map(|w| &w.a), Some(&"hello".to_string()));
     assert_eq!(w.as_ref().map(|w| w.b), Some(4i32));
 }
 
-#[test]
-fn test_rc() {
-    let w: std::rc::Rc<Womble> = std::rc::Rc::<Womble>::builder().a("hello").b(4i16).build();
-    assert_eq!(std::any::TypeId::of::<std::rc::Rc<Womble>>(), w.type_id());
-    assert_eq!(w.a, "hello".to_string());
-    assert_eq!(w.b, 4i32);
-}
+// #[test]
+// fn test_rc() {
+//     let w: std::rc::Rc<Womble> = std::rc::Rc::<Womble>::builder().a("hello").b(4i16).build();
+//     assert_eq!(std::any::TypeId::of::<std::rc::Rc<Womble>>(), w.type_id());
+//     assert_eq!(w.a, "hello".to_string());
+//     assert_eq!(w.b, 4i32);
+// }
 
-#[test]
-fn test_arc() {
-    let w: std::sync::Arc<Womble> = std::sync::Arc::<Womble>::builder()
-        .a("hello")
-        .b(4i16)
-        .build();
-    assert_eq!(std::any::TypeId::of::<std::sync::Arc<Womble>>(), w.type_id());
-    assert_eq!(w.a, "hello".to_string());
-    assert_eq!(w.b, 4i32);
-}
+// #[test]
+// fn test_arc() {
+//     let w: std::sync::Arc<Womble> = std::sync::Arc::<Womble>::builder()
+//         .a("hello")
+//         .b(4i16)
+//         .build();
+//     assert_eq!(std::any::TypeId::of::<std::sync::Arc<Womble>>(), w.type_id());
+//     assert_eq!(w.a, "hello".to_string());
+//     assert_eq!(w.b, 4i32);
+// }
 
-#[test]
-fn test_mutex() {
-    let w: std::sync::Mutex<Womble> = std::sync::Mutex::<Womble>::builder()
-        .a("hello")
-        .b(4i16)
-        .build();
-    assert_eq!(std::any::TypeId::of::<std::sync::Mutex<Womble>>(), w.type_id());
-    assert_eq!(w.lock().unwrap().a, "hello".to_string());
-    assert_eq!(w.lock().unwrap().b, 4i32);
-}
+// #[test]
+// fn test_mutex() {
+//     let w: std::sync::Mutex<Womble> = std::sync::Mutex::<Womble>::builder()
+//         .a("hello")
+//         .b(4i16)
+//         .build();
+//     assert_eq!(std::any::TypeId::of::<std::sync::Mutex<Womble>>(), w.type_id());
+//     assert_eq!(w.lock().unwrap().a, "hello".to_string());
+//     assert_eq!(w.lock().unwrap().b, 4i32);
+// }
 
-#[test]
-fn test_ref_cell() {
-    let w: std::cell::RefCell<Womble> = std::cell::RefCell::<Womble>::builder()
-        .a("hello")
-        .b(4i16)
-        .build();
-    assert_eq!(std::any::TypeId::of::<std::cell::RefCell<Womble>>(), w.type_id());
-    assert_eq!(w.borrow().a, "hello".to_string());
-    assert_eq!(w.borrow().b, 4i32);
-}
+// #[test]
+// fn test_ref_cell() {
+//     let w: std::cell::RefCell<Womble> = std::cell::RefCell::<Womble>::builder()
+//         .a("hello")
+//         .b(4i16)
+//         .build();
+//     assert_eq!(std::any::TypeId::of::<std::cell::RefCell<Womble>>(), w.type_id());
+//     assert_eq!(w.borrow().a, "hello".to_string());
+//     assert_eq!(w.borrow().b, 4i32);
+// }
 
-#[test]
-fn test_cell() {
-    let w: std::cell::Cell<Womble> = std::cell::Cell::<Womble>::builder()
-        .a("hello")
-        .b(4i16)
-        .build();
+// #[test]
+// fn test_cell() {
+//     let w: std::cell::Cell<Womble> = std::cell::Cell::<Womble>::builder()
+//         .a("hello")
+//         .b(4i16)
+//         .build();
 
-    assert_eq!(std::any::TypeId::of::<std::cell::Cell<Womble>>(), w.type_id());
-    let w_contents = w.into_inner();
-    assert_eq!(w_contents.a, "hello".to_string());
-    assert_eq!(w_contents.b, 4i32);
-}
+//     assert_eq!(std::any::TypeId::of::<std::cell::Cell<Womble>>(), w.type_id());
+//     let w_contents = w.into_inner();
+//     assert_eq!(w_contents.a, "hello".to_string());
+//     assert_eq!(w_contents.b, 4i32);
+// }
 
-#[test]
-fn test_box() {
-    let w: std::boxed::Box<Womble> = std::boxed::Box::<Womble>::builder()
-        .a("hello")
-        .b(4i16)
-        .build();
-    assert_eq!(std::any::TypeId::of::<std::boxed::Box<Womble>>(), w.type_id());
-    assert_eq!(w.a, "hello".to_string());
-    assert_eq!(w.b, 4i32);
-}
+// #[test]
+// fn test_box() {
+//     let w: std::boxed::Box<Womble> = std::boxed::Box::<Womble>::builder()
+//         .a("hello")
+//         .b(4i16)
+//         .build();
+//     assert_eq!(std::any::TypeId::of::<std::boxed::Box<Womble>>(), w.type_id());
+//     assert_eq!(w.a, "hello".to_string());
+//     assert_eq!(w.b, 4i32);
+// }
 
-#[test]
-fn test_arc_mutex() {
-    let w: std::sync::Arc<std::sync::Mutex::<Womble>>  = std::sync::Arc::<std::sync::Mutex::<Womble>>::builder()
-        .a("hello")
-        .b(4i16)
-        .build();
-    assert_eq!(std::any::TypeId::of::<std::sync::Arc<std::sync::Mutex<Womble>>>(), w.type_id());
-    assert_eq!(w.lock().unwrap().a, "hello".to_string());
-    assert_eq!(w.lock().unwrap().b, 4i32);
-}
+// #[test]
+// fn test_arc_mutex() {
+//     let w: std::sync::Arc<std::sync::Mutex::<Womble>>  = std::sync::Arc::<std::sync::Mutex::<Womble>>::builder()
+//         .a("hello")
+//         .b(4i16)
+//         .build();
+//     assert_eq!(std::any::TypeId::of::<std::sync::Arc<std::sync::Mutex<Womble>>>(), w.type_id());
+//     assert_eq!(w.lock().unwrap().a, "hello".to_string());
+//     assert_eq!(w.lock().unwrap().b, 4i32);
+// }
 
 #[derive(Debug, Buildable)]
 pub struct Bodger<U: Buildable>
