@@ -17,133 +17,62 @@ where
 }
 
 #[doc(hidden)]
-pub trait ConverterWithPersianRug<C, From>
-where
-    C: persian_rug::Context
-{
-    type Output;
-    fn convert<'b, B>(self, input: From, context: B) -> (Self::Output, B)
-    where
-        B: 'b + persian_rug::Mutator<Context = C>;
-}
+pub mod guts {
+    use super::{BuilderWithPersianRug, BuildableWithPersianRug};
+    use crate::builder::guts::BuilderBase;
+        
+    use std::cell::{Cell, RefCell};
+    use std::rc::Rc;
+    use std::sync::{Arc, Mutex};
 
-#[doc(hidden)]
-pub struct SelfConverterWithPersianRug;
-
-#[persian_rug::constraints(context=C, access(T))]
-impl<C, T> ConverterWithPersianRug<C, T> for SelfConverterWithPersianRug
-{
-    type Output = T;
-    fn convert<'b, B>(self, input: T, context: B) -> (T, B)
+    pub trait MiniBuildableWithPersianRug<T, C>: Sized
     where
-        B: 'b + persian_rug::Mutator<Context = C>
+        C: persian_rug::Context
     {
-        (input, context)
+        type Builder: MiniBuilderWithPersianRug<C, Result=Self>;
+        fn mini_builder() -> Self::Builder;
     }
-}
-
-pub trait ProxyBuildableWithPersianRug<C>: Sized
-where
-    C: persian_rug::Context
-{
-    type Builder: BuilderWithPersianRug<C, Result = persian_rug::Proxy<Self>>;
-    fn proxy_builder() -> Self::Builder;
-}
-
-#[persian_rug::constraints(context=C, access(T))]
-impl<C, T> BuildableWithPersianRug<C> for persian_rug::Proxy<T>
-where
-    T: ProxyBuildableWithPersianRug<C>
-{
-    type Builder = <T as ProxyBuildableWithPersianRug<C>>::Builder;
-    fn builder() -> Self::Builder {
-        T::proxy_builder()
-    }
-}
-
-#[doc(hidden)]
-pub struct ProxyConverterWithPersianRug;
-
-#[persian_rug::constraints(context=C, access(T))]
-impl<C, T> ConverterWithPersianRug<C, T> for ProxyConverterWithPersianRug
-{
-    type Output = persian_rug::Proxy<T>;
-    fn convert<'b, B>(self, input: T, mut context: B) -> (persian_rug::Proxy<T>, B)
+    
+    pub trait MiniBuilderWithPersianRug<C>: Sized
     where
-        B: 'b + persian_rug::Mutator<Context = C>
+        C: persian_rug::Context
     {
-        (context.add(input), context)
+        type Result;
+        fn build<'b, B>(self, context: B) -> (Self::Result, B)
+        where
+            B: 'b + persian_rug::Mutator<Context = C>;
     }
-}
-
-pub trait OptionBuildableWithPersianRug<C>: Sized
-where
-    C: persian_rug::Context
-{
-    type Builder: BuilderWithPersianRug<C, Result = Option<Self>>;
-    fn option_builder() -> Self::Builder;
-}
-
-impl<C, T> BuildableWithPersianRug<C> for Option<T>
-where
-    C: persian_rug::Context,
-    T: OptionBuildableWithPersianRug<C>
-{
-    type Builder = <T as OptionBuildableWithPersianRug<C>>::Builder;
-    fn builder() -> Self::Builder {
-        T::option_builder()
-    }
-}
-
-#[doc(hidden)]
-pub struct OptionConverterWithPersianRug;
-
-impl<C, T> ConverterWithPersianRug<C, T> for OptionConverterWithPersianRug
-where
-    C: persian_rug::Context
-{
-    type Output = Option<T>;
-    fn convert<'b, B>(self, input: T, context: B) -> (Option<T>, B)
+    
+    impl<T, C> BuildableWithPersianRug<C> for T
     where
-        B: 'b + persian_rug::Mutator<Context = C>
-    {
-        (Some(input), context)
+        T: BuilderBase,
+        T: MiniBuildableWithPersianRug<<T as BuilderBase>::Base, C>,
+        C: persian_rug::Context
+     {
+        type Builder = <T as MiniBuildableWithPersianRug<<T as BuilderBase>::Base, C>>::Builder;
+        fn builder() -> Self::Builder {
+            <T as MiniBuildableWithPersianRug<<T as BuilderBase>::Base, C>>::mini_builder()
+        }
     }
-}
 
-// So far nesting defeats me; but I only currently care about Option<Proxy<T>>
-pub trait OptionProxyBuildableWithPersianRug<C>: Sized
-where
-    C: persian_rug::Context
-{
-    type Builder: BuilderWithPersianRug<C, Result = Option<persian_rug::Proxy<Self>>>;
-    fn option_proxy_builder() -> Self::Builder;
-}
-
-
-#[persian_rug::constraints(context=C, access(T))]
-impl<C, T> OptionBuildableWithPersianRug<C> for persian_rug::Proxy<T>
-where
-    T: OptionProxyBuildableWithPersianRug<C>,
-    C: persian_rug::Context
-{
-    type Builder = <T as OptionProxyBuildableWithPersianRug<C>>::Builder;
-    fn option_builder() -> Self::Builder {
-        T::option_proxy_builder()
-    }
-}
-
-#[doc(hidden)]
-pub struct OptionProxyConverterWithPersianRug;
-
-#[persian_rug::constraints(context=C, access(T))]
-impl<C, T> ConverterWithPersianRug<C, T> for OptionProxyConverterWithPersianRug
-{
-    type Output = Option<persian_rug::Proxy<T>>;
-    fn convert<'b, B>(self, input: T, mut context: B) -> (Option<persian_rug::Proxy<T>>, B)
+    impl<T, C> BuilderWithPersianRug<C> for T
     where
-        B: 'b + persian_rug::Mutator<Context = C>
+        T: MiniBuilderWithPersianRug<C>,
+        C: persian_rug::Context
     {
-        (Some(context.add(input)), context)
+        type Result =<T as MiniBuilderWithPersianRug<C>>::Result;
+        fn build<'b, B>(self, context: B) -> (Self::Result, B)
+        where
+            B: 'b + persian_rug::Mutator<Context=C>
+        {
+            <Self as MiniBuilderWithPersianRug<C>>::build(self, context)
+        }
     }
-}
+
+    impl<T> BuilderBase for persian_rug::Proxy<T>
+    where
+        T: BuilderBase
+    {
+        type Base = <T as BuilderBase>::Base;
+    }
+}    
