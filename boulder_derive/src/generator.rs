@@ -63,9 +63,9 @@ pub fn derive_generatable(input: syn::DeriveInput) -> pm2::TokenStream {
                 });
 
                 methods.extend(quote::quote! {
-                    pub fn #fieldid<V>(&mut self, generator: V) -> &mut Self
+                    pub fn #fieldid<V>(mut self, generator: V) -> Self
                     where
-                        V: ::boulder::Generator<Output=#fieldtype>
+                        V: 'static + ::boulder::Generator<Output=#fieldtype>
                     {
                         self.#fieldid = Box::new(generator);
                         self
@@ -73,7 +73,7 @@ pub fn derive_generatable(input: syn::DeriveInput) -> pm2::TokenStream {
                 });
 
                 make_body.extend(quote::quote! {
-                    #fieldid: self.#fieldid.generate(),
+                    #fieldid: gen.#fieldid.generate(),
                 });
 
                 let element_type = if sequence.is_some() {
@@ -91,22 +91,15 @@ pub fn derive_generatable(input: syn::DeriveInput) -> pm2::TokenStream {
                     GeneratorType::Generatable(map) => {
                         let mut inner = pm2::TokenStream::new();
                         inner.extend(quote::quote! {
-                            let mut gen = <#element_type as ::boulder::Generatable>::generator();
+                            <#element_type as ::boulder::Generatable>::generator()
                         });
-
+                        
                         for (k, v) in map {
                             inner.extend(quote::quote! {
-                                gen.#k(#v);
+                                .#k(#v)
                             });
                         }
-                        inner.extend(quote::quote! {
-                            gen
-                        });
-                        quote::quote! {
-                            {
-                                #inner
-                            }
-                        }
+                        inner
                     }
                     GeneratorType::Default => {
                         let mut static_value = pm2::TokenStream::new();
@@ -164,32 +157,275 @@ pub fn derive_generatable(input: syn::DeriveInput) -> pm2::TokenStream {
         }
     }
 
-    let gparams = &full_generics.params;
+
+    let bare_generics = {
+        let params = &full_generics.params;
+        quote::quote! {
+            , #params
+        }
+    };
+
+    let bare_ty_generics = {
+        let mut res = pm2::TokenStream::new();
+        for p in &full_generics.params {
+            match p {
+                syn::GenericParam::Type(syn::TypeParam { ident, .. }) => {
+                    res.extend(quote::quote! {
+                        , #ident
+                    });
+                },
+                syn::GenericParam::Lifetime(syn::LifetimeDef { lifetime, .. }) => {
+                    res.extend(quote::quote! {
+                        , #lifetime
+                    });
+                },
+                syn::GenericParam::Const(syn::ConstParam { const_token, ident, ..}) => {
+                    res.extend(quote::quote! {
+                        , #const_token #ident
+                    });
+                },
+            }
+        }
+        res
+    };
+    
+    let bare_wc = {
+        let wc = &full_generics.where_clause.as_ref().map(|w| &w.predicates);
+
+        quote::quote! {
+            #wc
+        }
+    };
 
     let res = quote::quote! {
         const _: () = {
-            #vis struct Generator #generics #wc {
+            #vis struct Generator<BoulderTypeMarkerParam #bare_generics> #wc {
+                _marker: ::core::marker::PhantomData<BoulderTypeMarkerParam>,
                 #body
             }
 
+            #vis trait NestedGenerate #generics #wc {
+                type Output;
+                fn nested_generate<BoulderFunctionParam>(gen: &mut Generator<BoulderFunctionParam #bare_ty_generics>) -> Self::Output;
+            }
+            
             #[automatically_derived]
-            impl #generics Generator #ty_generics #wc {
+            impl<BoulderTypeMarkerParam #bare_generics> Generator <BoulderTypeMarkerParam #bare_ty_generics> #wc {
+                pub fn new() -> Self
+                {
+                    Self {
+                        _marker: Default::default(),
+                        #defaults
+                    }
+                }
+
                 #methods
             }
 
             #[automatically_derived]
-            impl #generics ::boulder::Generator for Generator #ty_generics #wc {
+            impl<BoulderTypeMarkerParam #bare_generics> ::boulder::generator::guts::MiniGenerator for Generator<BoulderTypeMarkerParam #bare_ty_generics>
+
+            where
+                Self: NestedGenerate #ty_generics,
+                BoulderTypeMarkerParam: 'static,
+                #bare_wc
+            {
+                type Output = <Self as NestedGenerate #ty_generics>::Output;
+                fn generate(&mut self) -> Self::Output {
+                    <Self as NestedGenerate #ty_generics>::nested_generate(self)
+                }
+            }
+
+            #[automatically_derived]
+            impl #generics ::boulder::generator::guts::BoulderBase for #ident #ty_generics #wc {
+                type Base = #ident #ty_generics;
+            }
+
+            // Base case
+
+            #[automatically_derived]
+            impl #generics ::boulder::generator::guts::MiniGeneratable<#ident #ty_generics> for #ident #ty_generics #wc {
+                type Generator = Generator<#ident #ty_generics #bare_ty_generics>;
+                fn mini_generator() -> Self::Generator {
+                    Generator::new()
+                }
+            }
+
+            #[automatically_derived]
+            impl #generics NestedGenerate #ty_generics for Generator<#ident #ty_generics #bare_ty_generics> #wc {
                 type Output = #ident #ty_generics;
-                fn generate(&mut self) -> #ident #ty_generics {
+                fn nested_generate<BoulderFunctionParam>(gen: &mut Generator<BoulderFunctionParam #bare_ty_generics>) -> Self::Output {
                     #ident {
                         #make_body
                     }
                 }
             }
+            
+            // Option
+            #[automatically_derived]
+            impl <BoulderExtraGenericParam #bare_generics> ::boulder::generator::guts::MiniGeneratable<#ident #ty_generics> for Option<BoulderExtraGenericParam>
+            where
+                BoulderExtraGenericParam: ::boulder::generator::guts::MiniGeneratable<#ident #ty_generics>,
+                Generator<Option<BoulderExtraGenericParam> #bare_ty_generics>: ::boulder::generator::guts::MiniGenerator<Output=Option<BoulderExtraGenericParam>>,
+                #bare_wc
+            {
+                type Generator = Generator<Option<BoulderExtraGenericParam> #bare_ty_generics>;
+                fn mini_generator() -> Self::Generator {
+                    Generator::new()
+                }
+            }
 
             #[automatically_derived]
-            impl #generics ::std::iter::IntoIterator for Generator #ty_generics #wc {
-                type Item = #ident #ty_generics;
+            impl <BoulderExtraGenericParam #bare_generics> NestedGenerate #ty_generics for Generator<Option<BoulderExtraGenericParam> #bare_ty_generics>
+            where
+                Generator<BoulderExtraGenericParam #bare_ty_generics>: NestedGenerate #ty_generics,
+                #bare_wc
+            {
+                type Output = Option<<Generator<BoulderExtraGenericParam #bare_ty_generics> as NestedGenerate #ty_generics>::Output>;
+                fn nested_generate<BoulderFunctionParam>(gen: &mut Generator<BoulderFunctionParam #bare_ty_generics>) -> Self::Output {
+                    Some( Generator::<BoulderExtraGenericParam #bare_ty_generics>::nested_generate(gen) )
+                }
+            }
+
+            // Rc
+            #[automatically_derived]
+            impl <BoulderExtraGenericParam #bare_generics> ::boulder::generator::guts::MiniGeneratable<#ident #ty_generics> for ::std::rc::Rc<BoulderExtraGenericParam>
+            where
+                BoulderExtraGenericParam: ::boulder::generator::guts::MiniGeneratable<#ident #ty_generics>,
+                Generator<::std::rc::Rc<BoulderExtraGenericParam> #bare_ty_generics>: ::boulder::generator::guts::MiniGenerator<Output=::std::rc::Rc<BoulderExtraGenericParam>>,
+                #bare_wc
+            {
+                type Generator = Generator<::std::rc::Rc<BoulderExtraGenericParam> #bare_ty_generics>;
+                fn mini_generator() -> Self::Generator {
+                    Generator::new()
+                }
+            }
+
+            #[automatically_derived]
+            impl <BoulderExtraGenericParam #bare_generics> NestedGenerate #ty_generics for Generator<::std::rc::Rc<BoulderExtraGenericParam> #bare_ty_generics>
+            where
+                Generator<BoulderExtraGenericParam #bare_ty_generics>: NestedGenerate #ty_generics,
+                #bare_wc
+            {
+                type Output = ::std::rc::Rc<<Generator<BoulderExtraGenericParam #bare_ty_generics> as NestedGenerate #ty_generics>::Output>;
+                fn nested_generate<BoulderFunctionParam>(gen: &mut Generator<BoulderFunctionParam #bare_ty_generics>) -> Self::Output {
+                    ::std::rc::Rc::new( Generator::<BoulderExtraGenericParam #bare_ty_generics>::nested_generate(gen) )
+                }
+            }
+
+            // Arc
+            #[automatically_derived]
+            impl <BoulderExtraGenericParam #bare_generics> ::boulder::generator::guts::MiniGeneratable<#ident #ty_generics> for ::std::sync::Arc<BoulderExtraGenericParam>
+            where
+                BoulderExtraGenericParam: ::boulder::generator::guts::MiniGeneratable<#ident #ty_generics>,
+                Generator<::std::sync::Arc<BoulderExtraGenericParam> #bare_ty_generics>: ::boulder::generator::guts::MiniGenerator<Output=::std::sync::Arc<BoulderExtraGenericParam>>,
+                #bare_wc
+            {
+                type Generator = Generator<::std::sync::Arc<BoulderExtraGenericParam> #bare_ty_generics>;
+                fn mini_generator() -> Self::Generator {
+                    Generator::new()
+                }
+            }
+
+            #[automatically_derived]
+            impl <BoulderExtraGenericParam #bare_generics> NestedGenerate #ty_generics for Generator<::std::sync::Arc<BoulderExtraGenericParam> #bare_ty_generics>
+            where
+                Generator<BoulderExtraGenericParam #bare_ty_generics>: NestedGenerate #ty_generics,
+                #bare_wc
+            {
+                type Output = ::std::sync::Arc<<Generator<BoulderExtraGenericParam #bare_ty_generics> as NestedGenerate #ty_generics>::Output>;
+                fn nested_generate<BoulderFunctionParam>(gen: &mut Generator<BoulderFunctionParam #bare_ty_generics>) -> Self::Output {
+                    ::std::sync::Arc::new( Generator::<BoulderExtraGenericParam #bare_ty_generics>::nested_generate(gen) )
+                }
+            }
+            
+            // Mutex
+            #[automatically_derived]
+            impl <BoulderExtraGenericParam #bare_generics> ::boulder::generator::guts::MiniGeneratable<#ident #ty_generics> for ::std::sync::Mutex<BoulderExtraGenericParam>
+            where
+                BoulderExtraGenericParam: ::boulder::generator::guts::MiniGeneratable<#ident #ty_generics>,
+                Generator<::std::sync::Mutex<BoulderExtraGenericParam> #bare_ty_generics>: ::boulder::generator::guts::MiniGenerator<Output=::std::sync::Mutex<BoulderExtraGenericParam>>,
+                #bare_wc
+            {
+                type Generator = Generator<::std::sync::Mutex<BoulderExtraGenericParam> #bare_ty_generics>;
+                fn mini_generator() -> Self::Generator {
+                    Generator::new()
+                }
+            }
+
+            #[automatically_derived]
+            impl <BoulderExtraGenericParam #bare_generics> NestedGenerate #ty_generics for Generator<::std::sync::Mutex<BoulderExtraGenericParam> #bare_ty_generics>
+            where
+                Generator<BoulderExtraGenericParam #bare_ty_generics>: NestedGenerate #ty_generics,
+                #bare_wc
+            {
+                type Output = ::std::sync::Mutex<<Generator<BoulderExtraGenericParam #bare_ty_generics> as NestedGenerate #ty_generics>::Output>;
+                fn nested_generate<BoulderFunctionParam>(gen: &mut Generator<BoulderFunctionParam #bare_ty_generics>) -> Self::Output {
+                    ::std::sync::Mutex::new( Generator::<BoulderExtraGenericParam #bare_ty_generics>::nested_generate(gen) )
+                }
+            }
+
+            // Cell
+            #[automatically_derived]
+            impl <BoulderExtraGenericParam #bare_generics> ::boulder::generator::guts::MiniGeneratable<#ident #ty_generics> for ::std::cell::Cell<BoulderExtraGenericParam>
+            where
+                BoulderExtraGenericParam: ::boulder::generator::guts::MiniGeneratable<#ident #ty_generics>,
+                Generator<::std::cell::Cell<BoulderExtraGenericParam> #bare_ty_generics>: ::boulder::generator::guts::MiniGenerator<Output=::std::cell::Cell<BoulderExtraGenericParam>>,
+                #bare_wc
+            {
+                type Generator = Generator<::std::cell::Cell<BoulderExtraGenericParam> #bare_ty_generics>;
+                fn mini_generator() -> Self::Generator {
+                    Generator::new()
+                }
+            }
+
+            #[automatically_derived]
+            impl <BoulderExtraGenericParam #bare_generics> NestedGenerate #ty_generics for Generator<::std::cell::Cell<BoulderExtraGenericParam> #bare_ty_generics>
+            where
+                Generator<BoulderExtraGenericParam #bare_ty_generics>: NestedGenerate #ty_generics,
+                #bare_wc
+            {
+                type Output = ::std::cell::Cell<<Generator<BoulderExtraGenericParam #bare_ty_generics> as NestedGenerate #ty_generics>::Output>;
+                fn nested_generate<BoulderFunctionParam>(gen: &mut Generator<BoulderFunctionParam #bare_ty_generics>) -> Self::Output {
+                    ::std::cell::Cell::new( Generator::<BoulderExtraGenericParam #bare_ty_generics>::nested_generate(gen) )
+                }
+            }
+
+            // RefCell
+            #[automatically_derived]
+            impl <BoulderExtraGenericParam #bare_generics> ::boulder::generator::guts::MiniGeneratable<#ident #ty_generics> for ::std::cell::RefCell<BoulderExtraGenericParam>
+            where
+                BoulderExtraGenericParam: ::boulder::generator::guts::MiniGeneratable<#ident #ty_generics>,
+                Generator<::std::cell::RefCell<BoulderExtraGenericParam> #bare_ty_generics>: ::boulder::generator::guts::MiniGenerator<Output=::std::cell::RefCell<BoulderExtraGenericParam>>,
+                #bare_wc
+            {
+                type Generator = Generator<::std::cell::RefCell<BoulderExtraGenericParam> #bare_ty_generics>;
+                fn mini_generator() -> Self::Generator {
+                    Generator::new()
+                }
+            }
+
+            #[automatically_derived]
+            impl <BoulderExtraGenericParam #bare_generics> NestedGenerate #ty_generics for Generator<::std::cell::RefCell<BoulderExtraGenericParam> #bare_ty_generics>
+            where
+                Generator<BoulderExtraGenericParam #bare_ty_generics>: NestedGenerate #ty_generics,
+                #bare_wc
+            {
+                type Output = ::std::cell::RefCell<<Generator<BoulderExtraGenericParam #bare_ty_generics> as NestedGenerate #ty_generics>::Output>;
+                fn nested_generate<BoulderFunctionParam>(gen: &mut Generator<BoulderFunctionParam #bare_ty_generics>) -> Self::Output {
+                    ::std::cell::RefCell::new( Generator::<BoulderExtraGenericParam #bare_ty_generics>::nested_generate(gen) )
+                }
+            }
+            
+            // Iterators
+            
+            #[automatically_derived]
+            impl <BoulderExtraGenericParam #bare_generics> ::std::iter::IntoIterator for Generator<BoulderExtraGenericParam #bare_ty_generics>
+            where
+                Generator<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::generator::guts::MiniGenerator<Output=BoulderExtraGenericParam>,
+                #bare_wc
+            {
+                type Item = BoulderExtraGenericParam;
                 type IntoIter = ::boulder::GeneratorIterator<Self>;
                 fn into_iter(self) -> Self::IntoIter {
                     Self::IntoIter::new(self)
@@ -197,25 +433,21 @@ pub fn derive_generatable(input: syn::DeriveInput) -> pm2::TokenStream {
             }
 
             #[automatically_derived]
-            impl<'a, #gparams> ::std::iter::IntoIterator for &'a mut Generator #ty_generics #wc {
-                type Item = #ident #ty_generics;
-                type IntoIter = ::boulder::GeneratorMutIterator<'a, Generator #ty_generics>;
+            impl<'boulder_reference_lifetime, BoulderExtraGenericParam #bare_generics> ::std::iter::IntoIterator for &'boulder_reference_lifetime mut Generator<BoulderExtraGenericParam #bare_ty_generics>
+            where
+                Generator<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::generator::guts::MiniGenerator<Output=BoulderExtraGenericParam>,
+               #bare_wc
+            {
+                type Item = BoulderExtraGenericParam;
+                type IntoIter = ::boulder::GeneratorMutIterator<'boulder_reference_lifetime, Generator<BoulderExtraGenericParam #bare_ty_generics>>;
                 fn into_iter(self) -> Self::IntoIter {
                     Self::IntoIter::new(self)
-                }
-            }
-
-            #[automatically_derived]
-            impl #generics ::boulder::Generatable for #ident #ty_generics #wc {
-                type Generator = Generator #ty_generics;
-                fn generator() -> Self::Generator {
-                    Generator {
-                        #defaults
-                    }
                 }
             }
         };
     };
 
+    //println!("{}", res);
+    
     res
 }

@@ -35,8 +35,8 @@ pub trait Builder {
 /// derive macro.
 pub trait Buildable: Sized
 where
-    Self: guts::BuilderBase,
-//    Self: guts::MiniBuildable<<Self as guts::BuilderBase>::Base>,
+    Self: guts::BoulderBase,
+//    Self: guts::MiniBuildable<<Self as guts::BoulderBase>::Base>,
 {
     type Builder: Builder<Result=Self>;
     /// Create a new builder for this type.
@@ -83,7 +83,7 @@ pub mod guts {
     use std::cell::{Cell, RefCell};
     use std::rc::Rc;
     use std::sync::{Arc, Mutex};
-
+    
     pub trait MiniBuildable<T>: Sized {
         type Builder: MiniBuilder<Result=Self>;
         fn mini_builder() -> Self::Builder;
@@ -93,19 +93,15 @@ pub mod guts {
         type Result;
         fn build(self) -> Self::Result;
     }
-
-    pub trait BuilderBase {
-        type Base;
-    }
     
     impl<T> Buildable for T
     where
-        T: BuilderBase,
-        T: MiniBuildable<<T as BuilderBase>::Base>,
+        T: BoulderBase,
+        T: MiniBuildable<<T as BoulderBase>::Base>,
      {
-        type Builder = <T as MiniBuildable<<T as BuilderBase>::Base>>::Builder;
+        type Builder = <T as MiniBuildable<<T as BoulderBase>::Base>>::Builder;
         fn builder() -> Self::Builder {
-            <T as MiniBuildable<<T as BuilderBase>::Base>>::mini_builder()
+            <T as MiniBuildable<<T as BoulderBase>::Base>>::mini_builder()
         }
     }
 
@@ -118,53 +114,50 @@ pub mod guts {
             <Self as MiniBuilder>::build(self)
         }
     }
+
+    pub trait BoulderBase {
+        type Base;
+    }
     
-    impl<T> BuilderBase for Option<T>
+    impl<T> BoulderBase for Option<T>
     where
-        T: BuilderBase
+        T: BoulderBase
     {
-        type Base = <T as BuilderBase>::Base;
+        type Base = <T as BoulderBase>::Base;
     }
 
-    impl<T> BuilderBase for Arc<T>
+    impl<T> BoulderBase for Arc<T>
     where
-        T: BuilderBase
+        T: BoulderBase
     {
-        type Base = <T as BuilderBase>::Base;
+        type Base = <T as BoulderBase>::Base;
     }
 
-    impl<T> BuilderBase for Rc<T>
+    impl<T> BoulderBase for Rc<T>
     where
-        T: BuilderBase
+        T: BoulderBase
     {
-        type Base = <T as BuilderBase>::Base;
+        type Base = <T as BoulderBase>::Base;
     }
 
-    impl<T> BuilderBase for Box<T>
+    impl<T> BoulderBase for RefCell<T>
     where
-        T: BuilderBase
+        T: BoulderBase
     {
-        type Base = <T as BuilderBase>::Base;
+        type Base = <T as BoulderBase>::Base;
     }
 
-    impl<T> BuilderBase for RefCell<T>
+    impl<T> BoulderBase for Cell<T>
     where
-        T: BuilderBase
+        T: BoulderBase
     {
-        type Base = <T as BuilderBase>::Base;
+        type Base = <T as BoulderBase>::Base;
     }
 
-    impl<T> BuilderBase for Cell<T>
+    impl<T> BoulderBase for Mutex<T>
     where
-        T: BuilderBase
+        T: BoulderBase
     {
-        type Base = <T as BuilderBase>::Base;
-    }
-
-    impl<T> BuilderBase for Mutex<T>
-    where
-        T: BuilderBase
-    {
-        type Base = <T as BuilderBase>::Base;
+        type Base = <T as BoulderBase>::Base;
     }
 }    

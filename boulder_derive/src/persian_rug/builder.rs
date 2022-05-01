@@ -310,7 +310,7 @@ pub fn derive_buildable_with_persian_rug(input: syn::DeriveInput) -> pm2::TokenS
 
             #[automatically_derived]
             #[persian_rug::constraints(#constraints)]
-            impl #generics ::boulder::builder::guts::BuilderBase for #ident #ty_generics #wc {
+            impl #generics ::boulder::persian_rug::builder::guts::BoulderBase for #ident #ty_generics #wc {
                 type Base = #ident #ty_generics;
             }
 

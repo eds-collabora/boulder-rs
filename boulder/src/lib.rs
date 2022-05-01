@@ -66,7 +66,7 @@
 //! ```
 
 pub mod builder;
-mod generator;
+pub mod generator;
 
 pub use self::builder::{Buildable, Builder};
 pub use self::generator::{generators as gen, Generatable, Generator};
