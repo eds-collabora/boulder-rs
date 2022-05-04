@@ -244,3 +244,9 @@ mod persian_rug;
 pub fn buildable_with_persian_rug(input: TokenStream) -> TokenStream {
     persian_rug::builder::derive_buildable_with_persian_rug(syn::parse_macro_input!(input)).into()
 }
+
+#[proc_macro_derive(GeneratableWithPersianRug, attributes(boulder))]
+pub fn generatable_with_persian_rug(input: TokenStream) -> TokenStream {
+    persian_rug::generator::derive_generatable_with_persian_rug(syn::parse_macro_input!(input))
+        .into()
+}

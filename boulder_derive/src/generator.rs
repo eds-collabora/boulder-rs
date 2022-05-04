@@ -49,11 +49,11 @@ pub fn derive_generatable(input: syn::DeriveInput) -> pm2::TokenStream {
                     }
                 }
 
-                let sequence = if let Some(sequence) = sequence {
+                let sequence = if let Some((sequence, _ty)) = sequence {
                     Some(quote::quote! { #sequence })
                 } else {
                     // if let Some(sequence) = build_sequence {
-                    build_sequence.map(|sequence| {
+                    build_sequence.map(|(sequence, _ty)| {
                         quote::quote! { || ((#sequence) as usize) }
                     })
                 };
@@ -83,7 +83,7 @@ pub fn derive_generatable(input: syn::DeriveInput) -> pm2::TokenStream {
                 };
 
                 let value = match generator {
-                    GeneratorType::Generator(expr) => {
+                    GeneratorType::Generator { expr, .. } => {
                         quote::quote! {
                             #expr
                         }
@@ -93,7 +93,7 @@ pub fn derive_generatable(input: syn::DeriveInput) -> pm2::TokenStream {
                         inner.extend(quote::quote! {
                             <#element_type as ::boulder::Generatable>::generator()
                         });
-                        
+
                         for (k, v) in map {
                             inner.extend(quote::quote! {
                                 .#k(#v)
@@ -120,7 +120,7 @@ pub fn derive_generatable(input: syn::DeriveInput) -> pm2::TokenStream {
                                     <<#element_type as ::boulder::Buildable>::Builder as ::boulder::Builder>::build(#init)
                                 });
                             }
-                            BuildType::Value(value) => {
+                            BuildType::Value { expr: value, .. } => {
                                 static_value.extend(quote::quote! {
                                     (#value).into(),
                                 });
@@ -157,7 +157,6 @@ pub fn derive_generatable(input: syn::DeriveInput) -> pm2::TokenStream {
         }
     }
 
-
     let bare_generics = {
         let params = &full_generics.params;
         quote::quote! {
@@ -173,22 +172,24 @@ pub fn derive_generatable(input: syn::DeriveInput) -> pm2::TokenStream {
                     res.extend(quote::quote! {
                         , #ident
                     });
-                },
+                }
                 syn::GenericParam::Lifetime(syn::LifetimeDef { lifetime, .. }) => {
                     res.extend(quote::quote! {
                         , #lifetime
                     });
-                },
-                syn::GenericParam::Const(syn::ConstParam { const_token, ident, ..}) => {
+                }
+                syn::GenericParam::Const(syn::ConstParam {
+                    const_token, ident, ..
+                }) => {
                     res.extend(quote::quote! {
                         , #const_token #ident
                     });
-                },
+                }
             }
         }
         res
     };
-    
+
     let bare_wc = {
         let wc = &full_generics.where_clause.as_ref().map(|w| &w.predicates);
 
@@ -200,7 +201,7 @@ pub fn derive_generatable(input: syn::DeriveInput) -> pm2::TokenStream {
     let res = quote::quote! {
         const _: () = {
             #vis struct Generator<BoulderTypeMarkerParam #bare_generics> #wc {
-                _marker: ::core::marker::PhantomData<BoulderTypeMarkerParam>,
+                _boulder_type_marker: ::core::marker::PhantomData<BoulderTypeMarkerParam>,
                 #body
             }
 
@@ -208,13 +209,13 @@ pub fn derive_generatable(input: syn::DeriveInput) -> pm2::TokenStream {
                 type Output;
                 fn nested_generate<BoulderFunctionParam>(gen: &mut Generator<BoulderFunctionParam #bare_ty_generics>) -> Self::Output;
             }
-            
+
             #[automatically_derived]
             impl<BoulderTypeMarkerParam #bare_generics> Generator <BoulderTypeMarkerParam #bare_ty_generics> #wc {
                 pub fn new() -> Self
                 {
                     Self {
-                        _marker: Default::default(),
+                        _boulder_type_marker: Default::default(),
                         #defaults
                     }
                 }
@@ -260,7 +261,7 @@ pub fn derive_generatable(input: syn::DeriveInput) -> pm2::TokenStream {
                     }
                 }
             }
-            
+
             // Option
             #[automatically_derived]
             impl <BoulderExtraGenericParam #bare_generics> ::boulder::generator::guts::MiniGeneratable<#ident #ty_generics> for Option<BoulderExtraGenericParam>
@@ -338,7 +339,7 @@ pub fn derive_generatable(input: syn::DeriveInput) -> pm2::TokenStream {
                     ::std::sync::Arc::new( Generator::<BoulderExtraGenericParam #bare_ty_generics>::nested_generate(gen) )
                 }
             }
-            
+
             // Mutex
             #[automatically_derived]
             impl <BoulderExtraGenericParam #bare_generics> ::boulder::generator::guts::MiniGeneratable<#ident #ty_generics> for ::std::sync::Mutex<BoulderExtraGenericParam>
@@ -416,9 +417,9 @@ pub fn derive_generatable(input: syn::DeriveInput) -> pm2::TokenStream {
                     ::std::cell::RefCell::new( Generator::<BoulderExtraGenericParam #bare_ty_generics>::nested_generate(gen) )
                 }
             }
-            
+
             // Iterators
-            
+
             #[automatically_derived]
             impl <BoulderExtraGenericParam #bare_generics> ::std::iter::IntoIterator for Generator<BoulderExtraGenericParam #bare_ty_generics>
             where
@@ -447,7 +448,5 @@ pub fn derive_generatable(input: syn::DeriveInput) -> pm2::TokenStream {
         };
     };
 
-    //println!("{}", res);
-    
     res
 }

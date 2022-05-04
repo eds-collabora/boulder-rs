@@ -41,15 +41,17 @@ pub fn derive_buildable(input: syn::DeriveInput) -> pm2::TokenStream {
                             generator = parsed.generator.element;
                         }
                         if sequence.is_none() {
-                            sequence = parsed.builder.sequence;
+                            if !parsed.builder.sequence_needs_context {
+                                sequence = parsed.builder.sequence;
+                            }
                         }
                     }
                 }
 
-                if let Some(sequence) = sequence {
+                if let Some((sequence, _)) = sequence {
                     let mut gen_init = pm2::TokenStream::new();
                     match generator {
-                        GeneratorType::Generator(expr) => {
+                        GeneratorType::Generator { expr, .. } => {
                             gen_init.extend(quote::quote! {
                                 {
                                     #expr
@@ -85,7 +87,7 @@ pub fn derive_buildable(input: syn::DeriveInput) -> pm2::TokenStream {
                                         <<<#fieldtype as std::iter::IntoIterator>::Item as ::boulder::Buildable>::Builder as ::boulder::Builder>::build(#init),
                                     });
                                 }
-                                BuildType::Value(value) => {
+                                BuildType::Value { expr: value, .. } => {
                                     static_value.extend(quote::quote! {
                                         (#value).into(),
                                     });
@@ -121,7 +123,7 @@ pub fn derive_buildable(input: syn::DeriveInput) -> pm2::TokenStream {
                                 #fieldid: <<#fieldtype as ::boulder::Buildable>::Builder as ::boulder::Builder>::build(#init),
                             });
                         }
-                        BuildType::Value(value) => defaults.extend(quote::quote! {
+                        BuildType::Value { expr: value, .. } => defaults.extend(quote::quote! {
                             #fieldid: (#value).into(),
                         }),
                         BuildType::Default => defaults.extend(quote::quote! {
@@ -164,22 +166,24 @@ pub fn derive_buildable(input: syn::DeriveInput) -> pm2::TokenStream {
                     res.extend(quote::quote! {
                         , #ident
                     });
-                },
+                }
                 syn::GenericParam::Lifetime(syn::LifetimeDef { lifetime, .. }) => {
                     res.extend(quote::quote! {
                         , #lifetime
                     });
-                },
-                syn::GenericParam::Const(syn::ConstParam { const_token, ident, ..}) => {
+                }
+                syn::GenericParam::Const(syn::ConstParam {
+                    const_token, ident, ..
+                }) => {
                     res.extend(quote::quote! {
                         , #const_token #ident
                     });
-                },
+                }
             }
         }
         res
     };
-    
+
     let bare_wc = {
         let wc = &full_generics.where_clause.as_ref().map(|w| &w.predicates);
 
@@ -193,7 +197,7 @@ pub fn derive_buildable(input: syn::DeriveInput) -> pm2::TokenStream {
     let res = quote::quote! {
         const _: () = {
             #vis struct Builder <BoulderTypeMarkerParam #bare_generics> #wc {
-                _marker: ::core::marker::PhantomData<BoulderTypeMarkerParam>,
+                _boulder_type_marker: ::core::marker::PhantomData<BoulderTypeMarkerParam>,
                 #body
             }
 
@@ -202,14 +206,14 @@ pub fn derive_buildable(input: syn::DeriveInput) -> pm2::TokenStream {
                 pub fn new() -> Self
                 {
                     Self {
-                        _marker: Default::default(),
+                        _boulder_type_marker: Default::default(),
                         #defaults
                     }
                 }
 
                 fn change_type<BoulderFunctionTypeParam>(self) -> Builder<BoulderFunctionTypeParam #bare_ty_generics> {
                     Builder {
-                        _marker: Default::default(),
+                        _boulder_type_marker: Default::default(),
                         #make_body
                     }
                 }
@@ -229,7 +233,7 @@ pub fn derive_buildable(input: syn::DeriveInput) -> pm2::TokenStream {
                     Builder::new()
                 }
             }
-            
+
             #[automatically_derived]
             impl #generics ::boulder::builder::guts::MiniBuilder for Builder<#ident #ty_generics #bare_ty_generics> #wc
             {
@@ -253,7 +257,7 @@ pub fn derive_buildable(input: syn::DeriveInput) -> pm2::TokenStream {
                     Builder::new()
                 }
             }
-            
+
             #[automatically_derived]
             impl <BoulderExtraGenericParam #bare_generics> ::boulder::builder::guts::MiniBuilder for Builder<Option<BoulderExtraGenericParam> #bare_ty_generics>
             where
@@ -278,7 +282,7 @@ pub fn derive_buildable(input: syn::DeriveInput) -> pm2::TokenStream {
                     Builder::new()
                 }
             }
-            
+
             #[automatically_derived]
             impl <BoulderExtraGenericParam #bare_generics> ::boulder::builder::guts::MiniBuilder for Builder<::std::sync::Arc<BoulderExtraGenericParam> #bare_ty_generics>
             where
@@ -303,7 +307,7 @@ pub fn derive_buildable(input: syn::DeriveInput) -> pm2::TokenStream {
                     Builder::new()
                 }
             }
-            
+
             #[automatically_derived]
             impl <BoulderExtraGenericParam #bare_generics> ::boulder::builder::guts::MiniBuilder for Builder<::std::rc::Rc<BoulderExtraGenericParam> #bare_ty_generics>
             where
@@ -328,7 +332,7 @@ pub fn derive_buildable(input: syn::DeriveInput) -> pm2::TokenStream {
                     Builder::new()
                 }
             }
-            
+
             #[automatically_derived]
             impl <BoulderExtraGenericParam #bare_generics> ::boulder::builder::guts::MiniBuilder for Builder<::std::sync::Mutex<BoulderExtraGenericParam> #bare_ty_generics>
             where
@@ -353,7 +357,7 @@ pub fn derive_buildable(input: syn::DeriveInput) -> pm2::TokenStream {
                     Builder::new()
                 }
             }
-            
+
             #[automatically_derived]
             impl <BoulderExtraGenericParam #bare_generics> ::boulder::builder::guts::MiniBuilder for Builder<::std::cell::Cell<BoulderExtraGenericParam> #bare_ty_generics>
             where
@@ -378,7 +382,7 @@ pub fn derive_buildable(input: syn::DeriveInput) -> pm2::TokenStream {
                     Builder::new()
                 }
             }
-            
+
             #[automatically_derived]
             impl <BoulderExtraGenericParam #bare_generics> ::boulder::builder::guts::MiniBuilder for Builder<::std::cell::RefCell<BoulderExtraGenericParam> #bare_ty_generics>
             where
@@ -390,10 +394,9 @@ pub fn derive_buildable(input: syn::DeriveInput) -> pm2::TokenStream {
                     ::std::cell::RefCell::new( <Builder<BoulderExtraGenericParam #bare_ty_generics> as ::boulder::builder::guts::MiniBuilder>::build(self.change_type()) )
                 }
             }
-            
+
         };
     };
 
-    //println!("{}", res);
     res
 }

@@ -19,7 +19,7 @@ pub struct Womble {
     b: i32,
 }
 
-#[derive(Debug, Buildable)] // 
+#[derive(Debug, Buildable)] //
 pub struct Badger {
     #[boulder(buildable(a="hallo", b=foo(5)))]
     w: Womble,
@@ -69,7 +69,10 @@ fn test_arc() {
         .a("hello")
         .b(4i16)
         .build();
-    assert_eq!(std::any::TypeId::of::<std::sync::Arc<Womble>>(), w.type_id());
+    assert_eq!(
+        std::any::TypeId::of::<std::sync::Arc<Womble>>(),
+        w.type_id()
+    );
     assert_eq!(w.a, "hello".to_string());
     assert_eq!(w.b, 4i32);
 }
@@ -80,7 +83,10 @@ fn test_mutex() {
         .a("hello")
         .b(4i16)
         .build();
-    assert_eq!(std::any::TypeId::of::<std::sync::Mutex<Womble>>(), w.type_id());
+    assert_eq!(
+        std::any::TypeId::of::<std::sync::Mutex<Womble>>(),
+        w.type_id()
+    );
     assert_eq!(w.lock().unwrap().a, "hello".to_string());
     assert_eq!(w.lock().unwrap().b, 4i32);
 }
@@ -91,7 +97,10 @@ fn test_ref_cell() {
         .a("hello")
         .b(4i16)
         .build();
-    assert_eq!(std::any::TypeId::of::<std::cell::RefCell<Womble>>(), w.type_id());
+    assert_eq!(
+        std::any::TypeId::of::<std::cell::RefCell<Womble>>(),
+        w.type_id()
+    );
     assert_eq!(w.borrow().a, "hello".to_string());
     assert_eq!(w.borrow().b, 4i32);
 }
@@ -103,7 +112,10 @@ fn test_cell() {
         .b(4i16)
         .build();
 
-    assert_eq!(std::any::TypeId::of::<std::cell::Cell<Womble>>(), w.type_id());
+    assert_eq!(
+        std::any::TypeId::of::<std::cell::Cell<Womble>>(),
+        w.type_id()
+    );
     let w_contents = w.into_inner();
     assert_eq!(w_contents.a, "hello".to_string());
     assert_eq!(w_contents.b, 4i32);
@@ -111,11 +123,14 @@ fn test_cell() {
 
 #[test]
 fn test_arc_mutex() {
-    let w = std::sync::Arc::<std::sync::Mutex::<Womble>>::builder()
+    let w = std::sync::Arc::<std::sync::Mutex<Womble>>::builder()
         .a("hello")
         .b(4i16)
         .build();
-    assert_eq!(std::any::TypeId::of::<std::sync::Arc<std::sync::Mutex<Womble>>>(), w.type_id());
+    assert_eq!(
+        std::any::TypeId::of::<std::sync::Arc<std::sync::Mutex<Womble>>>(),
+        w.type_id()
+    );
     assert_eq!(w.lock().unwrap().a, "hello".to_string());
     assert_eq!(w.lock().unwrap().b, 4i32);
 }
@@ -161,7 +176,7 @@ fn test_generator() {
 
     assert_eq!(std::any::TypeId::of::<Wizard>(), w.type_id());
     assert_eq!(std::any::TypeId::of::<Wizard>(), w2.type_id());
-    
+
     assert_eq!(w.a, "hello".to_string());
     assert_eq!(w.b, 5);
     assert_eq!(w2.a, "hello".to_string());
@@ -177,7 +192,7 @@ fn test_option_generator() {
 
     assert_eq!(std::any::TypeId::of::<Option<Wizard>>(), w.type_id());
     assert_eq!(std::any::TypeId::of::<Option<Wizard>>(), w2.type_id());
-    
+
     assert_eq!(w.as_ref().map(|w| &w.a), Some(&"hello".to_string()));
     assert_eq!(w.as_ref().map(|w| &w.b), Some(&5));
     assert_eq!(w2.as_ref().map(|w| &w.a), Some(&"hello".to_string()));
@@ -188,13 +203,28 @@ fn test_option_generator() {
     let w = g.generate();
     let w2 = g.generate();
 
-    assert_eq!(std::any::TypeId::of::<Option<Option<Wizard>>>(), w.type_id());
-    assert_eq!(std::any::TypeId::of::<Option<Option<Wizard>>>(), w2.type_id());
-    
-    assert_eq!(w.as_ref().map(|w| w.as_ref().map(|w| &w.a)), Some(Some(&"hello".to_string())));
+    assert_eq!(
+        std::any::TypeId::of::<Option<Option<Wizard>>>(),
+        w.type_id()
+    );
+    assert_eq!(
+        std::any::TypeId::of::<Option<Option<Wizard>>>(),
+        w2.type_id()
+    );
+
+    assert_eq!(
+        w.as_ref().map(|w| w.as_ref().map(|w| &w.a)),
+        Some(Some(&"hello".to_string()))
+    );
     assert_eq!(w.as_ref().map(|w| w.as_ref().map(|w| &w.b)), Some(Some(&5)));
-    assert_eq!(w2.as_ref().map(|w| w.as_ref().map(|w| &w.a)), Some(Some(&"hello".to_string())));
-    assert_eq!(w2.as_ref().map(|w| w.as_ref().map(|w| &w.b)), Some(Some(&6)));
+    assert_eq!(
+        w2.as_ref().map(|w| w.as_ref().map(|w| &w.a)),
+        Some(Some(&"hello".to_string()))
+    );
+    assert_eq!(
+        w2.as_ref().map(|w| w.as_ref().map(|w| &w.b)),
+        Some(Some(&6))
+    );
 }
 
 #[test]
@@ -220,9 +250,15 @@ fn test_arc_generator() {
     let w = g.generate();
     let w2 = g.generate();
 
-    assert_eq!(std::any::TypeId::of::<std::sync::Arc<Wizard>>(), w.type_id());
-    assert_eq!(std::any::TypeId::of::<std::sync::Arc<Wizard>>(), w2.type_id());
-    
+    assert_eq!(
+        std::any::TypeId::of::<std::sync::Arc<Wizard>>(),
+        w.type_id()
+    );
+    assert_eq!(
+        std::any::TypeId::of::<std::sync::Arc<Wizard>>(),
+        w2.type_id()
+    );
+
     assert_eq!(w.a, "hello".to_string());
     assert_eq!(w.b, 5);
     assert_eq!(w2.a, "hello".to_string());
@@ -236,9 +272,15 @@ fn test_mutex_generator() {
     let w = g.generate();
     let w2 = g.generate();
 
-    assert_eq!(std::any::TypeId::of::<std::sync::Mutex<Wizard>>(), w.type_id());
-    assert_eq!(std::any::TypeId::of::<std::sync::Mutex<Wizard>>(), w2.type_id());
-    
+    assert_eq!(
+        std::any::TypeId::of::<std::sync::Mutex<Wizard>>(),
+        w.type_id()
+    );
+    assert_eq!(
+        std::any::TypeId::of::<std::sync::Mutex<Wizard>>(),
+        w2.type_id()
+    );
+
     assert_eq!(w.lock().unwrap().a, "hello".to_string());
     assert_eq!(w.lock().unwrap().b, 5);
     assert_eq!(w2.lock().unwrap().a, "hello".to_string());
@@ -252,9 +294,15 @@ fn test_arc_mutex_generator() {
     let w = g.generate();
     let w2 = g.generate();
 
-    assert_eq!(std::any::TypeId::of::<std::sync::Arc<std::sync::Mutex<Wizard>>>(), w.type_id());
-    assert_eq!(std::any::TypeId::of::<std::sync::Arc<std::sync::Mutex<Wizard>>>(), w2.type_id());
-    
+    assert_eq!(
+        std::any::TypeId::of::<std::sync::Arc<std::sync::Mutex<Wizard>>>(),
+        w.type_id()
+    );
+    assert_eq!(
+        std::any::TypeId::of::<std::sync::Arc<std::sync::Mutex<Wizard>>>(),
+        w2.type_id()
+    );
+
     assert_eq!(w.lock().unwrap().a, "hello".to_string());
     assert_eq!(w.lock().unwrap().b, 5);
     assert_eq!(w2.lock().unwrap().a, "hello".to_string());
@@ -268,9 +316,15 @@ fn test_cell_generator() {
     let w = g.generate();
     let w2 = g.generate();
 
-    assert_eq!(std::any::TypeId::of::<std::cell::Cell<Wizard>>(), w.type_id());
+    assert_eq!(
+        std::any::TypeId::of::<std::cell::Cell<Wizard>>(),
+        w.type_id()
+    );
 
-    assert_eq!(std::any::TypeId::of::<std::cell::Cell<Wizard>>(), w2.type_id());
+    assert_eq!(
+        std::any::TypeId::of::<std::cell::Cell<Wizard>>(),
+        w2.type_id()
+    );
 
     let w_contents = w.into_inner();
     assert_eq!(w_contents.a, "hello".to_string());
@@ -287,9 +341,15 @@ fn test_ref_cell_generator() {
     let w = g.generate();
     let w2 = g.generate();
 
-    assert_eq!(std::any::TypeId::of::<std::cell::RefCell<Wizard>>(), w.type_id());
+    assert_eq!(
+        std::any::TypeId::of::<std::cell::RefCell<Wizard>>(),
+        w.type_id()
+    );
 
-    assert_eq!(std::any::TypeId::of::<std::cell::RefCell<Wizard>>(), w2.type_id());
+    assert_eq!(
+        std::any::TypeId::of::<std::cell::RefCell<Wizard>>(),
+        w2.type_id()
+    );
 
     assert_eq!(w.borrow().a, "hello".to_string());
     assert_eq!(w.borrow().b, 5);
@@ -357,7 +417,6 @@ where
     #[boulder(default = 5)]
     ival: i64,
 }
-
 
 #[test]
 fn test_iterator() {

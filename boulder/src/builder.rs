@@ -32,39 +32,23 @@ pub trait Builder {
 /// A type that has an associated default `Builder`.
 ///
 /// The convenient way to implement this trait is via the `Buildable`
-/// derive macro.
+/// derive macro. Note that it cannot be directly implemented because
+/// the library itself provides a blanket implementation from a
+/// more complex underlying trait.
 pub trait Buildable: Sized
 where
     Self: guts::BoulderBase,
-//    Self: guts::MiniBuildable<<Self as guts::BoulderBase>::Base>,
 {
-    type Builder: Builder<Result=Self>;
+    type Builder: Builder<Result = Self>;
     /// Create a new builder for this type.
     ///
     /// Example
     /// ```rust
     /// use boulder::{Builder, Buildable};
     ///
+    /// #[derive(Buildable)]
     /// struct Foo {
     ///    a: i32
-    /// }
-    ///
-    /// impl Buildable for Foo {
-    ///    type Builder = FooBuilder;
-    ///    fn builder() -> Self::Builder {
-    ///       FooBuilder { a: 0 }
-    ///    }
-    /// }
-    ///
-    /// struct FooBuilder {
-    ///    a: i32
-    /// }
-    ///
-    /// impl Builder for FooBuilder {
-    ///    type Result = Foo;
-    ///    fn build(self) -> Self::Result {
-    ///       Foo { a: self.a }
-    ///    }
     /// }
     ///
     /// let b = Foo::builder();
@@ -78,86 +62,73 @@ pub use boulder_derive::Buildable;
 
 #[doc(hidden)]
 pub mod guts {
-    use super::{Builder, Buildable};
+    use super::Buildable;
 
     use std::cell::{Cell, RefCell};
     use std::rc::Rc;
     use std::sync::{Arc, Mutex};
-    
+
+    pub use super::Builder as MiniBuilder;
+
     pub trait MiniBuildable<T>: Sized {
-        type Builder: MiniBuilder<Result=Self>;
+        type Builder: MiniBuilder<Result = Self>;
         fn mini_builder() -> Self::Builder;
     }
-    
-    pub trait MiniBuilder: Sized {
-        type Result;
-        fn build(self) -> Self::Result;
-    }
-    
+
     impl<T> Buildable for T
     where
         T: BoulderBase,
         T: MiniBuildable<<T as BoulderBase>::Base>,
-     {
+    {
         type Builder = <T as MiniBuildable<<T as BoulderBase>::Base>>::Builder;
         fn builder() -> Self::Builder {
             <T as MiniBuildable<<T as BoulderBase>::Base>>::mini_builder()
         }
     }
 
-    impl<T> Builder for T
-    where
-        T: MiniBuilder
-    {
-        type Result = <T as MiniBuilder>::Result;
-        fn build(self) -> Self::Result {
-            <Self as MiniBuilder>::build(self)
-        }
-    }
-
     pub trait BoulderBase {
         type Base;
     }
-    
+
     impl<T> BoulderBase for Option<T>
     where
-        T: BoulderBase
+        T: BoulderBase,
     {
         type Base = <T as BoulderBase>::Base;
     }
 
     impl<T> BoulderBase for Arc<T>
     where
-        T: BoulderBase
+        T: BoulderBase,
     {
         type Base = <T as BoulderBase>::Base;
     }
 
     impl<T> BoulderBase for Rc<T>
     where
-        T: BoulderBase
+        T: BoulderBase,
     {
         type Base = <T as BoulderBase>::Base;
     }
 
     impl<T> BoulderBase for RefCell<T>
     where
-        T: BoulderBase
+        T: BoulderBase,
     {
         type Base = <T as BoulderBase>::Base;
     }
 
     impl<T> BoulderBase for Cell<T>
     where
-        T: BoulderBase
+        T: BoulderBase,
     {
         type Base = <T as BoulderBase>::Base;
     }
 
     impl<T> BoulderBase for Mutex<T>
     where
-        T: BoulderBase
+        T: BoulderBase,
     {
         type Base = <T as BoulderBase>::Base;
     }
-}    
+}

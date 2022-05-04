@@ -50,10 +50,10 @@
 //! }
 //!
 //! let mut n = 2;
-//! let mut gen = Bar::generator();
-//! gen.a(move || {
-//!      n = n + 2;
-//!      n
+//! let mut gen = Bar::generator()
+//!      .a(move || {
+//!          n = n + 2;
+//!          n
 //! });
 //!
 //! let bar1 = gen.generate();
@@ -75,4 +75,7 @@ pub use self::generator::{GeneratorIterator, GeneratorMutIterator};
 #[cfg(feature = "persian-rug")]
 pub mod persian_rug;
 #[cfg(feature = "persian-rug")]
-pub use self::persian_rug::{BuildableWithPersianRug, BuilderWithPersianRug};
+pub use self::persian_rug::{
+    BuildableWithPersianRug, BuilderWithPersianRug, GeneratableWithPersianRug,
+    GeneratorWithPersianRug,
+};

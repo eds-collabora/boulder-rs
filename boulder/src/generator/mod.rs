@@ -131,22 +131,17 @@ where
 pub use boulder_derive::Generatable;
 
 pub mod guts {
-    use super::{Generatable};
+    use super::Generatable;
     pub use super::Generator as MiniGenerator;
-    
+
     use std::cell::{Cell, RefCell};
     use std::rc::Rc;
     use std::sync::{Arc, Mutex};
-    
+
     pub trait MiniGeneratable<T>: Sized {
-        type Generator: MiniGenerator<Output=Self>;
+        type Generator: MiniGenerator<Output = Self>;
         fn mini_generator() -> Self::Generator;
     }
-
-    // pub trait MiniGenerator: Sized {
-    //     type Output;
-    //     fn generate(&mut self) -> Self::Output;
-    // }
 
     impl<T> Generatable for T
     where
@@ -158,277 +153,48 @@ pub mod guts {
             <T as MiniGeneratable<<T as BoulderBase>::Base>>::mini_generator()
         }
     }
-        
-    // impl<T> Generator for T
-    // where
-    //     T: MiniGenerator
-    // {
-    //     type Output =<T as MiniGenerator>::Output;
-    //     fn generate(&mut self) -> Self::Output {
-    //         <Self as MiniGenerator>::generate(self)
-    //     }
-    // }
-    
-    // pub struct OptionGenerator<T>(T);
-
-    // impl<T> Deref for OptionGenerator<T> {
-    //     type Target = T;
-    //     fn deref(&self) -> &Self::Target {
-    //         &self.0
-    //     }
-    // }
-
-    // impl<T> DerefMut for OptionGenerator<T> {
-    //     fn deref_mut(&mut self) -> &mut Self::Target {
-    //         &mut self.0
-    //     }
-    // }
-
-    // impl<T> Generator for OptionGenerator<T>
-    // where
-    //     T: Generator,
-    // {
-    //     type Output = Option<<T as Generator>::Output>;
-    //     fn generate(&mut self) -> Self::Output {
-    //         Some(self.0.generate())
-    //     }
-    // }
-
-    // impl<T> IntoIterator for OptionGenerator<T>
-    // where
-    //     T: Generator,
-    // {
-    //     type Item = Option<<T as Generator>::Output>;
-    //     type IntoIter = GeneratorIterator<Self>;
-    //     fn into_iter(self) -> Self::IntoIter {
-    //         Self::IntoIter::new(self)
-    //     }
-    // }
-
-    // impl<'a, T> IntoIterator for &'a mut OptionGenerator<T>
-    // where
-    //     T: Generator,
-    // {
-    //     type Item = Option<<T as Generator>::Output>;
-    //     type IntoIter = GeneratorMutIterator<'a, OptionGenerator<T>>;
-    //     fn into_iter(self) -> Self::IntoIter {
-    //         Self::IntoIter::new(self)
-    //     }
-    // }
-
-    // impl<T> Generatable for Rc<T>
-    // where
-    //     T: Generatable,
-    // {
-    //     type Generator = RcGenerator<<T as Generatable>::Generator>;
-    //     fn generator() -> Self::Generator {
-    //         RcGenerator(T::generator())
-    //     }
-    // }
-
-    // pub struct RcGenerator<T>(T);
-
-    // impl<T> Deref for RcGenerator<T> {
-    //     type Target = T;
-    //     fn deref(&self) -> &Self::Target {
-    //         &self.0
-    //     }
-    // }
-
-    // impl<T> DerefMut for RcGenerator<T> {
-    //     fn deref_mut(&mut self) -> &mut Self::Target {
-    //         &mut self.0
-    //     }
-    // }
-
-    // impl<T> Generator for RcGenerator<T>
-    // where
-    //     T: Generator,
-    // {
-    //     type Output = Rc<<T as Generator>::Output>;
-    //     fn generate(&mut self) -> Self::Output {
-    //         Rc::new(self.0.generate())
-    //     }
-    // }
-
-    // impl<T> IntoIterator for RcGenerator<T>
-    // where
-    //     T: Generator,
-    // {
-    //     type Item = Rc<<T as Generator>::Output>;
-    //     type IntoIter = GeneratorIterator<Self>;
-    //     fn into_iter(self) -> Self::IntoIter {
-    //         Self::IntoIter::new(self)
-    //     }
-    // }
-
-    // impl<'a, T> IntoIterator for &'a mut RcGenerator<T>
-    // where
-    //     T: Generator,
-    // {
-    //     type Item = Rc<<T as Generator>::Output>;
-    //     type IntoIter = GeneratorMutIterator<'a, RcGenerator<T>>;
-    //     fn into_iter(self) -> Self::IntoIter {
-    //         Self::IntoIter::new(self)
-    //     }
-    // }
-
-    // impl<T> Generatable for Arc<T>
-    // where
-    //     T: Generatable,
-    // {
-    //     type Generator = ArcGenerator<<T as Generatable>::Generator>;
-    //     fn generator() -> Self::Generator {
-    //         ArcGenerator(T::generator())
-    //     }
-    // }
-
-    // pub struct ArcGenerator<T>(T);
-
-    // impl<T> Deref for ArcGenerator<T> {
-    //     type Target = T;
-    //     fn deref(&self) -> &Self::Target {
-    //         &self.0
-    //     }
-    // }
-
-    // impl<T> DerefMut for ArcGenerator<T> {
-    //     fn deref_mut(&mut self) -> &mut Self::Target {
-    //         &mut self.0
-    //     }
-    // }
-
-    // impl<T> Generator for ArcGenerator<T>
-    // where
-    //     T: Generator,
-    // {
-    //     type Output = Arc<<T as Generator>::Output>;
-    //     fn generate(&mut self) -> Self::Output {
-    //         Arc::new(self.0.generate())
-    //     }
-    // }
-
-    // impl<T> IntoIterator for ArcGenerator<T>
-    // where
-    //     T: Generator,
-    // {
-    //     type Item = Arc<<T as Generator>::Output>;
-    //     type IntoIter = GeneratorIterator<Self>;
-    //     fn into_iter(self) -> Self::IntoIter {
-    //         Self::IntoIter::new(self)
-    //     }
-    // }
-
-    // impl<'a, T> IntoIterator for &'a mut ArcGenerator<T>
-    // where
-    //     T: Generator,
-    // {
-    //     type Item = Arc<<T as Generator>::Output>;
-    //     type IntoIter = GeneratorMutIterator<'a, ArcGenerator<T>>;
-    //     fn into_iter(self) -> Self::IntoIter {
-    //         Self::IntoIter::new(self)
-    //     }
-    // }
-
-    // impl<T> Generatable for Mutex<T>
-    // where
-    //     T: Generatable,
-    // {
-    //     type Generator = MutexGenerator<<T as Generatable>::Generator>;
-    //     fn generator() -> Self::Generator {
-    //         MutexGenerator(T::generator())
-    //     }
-    // }
-
-    // pub struct MutexGenerator<T>(T);
-
-    // impl<T> Deref for MutexGenerator<T> {
-    //     type Target = T;
-    //     fn deref(&self) -> &Self::Target {
-    //         &self.0
-    //     }
-    // }
-
-    // impl<T> DerefMut for MutexGenerator<T> {
-    //     fn deref_mut(&mut self) -> &mut Self::Target {
-    //         &mut self.0
-    //     }
-    // }
-
-    // impl<T> Generator for MutexGenerator<T>
-    // where
-    //     T: Generator,
-    // {
-    //     type Output = Mutex<<T as Generator>::Output>;
-    //     fn generate(&mut self) -> Self::Output {
-    //         Mutex::new(self.0.generate())
-    //     }
-    // }
-
-    // impl<T> IntoIterator for MutexGenerator<T>
-    // where
-    //     T: Generator,
-    // {
-    //     type Item = Mutex<<T as Generator>::Output>;
-    //     type IntoIter = GeneratorIterator<Self>;
-    //     fn into_iter(self) -> Self::IntoIter {
-    //         Self::IntoIter::new(self)
-    //     }
-    // }
-
-    // impl<'a, T> IntoIterator for &'a mut MutexGenerator<T>
-    // where
-    //     T: Generator,
-    // {
-    //     type Item = Mutex<<T as Generator>::Output>;
-    //     type IntoIter = GeneratorMutIterator<'a, MutexGenerator<T>>;
-    //     fn into_iter(self) -> Self::IntoIter {
-    //         Self::IntoIter::new(self)
-    //     }
-    // }
-
     pub trait BoulderBase {
         type Base;
     }
-    
+
     impl<T> BoulderBase for Option<T>
     where
-        T: BoulderBase
+        T: BoulderBase,
     {
         type Base = <T as BoulderBase>::Base;
     }
 
     impl<T> BoulderBase for Arc<T>
     where
-        T: BoulderBase
+        T: BoulderBase,
     {
         type Base = <T as BoulderBase>::Base;
     }
 
     impl<T> BoulderBase for Rc<T>
     where
-        T: BoulderBase
+        T: BoulderBase,
     {
         type Base = <T as BoulderBase>::Base;
     }
 
     impl<T> BoulderBase for RefCell<T>
     where
-        T: BoulderBase
+        T: BoulderBase,
     {
         type Base = <T as BoulderBase>::Base;
     }
 
     impl<T> BoulderBase for Cell<T>
     where
-        T: BoulderBase
+        T: BoulderBase,
     {
         type Base = <T as BoulderBase>::Base;
     }
 
     impl<T> BoulderBase for Mutex<T>
     where
-        T: BoulderBase
+        T: BoulderBase,
     {
         type Base = <T as BoulderBase>::Base;
     }
