@@ -6,12 +6,10 @@ pub fn derive_buildable(input: syn::DeriveInput) -> pm2::TokenStream {
     let syn::DeriveInput {
         ident,
         data,
-        generics,
+        generics: full_generics,
         vis,
         ..
     } = input;
-
-    let full_generics = generics.clone();
 
     let (generics, ty_generics, wc) = full_generics.split_for_impl();
 
@@ -40,10 +38,8 @@ pub fn derive_buildable(input: syn::DeriveInput) -> pm2::TokenStream {
                         if let GeneratorType::Default = generator {
                             generator = parsed.generator.element;
                         }
-                        if sequence.is_none() {
-                            if !parsed.builder.sequence_needs_context {
-                                sequence = parsed.builder.sequence;
-                            }
+                        if sequence.is_none() && !parsed.builder.sequence_needs_context {
+                            sequence = parsed.builder.sequence;
                         }
                     }
                 }

@@ -46,7 +46,7 @@ fn make_method_body(
     let mut generics = pm2::TokenStream::new();
     for field in fields.iter() {
         let ident = &field.ident;
-        if field.ident.as_ref().unwrap().to_string() == replace.to_string() {
+        if field.ident.as_ref().unwrap() == replace {
             body.extend(quote::quote! {
                 #ident: #replace_with,
             });
@@ -257,7 +257,7 @@ pub fn derive_generatable_with_persian_rug(input: syn::DeriveInput) -> pm2::Toke
                     }
                     GeneratorType::Generatable(map) => {
                         if generator_needs_context {
-                            for (k, _) in map {
+                            if let Some(k) = map.keys().next() {
                                 return syn::Error::new_spanned(
                                     k,
                                     "cannot customise nested persian-rug generators from within a persian-rug generator"
@@ -347,7 +347,7 @@ pub fn derive_generatable_with_persian_rug(input: syn::DeriveInput) -> pm2::Toke
                         };
 
                         if builder_needs_context {
-                            let new_generator_id = make_generator_id_for_field(&field);
+                            let new_generator_id = make_generator_id_for_field(field);
 
                             dyn_generators.extend(quote::quote! {
                                 // This is just so the generics are used and in scope for #fieldtype
@@ -413,7 +413,7 @@ pub fn derive_generatable_with_persian_rug(input: syn::DeriveInput) -> pm2::Toke
                     }
                 } else if let Some((sequence, _seq_ty)) = build_sequence {
                     if build_sequence_needs_context {
-                        let new_generator_id = make_sequence_generator_id_for_field(&field);
+                        let new_generator_id = make_sequence_generator_id_for_field(field);
                         dyn_generators.extend(quote::quote! {
                             // This is just so the generics are used and in scope for #fieldtype
                             struct #new_generator_id #generics {

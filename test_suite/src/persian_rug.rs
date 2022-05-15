@@ -1,3 +1,5 @@
+#![allow(clippy::blacklisted_name)]
+
 mod builder_basic {
     use boulder::{BuildableWithPersianRug, BuilderWithPersianRug};
     use boulder::{GeneratableWithPersianRug, GeneratorWithPersianRug};
@@ -277,7 +279,7 @@ mod generators_basic {
         where
             B: 'b + persian_rug::Mutator<Context = C>,
         {
-            for wizard in context.get_iter() {
+            if let Some(wizard) = context.get_iter().next() {
                 return (format!("{}!", wizard.a), context);
             }
             ("hello".to_string(), context)

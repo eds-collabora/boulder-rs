@@ -161,7 +161,7 @@ pub fn derive_buildable_with_persian_rug(input: syn::DeriveInput) -> pm2::TokenS
                             };
 
                             if needs_context {
-                                let new_generator_id = make_generator_id_for_field(&field);
+                                let new_generator_id = make_generator_id_for_field(field);
 
                                 dyn_generators.extend(quote::quote! {
                                     // This is just so the generics are used and in scope for #fieldtype

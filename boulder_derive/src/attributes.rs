@@ -215,8 +215,8 @@ impl syn::parse::Parse for AttributeItem {
 pub enum BuildType {
     Buildable(BTreeMap<syn::Ident, syn::Expr>),
     Value {
-        expr: syn::Expr,
-        ty: Option<syn::Type>,
+        expr: Box<syn::Expr>,
+        ty: Option<Box<syn::Type>>,
     },
     Default,
 }
@@ -230,8 +230,8 @@ pub struct BuilderData {
 
 pub enum GeneratorType {
     Generator {
-        expr: syn::Expr,
-        ty: Option<syn::Type>,
+        expr: Box<syn::Expr>,
+        ty: Option<Box<syn::Type>>,
     },
     Generatable(BTreeMap<syn::Ident, syn::Expr>),
     Default,
@@ -275,7 +275,7 @@ impl syn::parse::Parse for BuilderMeta {
                 }
                 AttributeItem::Default { expr, .. } => {
                     bd.element = BuildType::Value {
-                        expr: expr.clone(),
+                        expr: Box::new(expr.clone()),
                         ty: None,
                     };
                 }
@@ -289,7 +289,7 @@ impl syn::parse::Parse for BuilderMeta {
                 }
                 AttributeItem::Generator { expr, .. } => {
                     gd.element = GeneratorType::Generator {
-                        expr: expr.clone(),
+                        expr: Box::new(expr.clone()),
                         ty: None,
                     };
                 }
@@ -369,7 +369,7 @@ impl syn::parse::Parse for BuilderMetaWithPersianRug {
                 }
                 AttributeItem::Default { expr, .. } => {
                     bd.element = BuildType::Value {
-                        expr: expr.clone(),
+                        expr: Box::new(expr.clone()),
                         ty: None,
                     };
                 }
@@ -383,7 +383,7 @@ impl syn::parse::Parse for BuilderMetaWithPersianRug {
                 }
                 AttributeItem::Generator { expr, .. } => {
                     gd.element = GeneratorType::Generator {
-                        expr: expr.clone(),
+                        expr: Box::new(expr.clone()),
                         ty: None,
                     };
                 }
@@ -399,8 +399,8 @@ impl syn::parse::Parse for BuilderMetaWithPersianRug {
                 }
                 AttributeItem::DefaultWithPersianRug { expr, ty, .. } => {
                     bd.element = BuildType::Value {
-                        expr: expr.clone(),
-                        ty: ty.clone(),
+                        expr: Box::new(expr.clone()),
+                        ty: ty.map(Box::new),
                     };
                     bd.needs_context = true;
                 }
@@ -416,8 +416,8 @@ impl syn::parse::Parse for BuilderMetaWithPersianRug {
                 }
                 AttributeItem::GeneratorWithPersianRug { expr, ty, .. } => {
                     gd.element = GeneratorType::Generator {
-                        expr: expr.clone(),
-                        ty: ty.clone(),
+                        expr: Box::new(expr.clone()),
+                        ty: ty.map(Box::new),
                     };
                     gd.needs_context = true;
                 }

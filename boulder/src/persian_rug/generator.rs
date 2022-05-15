@@ -1,5 +1,3 @@
-// pub mod generators;
-
 pub trait GeneratableWithPersianRug<C>
 where
     C: persian_rug::Context,
