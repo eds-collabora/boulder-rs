@@ -122,7 +122,7 @@ pub fn derive_generatable(input: syn::DeriveInput) -> pm2::TokenStream {
                             }
                             BuildType::Value { expr: value, .. } => {
                                 static_value.extend(quote::quote! {
-                                    (#value).into(),
+                                    (#value).into()
                                 });
                             }
                             BuildType::Default => {
@@ -141,9 +141,10 @@ pub fn derive_generatable(input: syn::DeriveInput) -> pm2::TokenStream {
                     defaults.extend(quote::quote! {
                         #fieldid: {
                             let mut seq = #sequence;
+                            let mut value = { #value };
                             Box::new(move || {
-                                ::boulder::GeneratorIterator::new(
-                                    #value
+                                ::boulder::GeneratorMutIterator::new(
+                                    &mut value
                                 ).take(::boulder::Generator::generate(&mut seq).into()).collect()
                             })
                         },

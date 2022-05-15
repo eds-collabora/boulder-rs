@@ -1,11 +1,10 @@
-//! This crate is based around two derive macros, `Buildable` and
-//! `Generatable` which provide a method to construct a `Builder` and
-//! `Generator` respectively for your type, wrapping up a lot of
-//! boilerplate within them.
+//! This crate is based around two traits, [`Buildable`] and
+//! [`Generatable`], and their associated derive macros, which provide
+//! ways to construct objects succinctly. 
 //!
 //! # Builder
 //!
-//! A `Builder` is a way to create a single object, specifying only the
+//! A [`Builder`] is a way to create a single object, specifying only the
 //! fields you wish to give non-default values. The default values are
 //! specified using attributes on your type for ease of reading. Each
 //! field gains a method of the same type in the builder which can be
@@ -30,13 +29,13 @@
 //! ```
 //! # Generator
 //!
-//! A `Generator` is a way to create an infinite sequence of objects,
-//! again specifying only the function for generating the fields you
-//! wish to have non-default sequences. The default sequences are
-//! specified using attributes on your type for ease of reading. Each
-//! field gains a method of the same type in the generator which can
-//! be be used to customise the sequence of values it takes between
-//! objects.
+//! A [`Generator`] is a way to create an infinite sequence of
+//! objects, again specifying only the functions for generating the
+//! fields you wish to have non-default sequences. The default
+//! sequences are specified using attributes on your type for ease of
+//! reading. Each field gains a method of the same name in the
+//! generator, which can be be used to customise the sequence of
+//! values produced for that field as objects are made.
 //!
 //! Example
 //! ```rust

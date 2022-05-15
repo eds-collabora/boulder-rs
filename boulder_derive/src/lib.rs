@@ -13,7 +13,7 @@ use proc_macro::{self, TokenStream};
 /// no implementation for either enums or structs with unnamed fields.
 /// All fields will be default constructed in the absence of other
 /// instructions. You can customise the construction process for your
-/// type by using the `builder` attribute on its fields, as follows:
+/// type by using the `boulder` attribute on its fields, as follows:
 ///
 /// - `#[boulder(default=Foo)]` The default value for this field is
 ///   `Foo`, where an arbitrary well-formed Rust expression can be
@@ -29,14 +29,15 @@ use proc_macro::{self, TokenStream};
 ///    member names, and `5` and `10` can be replaced by arbitrary
 ///    well-formed Rust expressions.
 ///
-/// - `#[boulder(sequence=3)]` This field is assumed to be a collection
-///   type (a type which can be the target of `collect()`). Generate 3 items and
-///   initialize a new collection from them, where `3` can be replaced
-///   by an arbitrary well-formed Rust expression. The generation mechanism
-///   will be the type's generator, if `generatable` is given; otherwise it
-///   will be the type's builder, if `buildable` is given, else it will be
-///   be the default value if `default` is given, else the items will be
-///   default initialized.
+/// - `#[boulder(sequence=3)]` This field is assumed to be a
+///   collection type (a type which can be the target of
+///   `collect()`). Generate 3 items and initialize a new collection
+///   from them, where `3` can be replaced by an arbitrary well-formed
+///   Rust expression. The generation mechanism will be taken from any
+///   generator specification (`generator` or `generatable`) if one is
+///   given; otherwise it will be from the builder specification
+///   (`default` or `buildable`, as described above) if one is given;
+///   otherwise the items will be default initialized.
 ///
 /// Example:
 /// ```rust
@@ -95,7 +96,7 @@ pub fn builder(input: TokenStream) -> TokenStream {
 /// no implementation for either enums or structs with unnamed fields.
 /// All fields will be default constructed (i.e. `Default::default()`)
 /// in the absence of other instructions. You can customise the
-/// construction process for your type by using the `builder`
+/// construction process for your type by using the `boulder`
 /// attribute as follows:
 ///
 /// - `#[boulder(generator=Inc(0))]` Each successive instance produced

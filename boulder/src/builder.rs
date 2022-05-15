@@ -1,5 +1,17 @@
-/// Something which can be turned into an object of type `Result`
+/// Something which can create a default object of some type.
+///
+/// The only required function in this trait is
+/// [`build`](Builder::build) which creates an object, consuming the
+/// builder. Most builders will allow customisation of the produced
+/// object in some way.
+///
+/// An object implementing this trait will be automatically created
+/// for you as part of the [`macro@Buildable`] derive macro. That
+/// builder will have a method for each field of the result type, to
+/// customise its value, and will produce a default value for every
+/// field which is not customised.
 pub trait Builder {
+    /// The output type for this type.
     type Result;
     /// Create the final object.
     ///
@@ -29,18 +41,24 @@ pub trait Builder {
     fn build(self) -> Self::Result;
 }
 
-/// A type that has an associated default `Builder`.
+/// A type that has an associated default [`Builder`].
 ///
-/// The convenient way to implement this trait is via the `Buildable`
-/// derive macro. Note that it cannot be directly implemented because
-/// the library itself provides a blanket implementation from a
-/// more complex underlying trait.
+/// This trait is implemented via the [`macro@Buildable`] derive
+/// macro. It cannot be directly implemented because the library
+/// itself provides a blanket implementation from a more complex
+/// underlying trait `MiniBuildable`, which is not currently
+/// documented.
+///
+/// This restriction may be removed in a future version; much of the
+/// complexity in this module stems from lacking generic associated
+/// types on stable.
 pub trait Buildable: Sized
 where
     Self: guts::BoulderBase,
 {
+    /// A default choice of [`Builder`] for this type.
     type Builder: Builder<Result = Self>;
-    /// Create a new builder for this type.
+    /// Create a new default builder.
     ///
     /// Example
     /// ```rust

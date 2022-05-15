@@ -254,6 +254,9 @@ mod builder_coverage {
         #[table]
         rabbits: Rabbit<RabbitState>,
     }
+
+
+    // FIXME: Test the output
 }
 
 mod generators_basic {
