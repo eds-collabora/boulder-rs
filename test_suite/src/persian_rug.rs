@@ -2997,3 +2997,134 @@ mod generator_coverage_no_generics {
         assert_eq!(d.q9[0].c9, 99);
     }
 }
+
+mod generator_wrappers {
+    use super::*;
+
+    use boulder::persian_rug::generator::GeneratorWrapper;
+    use boulder::{GeneratableWithPersianRug, GeneratorWithPersianRug};
+    use persian_rug::Proxy;
+    use std::any::Any;
+    use std::cell::{Cell, RefCell};
+    use std::rc::Rc;
+    use std::sync::{Arc, Mutex};
+
+    #[persian_rug::contextual(C)]
+    #[derive(GeneratableWithPersianRug)]
+    #[boulder(persian_rug(context=C, access(Foo2<C>)))]
+    struct Foo2<C: persian_rug::Context + 'static> {
+        _marker: core::marker::PhantomData<C>,
+        a: i32,
+    }
+
+    #[derive(Default)]
+    #[persian_rug::persian_rug]
+    struct State2 {
+        #[table]
+        foos: Foo2<State2>,
+    }
+
+    #[test]
+    fn test_option() {
+        let mut s: State2 = Default::default();
+
+        let mut g = Option::<Foo2<State2>>::generator().a(GeneratorWrapper::new(|| 5));
+        let (f1, _) = g.generate(&mut s);
+        assert_eq!(std::any::TypeId::of::<Option<Foo2<State2>>>(), f1.type_id());
+        assert_eq!(f1.as_ref().map(|f1| f1.a), Some(5));
+    }
+
+    #[test]
+    fn test_proxy() {
+        let mut s: State2 = Default::default();
+
+        let mut g = Proxy::<Foo2<State2>>::generator().a(GeneratorWrapper::new(|| 5));
+        let (f1, _) = g.generate(&mut s);
+        assert_eq!(std::any::TypeId::of::<Proxy<Foo2<State2>>>(), f1.type_id());
+        assert_eq!(<&State2 as persian_rug::Accessor>::get(&&s, &f1).a, 5);
+    }
+
+    #[test]
+    fn test_option_proxy() {
+        let mut s: State2 = Default::default();
+
+        let mut g = Option::<Proxy<Foo2<State2>>>::generator().a(GeneratorWrapper::new(|| 5));
+        let (f1, _) = g.generate(&mut s);
+        assert_eq!(
+            std::any::TypeId::of::<Option<Proxy<Foo2<State2>>>>(),
+            f1.type_id()
+        );
+        assert_eq!(
+            f1.as_ref()
+                .map(|f1| <State2 as persian_rug::Context>::get(&s, &f1).a),
+            Some(5)
+        );
+    }
+
+    #[test]
+    fn test_arc() {
+        let mut s: State2 = Default::default();
+
+        let mut g = Arc::<Foo2<State2>>::generator().a(GeneratorWrapper::new(|| 5));
+        let (f1, _) = g.generate(&mut s);
+        assert_eq!(std::any::TypeId::of::<Arc<Foo2<State2>>>(), f1.type_id());
+        assert_eq!(f1.a, 5);
+    }
+
+    #[test]
+    fn test_mutex() {
+        let mut s: State2 = Default::default();
+
+        let mut g = Mutex::<Foo2<State2>>::generator().a(GeneratorWrapper::new(|| 5));
+        let (f1, _) = g.generate(&mut s);
+        assert_eq!(std::any::TypeId::of::<Mutex<Foo2<State2>>>(), f1.type_id());
+        assert_eq!(f1.lock().unwrap().a, 5);
+    }
+
+    #[test]
+    fn test_arc_mutex() {
+        let mut s: State2 = Default::default();
+
+        let mut g = Arc::<Mutex<Foo2<State2>>>::generator().a(GeneratorWrapper::new(|| 5));
+        let (f1, _) = g.generate(&mut s);
+        assert_eq!(
+            std::any::TypeId::of::<Arc<Mutex<Foo2<State2>>>>(),
+            f1.type_id()
+        );
+        assert_eq!(f1.lock().unwrap().a, 5);
+    }
+
+    #[test]
+    fn test_rc() {
+        let mut s: State2 = Default::default();
+
+        let mut g = Rc::<Foo2<State2>>::generator().a(GeneratorWrapper::new(|| 5));
+        let (f1, _) = g.generate(&mut s);
+        assert_eq!(std::any::TypeId::of::<Rc<Foo2<State2>>>(), f1.type_id());
+        assert_eq!(f1.a, 5);
+    }
+
+    #[test]
+    fn test_cell() {
+        let mut s: State2 = Default::default();
+
+        let mut g = Cell::<Foo2<State2>>::generator().a(GeneratorWrapper::new(|| 5));
+        let (f1, _) = g.generate(&mut s);
+        assert_eq!(std::any::TypeId::of::<Cell<Foo2<State2>>>(), f1.type_id());
+        let f1_contents = f1.into_inner();
+        assert_eq!(f1_contents.a, 5);
+    }
+
+    #[test]
+    fn test_ref_cell() {
+        let mut s: State2 = Default::default();
+
+        let mut g = RefCell::<Foo2<State2>>::generator().a(GeneratorWrapper::new(|| 5));
+        let (f1, _) = g.generate(&mut s);
+        assert_eq!(
+            std::any::TypeId::of::<RefCell<Foo2<State2>>>(),
+            f1.type_id()
+        );
+        assert_eq!(f1.borrow().a, 5);
+    }
+}
