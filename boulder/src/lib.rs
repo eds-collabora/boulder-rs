@@ -1,6 +1,6 @@
 //! This crate is based around two traits, [`Buildable`] and
 //! [`Generatable`], and their associated derive macros, which provide
-//! ways to construct objects succinctly. 
+//! ways to construct objects succinctly.
 //!
 //! # Builder
 //!

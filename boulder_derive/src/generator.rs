@@ -158,7 +158,9 @@ pub fn derive_generatable(input: syn::DeriveInput) -> pm2::TokenStream {
         }
     }
 
-    let bare_generics = {
+    let bare_generics = if full_generics.params.is_empty() {
+        quote::quote! {}
+    } else {
         let params = &full_generics.params;
         quote::quote! {
             , #params

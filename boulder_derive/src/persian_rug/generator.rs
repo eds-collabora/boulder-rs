@@ -101,7 +101,9 @@ pub fn derive_generatable_with_persian_rug(input: syn::DeriveInput) -> pm2::Toke
     let mut gen_generics = generics.clone();
     let (generics, ty_generics, wc) = generics.split_for_impl();
 
-    let bare_generics = {
+    let bare_generics = if full_generics.params.is_empty() {
+        quote::quote! {}
+    } else {
         let params = &full_generics.params;
         quote::quote! {
             , #params
@@ -351,7 +353,7 @@ pub fn derive_generatable_with_persian_rug(input: syn::DeriveInput) -> pm2::Toke
 
                             dyn_generators.extend(quote::quote! {
                                 // This is just so the generics are used and in scope for #fieldtype
-                                struct #new_generator_id #generics {
+                                struct #new_generator_id #generics #wc {
                                     _marker: core::marker::PhantomData<#ident #ty_generics>
                                 }
 
@@ -416,7 +418,7 @@ pub fn derive_generatable_with_persian_rug(input: syn::DeriveInput) -> pm2::Toke
                         let new_generator_id = make_sequence_generator_id_for_field(field);
                         dyn_generators.extend(quote::quote! {
                             // This is just so the generics are used and in scope for #fieldtype
-                            struct #new_generator_id #generics {
+                            struct #new_generator_id #generics #wc {
                                 _marker: core::marker::PhantomData<#ident #ty_generics>
                             }
 
@@ -481,7 +483,7 @@ pub fn derive_generatable_with_persian_rug(input: syn::DeriveInput) -> pm2::Toke
                     context: BoulderMutatorParam)
                     -> (Self::Output, BoulderMutatorParam)
                 where
-                    BoulderMutatorParam: 'boulder_mutator_lifetime + ::persian_rug::Mutator<Context=C>;
+                    BoulderMutatorParam: 'boulder_mutator_lifetime + ::persian_rug::Mutator<Context=#context>;
             }
 
             #[automatically_derived]
@@ -519,7 +521,7 @@ pub fn derive_generatable_with_persian_rug(input: syn::DeriveInput) -> pm2::Toke
                     context: BoulderMutatorParam)
                     -> (Self::Output, BoulderMutatorParam)
                 where
-                    BoulderMutatorParam: 'boulder_mutator_lifetime + ::persian_rug::Mutator<Context=C>,
+                    BoulderMutatorParam: 'boulder_mutator_lifetime + ::persian_rug::Mutator<Context=#context>,
                 {
                     <Self as NestedGenerate #gen_ty_generics>::nested_generate(self, context)
                 }
@@ -809,8 +811,6 @@ pub fn derive_generatable_with_persian_rug(input: syn::DeriveInput) -> pm2::Toke
 
         };
     };
-
-    // println!("{}", res);
 
     res
 }

@@ -47,94 +47,6 @@ fn test_simple() {
     assert_eq!(b.v.b, 7i32);
 }
 
-#[test]
-fn test_option() {
-    let w = Option::<Womble>::builder().a("hello").b(4i16).build();
-    assert_eq!(std::any::TypeId::of::<Option<Womble>>(), w.type_id());
-    assert_eq!(w.as_ref().map(|w| &w.a), Some(&"hello".to_string()));
-    assert_eq!(w.as_ref().map(|w| w.b), Some(4i32));
-}
-
-#[test]
-fn test_rc() {
-    let w = std::rc::Rc::<Womble>::builder().a("hello").b(4i16).build();
-    assert_eq!(std::any::TypeId::of::<std::rc::Rc<Womble>>(), w.type_id());
-    assert_eq!(w.a, "hello".to_string());
-    assert_eq!(w.b, 4i32);
-}
-
-#[test]
-fn test_arc() {
-    let w = std::sync::Arc::<Womble>::builder()
-        .a("hello")
-        .b(4i16)
-        .build();
-    assert_eq!(
-        std::any::TypeId::of::<std::sync::Arc<Womble>>(),
-        w.type_id()
-    );
-    assert_eq!(w.a, "hello".to_string());
-    assert_eq!(w.b, 4i32);
-}
-
-#[test]
-fn test_mutex() {
-    let w = std::sync::Mutex::<Womble>::builder()
-        .a("hello")
-        .b(4i16)
-        .build();
-    assert_eq!(
-        std::any::TypeId::of::<std::sync::Mutex<Womble>>(),
-        w.type_id()
-    );
-    assert_eq!(w.lock().unwrap().a, "hello".to_string());
-    assert_eq!(w.lock().unwrap().b, 4i32);
-}
-
-#[test]
-fn test_ref_cell() {
-    let w = std::cell::RefCell::<Womble>::builder()
-        .a("hello")
-        .b(4i16)
-        .build();
-    assert_eq!(
-        std::any::TypeId::of::<std::cell::RefCell<Womble>>(),
-        w.type_id()
-    );
-    assert_eq!(w.borrow().a, "hello".to_string());
-    assert_eq!(w.borrow().b, 4i32);
-}
-
-#[test]
-fn test_cell() {
-    let w = std::cell::Cell::<Womble>::builder()
-        .a("hello")
-        .b(4i16)
-        .build();
-
-    assert_eq!(
-        std::any::TypeId::of::<std::cell::Cell<Womble>>(),
-        w.type_id()
-    );
-    let w_contents = w.into_inner();
-    assert_eq!(w_contents.a, "hello".to_string());
-    assert_eq!(w_contents.b, 4i32);
-}
-
-#[test]
-fn test_arc_mutex() {
-    let w = std::sync::Arc::<std::sync::Mutex<Womble>>::builder()
-        .a("hello")
-        .b(4i16)
-        .build();
-    assert_eq!(
-        std::any::TypeId::of::<std::sync::Arc<std::sync::Mutex<Womble>>>(),
-        w.type_id()
-    );
-    assert_eq!(w.lock().unwrap().a, "hello".to_string());
-    assert_eq!(w.lock().unwrap().b, 4i32);
-}
-
 #[derive(Debug, Buildable)]
 pub struct Bodger<U: Buildable>
 where
@@ -157,6 +69,349 @@ fn test_generic() {
     assert_eq!(w.w.b, 7i32);
     assert_eq!(w.v.a, "hullo".to_string());
     assert_eq!(w.v.b, 7i32);
+}
+
+mod builder_wrappers {
+    use super::*;
+
+    #[test]
+    fn test_option() {
+        let w = Option::<Womble>::builder().a("hello").b(4i16).build();
+        assert_eq!(std::any::TypeId::of::<Option<Womble>>(), w.type_id());
+        assert_eq!(w.as_ref().map(|w| &w.a), Some(&"hello".to_string()));
+        assert_eq!(w.as_ref().map(|w| w.b), Some(4i32));
+    }
+
+    #[test]
+    fn test_rc() {
+        let w = std::rc::Rc::<Womble>::builder().a("hello").b(4i16).build();
+        assert_eq!(std::any::TypeId::of::<std::rc::Rc<Womble>>(), w.type_id());
+        assert_eq!(w.a, "hello".to_string());
+        assert_eq!(w.b, 4i32);
+    }
+
+    #[test]
+    fn test_arc() {
+        let w = std::sync::Arc::<Womble>::builder()
+            .a("hello")
+            .b(4i16)
+            .build();
+        assert_eq!(
+            std::any::TypeId::of::<std::sync::Arc<Womble>>(),
+            w.type_id()
+        );
+        assert_eq!(w.a, "hello".to_string());
+        assert_eq!(w.b, 4i32);
+    }
+
+    #[test]
+    fn test_mutex() {
+        let w = std::sync::Mutex::<Womble>::builder()
+            .a("hello")
+            .b(4i16)
+            .build();
+        assert_eq!(
+            std::any::TypeId::of::<std::sync::Mutex<Womble>>(),
+            w.type_id()
+        );
+        assert_eq!(w.lock().unwrap().a, "hello".to_string());
+        assert_eq!(w.lock().unwrap().b, 4i32);
+    }
+
+    #[test]
+    fn test_ref_cell() {
+        let w = std::cell::RefCell::<Womble>::builder()
+            .a("hello")
+            .b(4i16)
+            .build();
+        assert_eq!(
+            std::any::TypeId::of::<std::cell::RefCell<Womble>>(),
+            w.type_id()
+        );
+        assert_eq!(w.borrow().a, "hello".to_string());
+        assert_eq!(w.borrow().b, 4i32);
+    }
+
+    #[test]
+    fn test_cell() {
+        let w = std::cell::Cell::<Womble>::builder()
+            .a("hello")
+            .b(4i16)
+            .build();
+
+        assert_eq!(
+            std::any::TypeId::of::<std::cell::Cell<Womble>>(),
+            w.type_id()
+        );
+        let w_contents = w.into_inner();
+        assert_eq!(w_contents.a, "hello".to_string());
+        assert_eq!(w_contents.b, 4i32);
+    }
+
+    #[test]
+    fn test_arc_mutex() {
+        let w = std::sync::Arc::<std::sync::Mutex<Womble>>::builder()
+            .a("hello")
+            .b(4i16)
+            .build();
+        assert_eq!(
+            std::any::TypeId::of::<std::sync::Arc<std::sync::Mutex<Womble>>>(),
+            w.type_id()
+        );
+        assert_eq!(w.lock().unwrap().a, "hello".to_string());
+        assert_eq!(w.lock().unwrap().b, 4i32);
+    }
+}
+
+mod builder_coverage {
+    use boulder::{Buildable, Builder, Generatable, Generator};
+
+    struct Parsnip1 {
+        c1: i32,
+    }
+
+    struct Parsnip1Generator {
+        c1: i32,
+    }
+
+    impl Generator for Parsnip1Generator {
+        type Output = Parsnip1;
+        fn generate(&mut self) -> Self::Output {
+            let ix = self.c1;
+            self.c1 += 1;
+            Parsnip1 { c1: ix }
+        }
+    }
+
+    #[derive(Generatable)]
+    struct Parsnip2 {
+        #[boulder(generator=boulder::gen::Inc(0))]
+        c2: i32,
+    }
+
+    #[derive(Buildable)]
+    struct Parsnip3 {
+        #[boulder(default = 0)]
+        c3: i32,
+    }
+
+    struct Parsnip4 {
+        c4: i32,
+    }
+
+    #[derive(Default)]
+    struct Parsnip5 {
+        c5: i32,
+    }
+
+    #[derive(Buildable)]
+    struct Elephant {
+        // #[boulder(generator=Parsnip1Generator {c1: 1})]
+        // v1: Parsnip2,
+        // #[boulder(generatable(c2=boulder::gen::Inc(2)))]
+        // v2: Parsnip2,
+        #[boulder(buildable(c3 = 3))]
+        v3: Parsnip3,
+        #[boulder(default=Parsnip4 { c4: 4 })]
+        v4: Parsnip4,
+        v5: Parsnip5,
+
+        #[boulder(generator=Parsnip1Generator { c1: 1}, sequence=1)]
+        s1: Vec<Parsnip1>,
+        #[boulder(generatable(c2=boulder::gen::Inc(2)), sequence=2)]
+        s2: Vec<Parsnip2>,
+        #[boulder(buildable(c3 = 3), sequence = 3)]
+        s3: Vec<Parsnip3>,
+        #[boulder(default=Parsnip4 { c4: 4 }, sequence=4)]
+        s4: Vec<Parsnip4>,
+        #[boulder(sequence = 5)]
+        s5: Vec<Parsnip5>,
+    }
+
+    #[test]
+    fn test_defaults() {
+        let e = Elephant::builder().build();
+
+        assert_eq!(e.v3.c3, 3);
+        assert_eq!(e.v4.c4, 4);
+        assert_eq!(e.v5.c5, 0);
+
+        assert_eq!(e.s1.len(), 1);
+        assert_eq!(e.s1[0].c1, 1);
+        assert_eq!(e.s2.len(), 2);
+        assert_eq!(e.s2[0].c2, 2);
+        assert_eq!(e.s2[1].c2, 3);
+        assert_eq!(e.s3.len(), 3);
+        assert_eq!(e.s3[0].c3, 3);
+        assert_eq!(e.s3[1].c3, 3);
+        assert_eq!(e.s3[2].c3, 3);
+        assert_eq!(e.s4.len(), 4);
+        assert_eq!(e.s4[0].c4, 4);
+        assert_eq!(e.s4[1].c4, 4);
+        assert_eq!(e.s4[2].c4, 4);
+        assert_eq!(e.s4[3].c4, 4);
+        assert_eq!(e.s5.len(), 5);
+        assert_eq!(e.s5[0].c5, 0);
+        assert_eq!(e.s5[1].c5, 0);
+        assert_eq!(e.s5[2].c5, 0);
+        assert_eq!(e.s5[3].c5, 0);
+    }
+
+    #[test]
+    fn test_customise() {
+        let e = Elephant::builder()
+            .v3(Parsnip3 { c3: 33 })
+            .v4(Parsnip4 { c4: 44 })
+            .v5(Parsnip5 { c5: 55 })
+            .s1(vec![Parsnip1 { c1: 11 }])
+            .s2(vec![Parsnip2 { c2: 22 }])
+            .s3(vec![Parsnip3 { c3: 33 }])
+            .s4(vec![Parsnip4 { c4: 44 }])
+            .s5(vec![Parsnip5 { c5: 55 }])
+            .build();
+
+        assert_eq!(e.v3.c3, 33);
+        assert_eq!(e.v4.c4, 44);
+        assert_eq!(e.v5.c5, 55);
+
+        assert_eq!(e.s1.len(), 1);
+        assert_eq!(e.s1[0].c1, 11);
+        assert_eq!(e.s2.len(), 1);
+        assert_eq!(e.s2[0].c2, 22);
+        assert_eq!(e.s3.len(), 1);
+        assert_eq!(e.s3[0].c3, 33);
+        assert_eq!(e.s4.len(), 1);
+        assert_eq!(e.s4[0].c4, 44);
+        assert_eq!(e.s5.len(), 1);
+        assert_eq!(e.s5[0].c5, 55);
+    }
+}
+
+mod builder_coverage_generics {
+    use boulder::{Buildable, Builder, Generatable, Generator};
+
+    struct Parsnip1 {
+        c1: i32,
+    }
+
+    struct Parsnip1Generator {
+        c1: i32,
+    }
+
+    impl Generator for Parsnip1Generator {
+        type Output = Parsnip1;
+        fn generate(&mut self) -> Self::Output {
+            let ix = self.c1;
+            self.c1 += 1;
+            Parsnip1 { c1: ix }
+        }
+    }
+
+    #[derive(Generatable)]
+    struct Parsnip2 {
+        #[boulder(generator=boulder::gen::Inc(0))]
+        c2: i32,
+    }
+
+    #[derive(Buildable)]
+    struct Parsnip3 {
+        #[boulder(default = 0)]
+        c3: i32,
+    }
+
+    struct Parsnip4 {
+        c4: i32,
+    }
+
+    #[derive(Default)]
+    struct Parsnip5 {
+        c5: i32,
+    }
+
+    #[derive(Buildable)]
+    struct Rhino<T: Default, U>
+    where
+        U: Default,
+    {
+        // #[boulder(generator=Parsnip1Generator {c1: 1})]
+        // v1: Parsnip2,
+        // #[boulder(generatable(c2=boulder::gen::Inc(2)))]
+        // v2: Parsnip2,
+        #[boulder(buildable(c3 = 3))]
+        v3: Parsnip3,
+        #[boulder(default=Parsnip4 { c4: 4 })]
+        v4: Parsnip4,
+        v5: T,
+
+        #[boulder(generator=Parsnip1Generator { c1: 1}, sequence=1)]
+        s1: Vec<Parsnip1>,
+        #[boulder(generatable(c2=boulder::gen::Inc(2)), sequence=2)]
+        s2: Vec<Parsnip2>,
+        #[boulder(buildable(c3 = 3), sequence = 3)]
+        s3: Vec<Parsnip3>,
+        #[boulder(default=Parsnip4 { c4: 4 }, sequence=4)]
+        s4: Vec<Parsnip4>,
+        #[boulder(sequence = 5)]
+        s5: Vec<U>,
+    }
+
+    #[test]
+    fn test_defaults() {
+        let e = Rhino::<Parsnip5, Parsnip5>::builder().build();
+
+        assert_eq!(e.v3.c3, 3);
+        assert_eq!(e.v4.c4, 4);
+        assert_eq!(e.v5.c5, 0);
+
+        assert_eq!(e.s1.len(), 1);
+        assert_eq!(e.s1[0].c1, 1);
+        assert_eq!(e.s2.len(), 2);
+        assert_eq!(e.s2[0].c2, 2);
+        assert_eq!(e.s2[1].c2, 3);
+        assert_eq!(e.s3.len(), 3);
+        assert_eq!(e.s3[0].c3, 3);
+        assert_eq!(e.s3[1].c3, 3);
+        assert_eq!(e.s3[2].c3, 3);
+        assert_eq!(e.s4.len(), 4);
+        assert_eq!(e.s4[0].c4, 4);
+        assert_eq!(e.s4[1].c4, 4);
+        assert_eq!(e.s4[2].c4, 4);
+        assert_eq!(e.s4[3].c4, 4);
+        assert_eq!(e.s5.len(), 5);
+        assert_eq!(e.s5[0].c5, 0);
+        assert_eq!(e.s5[1].c5, 0);
+        assert_eq!(e.s5[2].c5, 0);
+        assert_eq!(e.s5[3].c5, 0);
+    }
+
+    #[test]
+    fn test_customise() {
+        let e = Rhino::<Parsnip5, _>::builder()
+            .v3(Parsnip3 { c3: 33 })
+            .v4(Parsnip4 { c4: 44 })
+            .v5(Parsnip5 { c5: 55 })
+            .s1(vec![Parsnip1 { c1: 11 }])
+            .s2(vec![Parsnip2 { c2: 22 }])
+            .s3(vec![Parsnip3 { c3: 33 }])
+            .s4(vec![Parsnip4 { c4: 44 }])
+            .s5(vec![Parsnip5 { c5: 55 }])
+            .build();
+
+        assert_eq!(e.v3.c3, 33);
+        assert_eq!(e.v4.c4, 44);
+        assert_eq!(e.v5.c5, 55);
+
+        assert_eq!(e.s1.len(), 1);
+        assert_eq!(e.s1[0].c1, 11);
+        assert_eq!(e.s2.len(), 1);
+        assert_eq!(e.s2[0].c2, 22);
+        assert_eq!(e.s3.len(), 1);
+        assert_eq!(e.s3[0].c3, 33);
+        assert_eq!(e.s4.len(), 1);
+        assert_eq!(e.s4[0].c4, 44);
+        assert_eq!(e.s5.len(), 1);
+        assert_eq!(e.s5[0].c5, 55);
+    }
 }
 
 #[derive(Debug, Generatable)]
@@ -183,178 +438,182 @@ fn test_generator() {
     assert_eq!(w2.b, 6);
 }
 
-#[test]
-fn test_option_generator() {
-    let mut g = Option::<Wizard>::generator();
+mod generator_wrappers {
+    use super::*;
 
-    let w = g.generate();
-    let w2 = g.generate();
+    #[test]
+    fn test_option_generator() {
+        let mut g = Option::<Wizard>::generator();
 
-    assert_eq!(std::any::TypeId::of::<Option<Wizard>>(), w.type_id());
-    assert_eq!(std::any::TypeId::of::<Option<Wizard>>(), w2.type_id());
+        let w = g.generate();
+        let w2 = g.generate();
 
-    assert_eq!(w.as_ref().map(|w| &w.a), Some(&"hello".to_string()));
-    assert_eq!(w.as_ref().map(|w| &w.b), Some(&5));
-    assert_eq!(w2.as_ref().map(|w| &w.a), Some(&"hello".to_string()));
-    assert_eq!(w2.as_ref().map(|w| &w.b), Some(&6));
+        assert_eq!(std::any::TypeId::of::<Option<Wizard>>(), w.type_id());
+        assert_eq!(std::any::TypeId::of::<Option<Wizard>>(), w2.type_id());
 
-    let mut g = Option::<Option<Wizard>>::generator();
+        assert_eq!(w.as_ref().map(|w| &w.a), Some(&"hello".to_string()));
+        assert_eq!(w.as_ref().map(|w| &w.b), Some(&5));
+        assert_eq!(w2.as_ref().map(|w| &w.a), Some(&"hello".to_string()));
+        assert_eq!(w2.as_ref().map(|w| &w.b), Some(&6));
 
-    let w = g.generate();
-    let w2 = g.generate();
+        let mut g = Option::<Option<Wizard>>::generator();
 
-    assert_eq!(
-        std::any::TypeId::of::<Option<Option<Wizard>>>(),
-        w.type_id()
-    );
-    assert_eq!(
-        std::any::TypeId::of::<Option<Option<Wizard>>>(),
-        w2.type_id()
-    );
+        let w = g.generate();
+        let w2 = g.generate();
 
-    assert_eq!(
-        w.as_ref().map(|w| w.as_ref().map(|w| &w.a)),
-        Some(Some(&"hello".to_string()))
-    );
-    assert_eq!(w.as_ref().map(|w| w.as_ref().map(|w| &w.b)), Some(Some(&5)));
-    assert_eq!(
-        w2.as_ref().map(|w| w.as_ref().map(|w| &w.a)),
-        Some(Some(&"hello".to_string()))
-    );
-    assert_eq!(
-        w2.as_ref().map(|w| w.as_ref().map(|w| &w.b)),
-        Some(Some(&6))
-    );
-}
+        assert_eq!(
+            std::any::TypeId::of::<Option<Option<Wizard>>>(),
+            w.type_id()
+        );
+        assert_eq!(
+            std::any::TypeId::of::<Option<Option<Wizard>>>(),
+            w2.type_id()
+        );
 
-#[test]
-fn test_rc_generator() {
-    let mut g = std::rc::Rc::<Wizard>::generator();
+        assert_eq!(
+            w.as_ref().map(|w| w.as_ref().map(|w| &w.a)),
+            Some(Some(&"hello".to_string()))
+        );
+        assert_eq!(w.as_ref().map(|w| w.as_ref().map(|w| &w.b)), Some(Some(&5)));
+        assert_eq!(
+            w2.as_ref().map(|w| w.as_ref().map(|w| &w.a)),
+            Some(Some(&"hello".to_string()))
+        );
+        assert_eq!(
+            w2.as_ref().map(|w| w.as_ref().map(|w| &w.b)),
+            Some(Some(&6))
+        );
+    }
 
-    let w = g.generate();
-    let w2 = g.generate();
+    #[test]
+    fn test_rc_generator() {
+        let mut g = std::rc::Rc::<Wizard>::generator();
 
-    assert_eq!(std::any::TypeId::of::<std::rc::Rc<Wizard>>(), w.type_id());
-    assert_eq!(std::any::TypeId::of::<std::rc::Rc<Wizard>>(), w2.type_id());
+        let w = g.generate();
+        let w2 = g.generate();
 
-    assert_eq!(w.a, "hello".to_string());
-    assert_eq!(w.b, 5);
-    assert_eq!(w2.a, "hello".to_string());
-    assert_eq!(w2.b, 6);
-}
+        assert_eq!(std::any::TypeId::of::<std::rc::Rc<Wizard>>(), w.type_id());
+        assert_eq!(std::any::TypeId::of::<std::rc::Rc<Wizard>>(), w2.type_id());
 
-#[test]
-fn test_arc_generator() {
-    let mut g = std::sync::Arc::<Wizard>::generator();
+        assert_eq!(w.a, "hello".to_string());
+        assert_eq!(w.b, 5);
+        assert_eq!(w2.a, "hello".to_string());
+        assert_eq!(w2.b, 6);
+    }
 
-    let w = g.generate();
-    let w2 = g.generate();
+    #[test]
+    fn test_arc_generator() {
+        let mut g = std::sync::Arc::<Wizard>::generator();
 
-    assert_eq!(
-        std::any::TypeId::of::<std::sync::Arc<Wizard>>(),
-        w.type_id()
-    );
-    assert_eq!(
-        std::any::TypeId::of::<std::sync::Arc<Wizard>>(),
-        w2.type_id()
-    );
+        let w = g.generate();
+        let w2 = g.generate();
 
-    assert_eq!(w.a, "hello".to_string());
-    assert_eq!(w.b, 5);
-    assert_eq!(w2.a, "hello".to_string());
-    assert_eq!(w2.b, 6);
-}
+        assert_eq!(
+            std::any::TypeId::of::<std::sync::Arc<Wizard>>(),
+            w.type_id()
+        );
+        assert_eq!(
+            std::any::TypeId::of::<std::sync::Arc<Wizard>>(),
+            w2.type_id()
+        );
 
-#[test]
-fn test_mutex_generator() {
-    let mut g = std::sync::Mutex::<Wizard>::generator();
+        assert_eq!(w.a, "hello".to_string());
+        assert_eq!(w.b, 5);
+        assert_eq!(w2.a, "hello".to_string());
+        assert_eq!(w2.b, 6);
+    }
 
-    let w = g.generate();
-    let w2 = g.generate();
+    #[test]
+    fn test_mutex_generator() {
+        let mut g = std::sync::Mutex::<Wizard>::generator();
 
-    assert_eq!(
-        std::any::TypeId::of::<std::sync::Mutex<Wizard>>(),
-        w.type_id()
-    );
-    assert_eq!(
-        std::any::TypeId::of::<std::sync::Mutex<Wizard>>(),
-        w2.type_id()
-    );
+        let w = g.generate();
+        let w2 = g.generate();
 
-    assert_eq!(w.lock().unwrap().a, "hello".to_string());
-    assert_eq!(w.lock().unwrap().b, 5);
-    assert_eq!(w2.lock().unwrap().a, "hello".to_string());
-    assert_eq!(w2.lock().unwrap().b, 6);
-}
+        assert_eq!(
+            std::any::TypeId::of::<std::sync::Mutex<Wizard>>(),
+            w.type_id()
+        );
+        assert_eq!(
+            std::any::TypeId::of::<std::sync::Mutex<Wizard>>(),
+            w2.type_id()
+        );
 
-#[test]
-fn test_arc_mutex_generator() {
-    let mut g = std::sync::Arc::<std::sync::Mutex<Wizard>>::generator();
+        assert_eq!(w.lock().unwrap().a, "hello".to_string());
+        assert_eq!(w.lock().unwrap().b, 5);
+        assert_eq!(w2.lock().unwrap().a, "hello".to_string());
+        assert_eq!(w2.lock().unwrap().b, 6);
+    }
 
-    let w = g.generate();
-    let w2 = g.generate();
+    #[test]
+    fn test_arc_mutex_generator() {
+        let mut g = std::sync::Arc::<std::sync::Mutex<Wizard>>::generator();
 
-    assert_eq!(
-        std::any::TypeId::of::<std::sync::Arc<std::sync::Mutex<Wizard>>>(),
-        w.type_id()
-    );
-    assert_eq!(
-        std::any::TypeId::of::<std::sync::Arc<std::sync::Mutex<Wizard>>>(),
-        w2.type_id()
-    );
+        let w = g.generate();
+        let w2 = g.generate();
 
-    assert_eq!(w.lock().unwrap().a, "hello".to_string());
-    assert_eq!(w.lock().unwrap().b, 5);
-    assert_eq!(w2.lock().unwrap().a, "hello".to_string());
-    assert_eq!(w2.lock().unwrap().b, 6);
-}
+        assert_eq!(
+            std::any::TypeId::of::<std::sync::Arc<std::sync::Mutex<Wizard>>>(),
+            w.type_id()
+        );
+        assert_eq!(
+            std::any::TypeId::of::<std::sync::Arc<std::sync::Mutex<Wizard>>>(),
+            w2.type_id()
+        );
 
-#[test]
-fn test_cell_generator() {
-    let mut g = std::cell::Cell::<Wizard>::generator();
+        assert_eq!(w.lock().unwrap().a, "hello".to_string());
+        assert_eq!(w.lock().unwrap().b, 5);
+        assert_eq!(w2.lock().unwrap().a, "hello".to_string());
+        assert_eq!(w2.lock().unwrap().b, 6);
+    }
 
-    let w = g.generate();
-    let w2 = g.generate();
+    #[test]
+    fn test_cell_generator() {
+        let mut g = std::cell::Cell::<Wizard>::generator();
 
-    assert_eq!(
-        std::any::TypeId::of::<std::cell::Cell<Wizard>>(),
-        w.type_id()
-    );
+        let w = g.generate();
+        let w2 = g.generate();
 
-    assert_eq!(
-        std::any::TypeId::of::<std::cell::Cell<Wizard>>(),
-        w2.type_id()
-    );
+        assert_eq!(
+            std::any::TypeId::of::<std::cell::Cell<Wizard>>(),
+            w.type_id()
+        );
 
-    let w_contents = w.into_inner();
-    assert_eq!(w_contents.a, "hello".to_string());
-    assert_eq!(w_contents.b, 5);
-    let w2_contents = w2.into_inner();
-    assert_eq!(w2_contents.a, "hello".to_string());
-    assert_eq!(w2_contents.b, 6);
-}
+        assert_eq!(
+            std::any::TypeId::of::<std::cell::Cell<Wizard>>(),
+            w2.type_id()
+        );
 
-#[test]
-fn test_ref_cell_generator() {
-    let mut g = std::cell::RefCell::<Wizard>::generator();
+        let w_contents = w.into_inner();
+        assert_eq!(w_contents.a, "hello".to_string());
+        assert_eq!(w_contents.b, 5);
+        let w2_contents = w2.into_inner();
+        assert_eq!(w2_contents.a, "hello".to_string());
+        assert_eq!(w2_contents.b, 6);
+    }
 
-    let w = g.generate();
-    let w2 = g.generate();
+    #[test]
+    fn test_ref_cell_generator() {
+        let mut g = std::cell::RefCell::<Wizard>::generator();
 
-    assert_eq!(
-        std::any::TypeId::of::<std::cell::RefCell<Wizard>>(),
-        w.type_id()
-    );
+        let w = g.generate();
+        let w2 = g.generate();
 
-    assert_eq!(
-        std::any::TypeId::of::<std::cell::RefCell<Wizard>>(),
-        w2.type_id()
-    );
+        assert_eq!(
+            std::any::TypeId::of::<std::cell::RefCell<Wizard>>(),
+            w.type_id()
+        );
 
-    assert_eq!(w.borrow().a, "hello".to_string());
-    assert_eq!(w.borrow().b, 5);
-    assert_eq!(w2.borrow().a, "hello".to_string());
-    assert_eq!(w2.borrow().b, 6);
+        assert_eq!(
+            std::any::TypeId::of::<std::cell::RefCell<Wizard>>(),
+            w2.type_id()
+        );
+
+        assert_eq!(w.borrow().a, "hello".to_string());
+        assert_eq!(w.borrow().b, 5);
+        assert_eq!(w2.borrow().a, "hello".to_string());
+        assert_eq!(w2.borrow().b, 6);
+    }
 }
 
 #[test]
@@ -732,133 +991,9 @@ fn test_generate_vector() {
     assert_eq!(k62.b[2].b, "x7".to_string());
 }
 
-mod builder_coverage {
-    use boulder::{Buildable, Builder, Generatable, Generator};
-    
-    struct Parsnip1 {
-        c1: i32,
-    }
-
-    struct Parsnip1Generator {
-        c1: i32,
-    }
-
-    impl Generator for Parsnip1Generator {
-        type Output = Parsnip1;
-        fn generate(&mut self) -> Self::Output {
-            let ix = self.c1;
-            self.c1 += 1;
-            Parsnip1 { c1: ix }
-        }
-    }
-
-    #[derive(Generatable)]
-    struct Parsnip2 {
-        #[boulder(generator=boulder::gen::Inc(0))]
-        c2: i32,
-    }
-
-    #[derive(Buildable)]
-    struct Parsnip3 {
-        #[boulder(default = 0)]
-        c3: i32,
-    }
-
-    struct Parsnip4 {
-        c4: i32,
-    }
-
-    #[derive(Default)]
-    struct Parsnip5 {
-        c5: i32,
-    }
-
-    #[derive(Buildable)]
-    struct Elephant {
-        // #[boulder(generator=Parsnip1Generator {c1: 1})]
-        // v1: Parsnip2,
-        // #[boulder(generatable(c2=boulder::gen::Inc(2)))]
-        // v2: Parsnip2,
-        #[boulder(buildable(c3 = 3))]
-        v3: Parsnip3,
-        #[boulder(default=Parsnip4 { c4: 4 })]
-        v4: Parsnip4,
-        v5: Parsnip5,
-
-        #[boulder(generator=Parsnip1Generator { c1: 1}, sequence=1)]
-        s1: Vec<Parsnip1>,
-        #[boulder(generatable(c2=boulder::gen::Inc(2)), sequence=2)]
-        s2: Vec<Parsnip2>,
-        #[boulder(buildable(c3 = 3), sequence = 3)]
-        s3: Vec<Parsnip3>,
-        #[boulder(default=Parsnip4 { c4: 4 }, sequence=4)]
-        s4: Vec<Parsnip4>,
-        #[boulder(sequence = 5)]
-        s5: Vec<Parsnip5>,
-    }
-
-    #[test]
-    fn test_defaults() {
-        let e = Elephant::builder().build();
-
-        assert_eq!(e.v3.c3, 3);
-        assert_eq!(e.v4.c4, 4);
-        assert_eq!(e.v5.c5, 0);
-
-        assert_eq!(e.s1.len(), 1);
-        assert_eq!(e.s1[0].c1, 1);
-        assert_eq!(e.s2.len(), 2);
-        assert_eq!(e.s2[0].c2, 2);
-        assert_eq!(e.s2[1].c2, 3);
-        assert_eq!(e.s3.len(), 3);
-        assert_eq!(e.s3[0].c3, 3);
-        assert_eq!(e.s3[1].c3, 3);
-        assert_eq!(e.s3[2].c3, 3);
-        assert_eq!(e.s4.len(), 4);
-        assert_eq!(e.s4[0].c4, 4);
-        assert_eq!(e.s4[1].c4, 4);
-        assert_eq!(e.s4[2].c4, 4);
-        assert_eq!(e.s4[3].c4, 4);
-        assert_eq!(e.s5.len(), 5);
-        assert_eq!(e.s5[0].c5, 0);
-        assert_eq!(e.s5[1].c5, 0);
-        assert_eq!(e.s5[2].c5, 0);
-        assert_eq!(e.s5[3].c5, 0);
-    }
-
-    #[test]
-    fn test_customise() {
-        let e = Elephant::builder()
-            .v3( Parsnip3 { c3: 33 } )
-            .v4( Parsnip4 { c4: 44 } )
-            .v5( Parsnip5 { c5: 55 } )
-            .s1( vec![ Parsnip1 { c1: 11 } ] )
-            .s2( vec![ Parsnip2 { c2: 22 } ] )
-            .s3( vec![ Parsnip3 { c3: 33 } ] )
-            .s4( vec![ Parsnip4 { c4: 44 } ] )
-            .s5( vec![ Parsnip5 { c5: 55 } ] )
-            .build();
-
-        assert_eq!(e.v3.c3, 33);
-        assert_eq!(e.v4.c4, 44);
-        assert_eq!(e.v5.c5, 55);
-
-        assert_eq!(e.s1.len(), 1);
-        assert_eq!(e.s1[0].c1, 11);
-        assert_eq!(e.s2.len(), 1);
-        assert_eq!(e.s2[0].c2, 22);
-        assert_eq!(e.s3.len(), 1);
-        assert_eq!(e.s3[0].c3, 33);
-        assert_eq!(e.s4.len(), 1);
-        assert_eq!(e.s4[0].c4, 44);
-        assert_eq!(e.s5.len(), 1);
-        assert_eq!(e.s5[0].c5, 55);
-    }
-}
-
 mod generator_coverage {
     use boulder::{Buildable, Builder, Generatable, Generator};
-    
+
     struct Fig1 {
         c1: i32,
     }
@@ -1038,21 +1173,254 @@ mod generator_coverage {
     #[test]
     fn test_customise() {
         let mut g = Monkey::generator()
-            .v1( || Fig1 { c1: 11 } )
-            .v2( || Fig2 { c2: 22 } )
-            .v3( || Fig3 { c3: 33 } )
-            .v4( || Fig4 { c4: 44 } )
-            .v5( || Fig5 { c5: 55 } )
-            .s1( || vec![ Fig1 { c1: 11 } ] )
-            .s2( || vec![ Fig2 { c2: 22 } ] )
-            .s3( || vec![ Fig3 { c3: 33 } ] )
-            .s4( || vec![ Fig4 { c4: 44 } ] )
-            .s5( || vec![ Fig5 { c5: 55 } ] )
-            .p1( || vec![ Fig1 { c1: 11 } ] )
-            .p2( || vec![ Fig2 { c2: 22 } ] )
-            .p3( || vec![ Fig3 { c3: 33 } ] )
-            .p4( || vec![ Fig4 { c4: 44 } ] )
-            .p5( || vec![ Fig5 { c5: 55 } ] );
+            .v1(|| Fig1 { c1: 11 })
+            .v2(|| Fig2 { c2: 22 })
+            .v3(|| Fig3 { c3: 33 })
+            .v4(|| Fig4 { c4: 44 })
+            .v5(|| Fig5 { c5: 55 })
+            .s1(|| vec![Fig1 { c1: 11 }])
+            .s2(|| vec![Fig2 { c2: 22 }])
+            .s3(|| vec![Fig3 { c3: 33 }])
+            .s4(|| vec![Fig4 { c4: 44 }])
+            .s5(|| vec![Fig5 { c5: 55 }])
+            .p1(|| vec![Fig1 { c1: 11 }])
+            .p2(|| vec![Fig2 { c2: 22 }])
+            .p3(|| vec![Fig3 { c3: 33 }])
+            .p4(|| vec![Fig4 { c4: 44 }])
+            .p5(|| vec![Fig5 { c5: 55 }]);
+
+        let m1 = g.generate();
+
+        assert_eq!(m1.v1.c1, 11);
+        assert_eq!(m1.v2.c2, 22);
+        assert_eq!(m1.v3.c3, 33);
+        assert_eq!(m1.v4.c4, 44);
+        assert_eq!(m1.v5.c5, 55);
+
+        assert_eq!(m1.s1.len(), 1);
+        assert_eq!(m1.s1[0].c1, 11);
+        assert_eq!(m1.s2.len(), 1);
+        assert_eq!(m1.s2[0].c2, 22);
+        assert_eq!(m1.s3.len(), 1);
+        assert_eq!(m1.s3[0].c3, 33);
+        assert_eq!(m1.s4.len(), 1);
+        assert_eq!(m1.s4[0].c4, 44);
+        assert_eq!(m1.s5.len(), 1);
+        assert_eq!(m1.s5[0].c5, 55);
+
+        assert_eq!(m1.p1.len(), 1);
+        assert_eq!(m1.p1[0].c1, 11);
+        assert_eq!(m1.p2.len(), 1);
+        assert_eq!(m1.p2[0].c2, 22);
+        assert_eq!(m1.p3.len(), 1);
+        assert_eq!(m1.p3[0].c3, 33);
+        assert_eq!(m1.p4.len(), 1);
+        assert_eq!(m1.p4[0].c4, 44);
+        assert_eq!(m1.p5.len(), 1);
+        assert_eq!(m1.p5[0].c5, 55);
+    }
+}
+
+mod generator_coverage_generics {
+    use boulder::{Buildable, Builder, Generatable, Generator};
+
+    struct Fig1 {
+        c1: i32,
+    }
+
+    struct Fig1Generator {
+        c1: i32,
+    }
+
+    impl Generator for Fig1Generator {
+        type Output = Fig1;
+        fn generate(&mut self) -> Self::Output {
+            let ix = self.c1;
+            self.c1 += 1;
+            Fig1 { c1: ix }
+        }
+    }
+
+    #[derive(Generatable)]
+    struct Fig2 {
+        #[boulder(generator=boulder::gen::Inc(0))]
+        c2: i32,
+    }
+
+    #[derive(Buildable)]
+    struct Fig3 {
+        #[boulder(default = 0)]
+        c3: i32,
+    }
+
+    struct Fig4 {
+        c4: i32,
+    }
+
+    #[derive(Default)]
+    struct Fig5 {
+        c5: i32,
+    }
+
+    #[derive(Generatable)]
+    struct Ape<T: Default + 'static, U>
+    where
+        U: Default + 'static,
+    {
+        #[boulder(generator=Fig1Generator {c1: 1})]
+        v1: Fig1,
+        #[boulder(generatable(c2=boulder::gen::Inc(2)))]
+        v2: Fig2,
+        #[boulder(buildable(c3 = 3))]
+        v3: Fig3,
+        #[boulder(default=Fig4 { c4: 4 })]
+        v4: Fig4,
+        v5: T,
+
+        #[boulder(generator=Fig1Generator { c1: 1 }, sequence=1)]
+        s1: Vec<Fig1>,
+        #[boulder(generatable(c2=boulder::gen::Inc(2)), sequence=2)]
+        s2: Vec<Fig2>,
+        #[boulder(buildable(c3 = 3), sequence = 3)]
+        s3: Vec<Fig3>,
+        #[boulder(default=Fig4 { c4: 4 }, sequence=4)]
+        s4: Vec<Fig4>,
+        #[boulder(sequence = 5)]
+        s5: Vec<U>,
+
+        #[boulder(generator=Fig1Generator { c1: 1 }, sequence_generator=boulder::gen::Inc(1usize))]
+        p1: Vec<Fig1>,
+        #[boulder(generatable(c2=boulder::gen::Inc(2)), sequence_generator=boulder::gen::Inc(2usize))]
+        p2: Vec<Fig2>,
+        #[boulder(buildable(c3 = 3), sequence_generator=boulder::gen::Inc(3usize))]
+        p3: Vec<Fig3>,
+        #[boulder(default=Fig4 { c4: 4 }, sequence_generator=boulder::gen::Inc(4usize))]
+        p4: Vec<Fig4>,
+        #[boulder(sequence_generator = boulder::gen::Inc(5usize))]
+        p5: Vec<U>,
+    }
+
+    #[test]
+    fn test_defaults() {
+        let mut g = Ape::<Fig5, Fig5>::generator();
+        let m1 = g.generate();
+        let m2 = g.generate();
+
+        assert_eq!(m1.v1.c1, 1);
+        assert_eq!(m1.v2.c2, 2);
+        assert_eq!(m1.v3.c3, 3);
+        assert_eq!(m1.v4.c4, 4);
+        assert_eq!(m1.v5.c5, 0);
+        assert_eq!(m2.v1.c1, 2);
+        assert_eq!(m2.v2.c2, 3);
+        assert_eq!(m2.v3.c3, 3);
+        assert_eq!(m2.v4.c4, 4);
+        assert_eq!(m2.v5.c5, 0);
+
+        assert_eq!(m1.s1.len(), 1);
+        assert_eq!(m1.s1[0].c1, 1);
+        assert_eq!(m1.s2.len(), 2);
+        assert_eq!(m1.s2[0].c2, 2);
+        assert_eq!(m1.s2[1].c2, 3);
+        assert_eq!(m1.s3.len(), 3);
+        assert_eq!(m1.s3[0].c3, 3);
+        assert_eq!(m1.s3[1].c3, 3);
+        assert_eq!(m1.s3[2].c3, 3);
+        assert_eq!(m1.s4.len(), 4);
+        assert_eq!(m1.s4[0].c4, 4);
+        assert_eq!(m1.s4[1].c4, 4);
+        assert_eq!(m1.s4[2].c4, 4);
+        assert_eq!(m1.s4[3].c4, 4);
+        assert_eq!(m1.s5.len(), 5);
+        assert_eq!(m1.s5[0].c5, 0);
+        assert_eq!(m1.s5[1].c5, 0);
+        assert_eq!(m1.s5[2].c5, 0);
+        assert_eq!(m1.s5[3].c5, 0);
+        assert_eq!(m2.s1.len(), 1);
+        assert_eq!(m2.s1[0].c1, 2);
+        assert_eq!(m2.s2.len(), 2);
+        assert_eq!(m2.s2[0].c2, 4);
+        assert_eq!(m2.s2[1].c2, 5);
+        assert_eq!(m2.s3.len(), 3);
+        assert_eq!(m2.s3[0].c3, 3);
+        assert_eq!(m2.s3[1].c3, 3);
+        assert_eq!(m2.s3[2].c3, 3);
+        assert_eq!(m2.s4.len(), 4);
+        assert_eq!(m2.s4[0].c4, 4);
+        assert_eq!(m2.s4[1].c4, 4);
+        assert_eq!(m2.s4[2].c4, 4);
+        assert_eq!(m2.s4[3].c4, 4);
+        assert_eq!(m2.s5.len(), 5);
+        assert_eq!(m2.s5[0].c5, 0);
+        assert_eq!(m2.s5[1].c5, 0);
+        assert_eq!(m2.s5[2].c5, 0);
+        assert_eq!(m2.s5[3].c5, 0);
+        assert_eq!(m2.s5[4].c5, 0);
+
+        assert_eq!(m1.p1.len(), 1);
+        assert_eq!(m1.p1[0].c1, 1);
+        assert_eq!(m1.p2.len(), 2);
+        assert_eq!(m1.p2[0].c2, 2);
+        assert_eq!(m1.p2[1].c2, 3);
+        assert_eq!(m1.p3.len(), 3);
+        assert_eq!(m1.p3[0].c3, 3);
+        assert_eq!(m1.p3[1].c3, 3);
+        assert_eq!(m1.p3[2].c3, 3);
+        assert_eq!(m1.p4.len(), 4);
+        assert_eq!(m1.p4[0].c4, 4);
+        assert_eq!(m1.p4[1].c4, 4);
+        assert_eq!(m1.p4[2].c4, 4);
+        assert_eq!(m1.p4[3].c4, 4);
+        assert_eq!(m1.p5.len(), 5);
+        assert_eq!(m1.p5[0].c5, 0);
+        assert_eq!(m1.p5[1].c5, 0);
+        assert_eq!(m1.p5[2].c5, 0);
+        assert_eq!(m1.p5[3].c5, 0);
+        assert_eq!(m2.p1.len(), 2);
+        assert_eq!(m2.p1[0].c1, 2);
+        assert_eq!(m2.p1[1].c1, 3);
+        assert_eq!(m2.p2.len(), 3);
+        assert_eq!(m2.p2[0].c2, 4);
+        assert_eq!(m2.p2[1].c2, 5);
+        assert_eq!(m2.p2[2].c2, 6);
+        assert_eq!(m2.p3.len(), 4);
+        assert_eq!(m2.p3[0].c3, 3);
+        assert_eq!(m2.p3[1].c3, 3);
+        assert_eq!(m2.p3[2].c3, 3);
+        assert_eq!(m2.p3[3].c3, 3);
+        assert_eq!(m2.p4.len(), 5);
+        assert_eq!(m2.p4[0].c4, 4);
+        assert_eq!(m2.p4[1].c4, 4);
+        assert_eq!(m2.p4[2].c4, 4);
+        assert_eq!(m2.p4[3].c4, 4);
+        assert_eq!(m2.p4[4].c4, 4);
+        assert_eq!(m2.p5.len(), 6);
+        assert_eq!(m2.p5[0].c5, 0);
+        assert_eq!(m2.p5[1].c5, 0);
+        assert_eq!(m2.p5[2].c5, 0);
+        assert_eq!(m2.p5[3].c5, 0);
+        assert_eq!(m2.p5[4].c5, 0);
+        assert_eq!(m2.p5[5].c5, 0);
+    }
+
+    #[test]
+    fn test_customise() {
+        let mut g = Ape::<Fig5, Fig5>::generator()
+            .v1(|| Fig1 { c1: 11 })
+            .v2(|| Fig2 { c2: 22 })
+            .v3(|| Fig3 { c3: 33 })
+            .v4(|| Fig4 { c4: 44 })
+            .v5(|| Fig5 { c5: 55 })
+            .s1(|| vec![Fig1 { c1: 11 }])
+            .s2(|| vec![Fig2 { c2: 22 }])
+            .s3(|| vec![Fig3 { c3: 33 }])
+            .s4(|| vec![Fig4 { c4: 44 }])
+            .s5(|| vec![Fig5 { c5: 55 }])
+            .p1(|| vec![Fig1 { c1: 11 }])
+            .p2(|| vec![Fig2 { c2: 22 }])
+            .p3(|| vec![Fig3 { c3: 33 }])
+            .p4(|| vec![Fig4 { c4: 44 }])
+            .p5(|| vec![Fig5 { c5: 55 }]);
 
         let m1 = g.generate();
 
