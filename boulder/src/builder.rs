@@ -11,7 +11,7 @@
 /// customise its value, and will produce a default value for every
 /// field which is not customised.
 pub trait Builder {
-    /// The output type for this type.
+    /// The output type.
     type Result;
     /// Create the final object.
     ///

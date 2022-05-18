@@ -172,6 +172,7 @@ where
 
 pub use boulder_derive::GeneratableWithPersianRug;
 
+#[doc(hidden)]
 pub mod guts {
     use super::GeneratableWithPersianRug;
 
