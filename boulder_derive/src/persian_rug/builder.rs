@@ -28,7 +28,13 @@ pub fn derive_buildable_with_persian_rug(input: syn::DeriveInput) -> pm2::TokenS
     let mut defaults = pm2::TokenStream::new();
     let mut dyn_generators = pm2::TokenStream::new();
 
-    let (context, used_types) = get_persian_rug_constraints(&attrs);
+    let (context, used_types) = match get_persian_rug_constraints(&attrs) {
+        Ok(context) => context,
+        Err(e) => {
+            return e.to_compile_error();
+        }
+    };
+
     let mut constraints = pm2::TokenStream::new();
     constraints.extend(quote::quote! {
         context = #context,
@@ -309,9 +315,9 @@ pub fn derive_buildable_with_persian_rug(input: syn::DeriveInput) -> pm2::TokenS
                     #fieldid: ::std::default::Default::default(),
                 });
                 methods.extend(quote::quote! {
-                    pub fn #fieldid<S>(mut self, value: S) -> Self
+                    pub fn #fieldid<BoulderFunctionParam>(mut self, value: BoulderFunctionParam) -> Self
                     where
-                        S: Into<#fieldtype>
+                        BoulderFunctionParam: Into<#fieldtype>
                     {
                         self.#fieldid = Some(value.into());
                         self

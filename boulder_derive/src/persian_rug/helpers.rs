@@ -9,11 +9,6 @@ pub enum ConstraintItem {
         equals: syn::Token![=],
         value: syn::Ident,
     },
-    Accessor {
-        accessor: syn::Ident,
-        equals: syn::Token![=],
-        value: syn::Ident,
-    },
     Access {
         access: syn::Ident,
         paren: syn::token::Paren,
@@ -30,15 +25,6 @@ impl syn::parse::Parse for ConstraintItem {
                 let value = input.parse()?;
                 Ok(ConstraintItem::Context {
                     context: attr,
-                    equals,
-                    value,
-                })
-            }
-            "accessor" => {
-                let equals = input.parse()?;
-                let value = input.parse()?;
-                Ok(ConstraintItem::Accessor {
-                    accessor: attr,
                     equals,
                     value,
                 })
@@ -74,15 +60,6 @@ impl quote::ToTokens for ConstraintItem {
             } => {
                 tokens.extend(quote::quote! {
                     #context #equals #value
-                });
-            }
-            Self::Accessor {
-                accessor,
-                equals,
-                value,
-            } => {
-                tokens.extend(quote::quote! {
-                    #accessor #equals #value
                 });
             }
             Self::Access {
@@ -131,18 +108,17 @@ impl syn::parse::Parse for BoulderTypeAttr {
     }
 }
 
-pub fn get_persian_rug_constraints(attrs: &Vec<syn::Attribute>) -> (syn::Ident, Vec<syn::Type>) {
+pub fn get_persian_rug_constraints(
+    attrs: &Vec<syn::Attribute>,
+) -> syn::Result<(syn::Ident, Vec<syn::Type>)> {
     let mut context = None;
-    // let mut accessor = None;
     let mut used_types = Vec::new();
 
     for attr in attrs {
         if attr.path.is_ident("boulder") {
-            let items = attr
-                .parse_args_with(
-                    syn::punctuated::Punctuated::<BoulderTypeAttr, syn::Token![,]>::parse_terminated
-                )
-                .expect("failed to parse boulder attribute");
+            let items = attr.parse_args_with(
+                syn::punctuated::Punctuated::<BoulderTypeAttr, syn::Token![,]>::parse_terminated,
+            )?;
 
             for item in items.iter() {
                 match item {
@@ -151,9 +127,6 @@ pub fn get_persian_rug_constraints(attrs: &Vec<syn::Attribute>) -> (syn::Ident, 
                             match constraint {
                                 ConstraintItem::Context { value, .. } => {
                                     context = Some(value.clone());
-                                }
-                                ConstraintItem::Accessor { .. } => {
-                                    // accessor = Some(value.clone());
                                 }
                                 ConstraintItem::Access { items, .. } => {
                                     used_types.extend(items.iter().cloned());
@@ -165,5 +138,8 @@ pub fn get_persian_rug_constraints(attrs: &Vec<syn::Attribute>) -> (syn::Ident, 
             }
         }
     }
-    (context.expect("no context found"), used_types)
+    Ok((
+        context.ok_or_else(|| syn::Error::new(pm2::Span::call_site(), "no context found"))?,
+        used_types,
+    ))
 }

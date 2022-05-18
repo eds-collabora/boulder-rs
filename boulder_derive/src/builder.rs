@@ -29,9 +29,12 @@ pub fn derive_buildable(input: syn::DeriveInput) -> pm2::TokenStream {
 
                 for attr in field.attrs.iter() {
                     if attr.path.is_ident("boulder") {
-                        let parsed = attr
-                            .parse_args::<BuilderMeta>()
-                            .expect("failed to parse boulder attribute");
+                        let parsed = match attr.parse_args::<BuilderMeta>() {
+                            Ok(parsed) => parsed,
+                            Err(e) => {
+                                return e.to_compile_error();
+                            }
+                        };
                         if let BuildType::Default = builder {
                             builder = parsed.builder.element;
                         }

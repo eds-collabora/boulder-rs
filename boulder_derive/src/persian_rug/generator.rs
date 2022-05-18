@@ -86,7 +86,13 @@ pub fn derive_generatable_with_persian_rug(input: syn::DeriveInput) -> pm2::Toke
     let mut added_wc = pm2::TokenStream::new();
     let mut dyn_generators = pm2::TokenStream::new();
 
-    let (context, used_types) = get_persian_rug_constraints(&attrs);
+    let (context, used_types) = match get_persian_rug_constraints(&attrs) {
+        Ok(context) => context,
+        Err(e) => {
+            return e.to_compile_error();
+        }
+    };
+
     let mut constraints = pm2::TokenStream::new();
     constraints.extend(quote::quote! {
         context = #context,

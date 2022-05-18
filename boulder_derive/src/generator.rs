@@ -52,7 +52,6 @@ pub fn derive_generatable(input: syn::DeriveInput) -> pm2::TokenStream {
                 let sequence = if let Some((sequence, _ty)) = sequence {
                     Some(quote::quote! { #sequence })
                 } else {
-                    // if let Some(sequence) = build_sequence {
                     build_sequence.map(|(sequence, _ty)| {
                         quote::quote! { || ((#sequence) as usize) }
                     })
