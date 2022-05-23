@@ -85,7 +85,7 @@ where
 /// assert_eq!(g.generate(), 2);
 /// assert_eq!(g.generate(), 1);
 /// ```
-pub struct Cycle<T>(::std::iter::Cycle<T>);
+pub struct Cycle<T>(pub(crate) ::std::iter::Cycle<T>);
 
 impl<T: Iterator + Clone> Cycle<T> {
     pub fn new(iter: T) -> Self {
@@ -153,9 +153,9 @@ where
 /// assert_eq!(g.generate(), vec![4]);
 /// ```
 pub struct Sample<T, U, V> {
-    value: T,
-    count: U,
-    _result_marker: core::marker::PhantomData<V>,
+    pub(crate) value: T,
+    pub(crate) count: U,
+    pub(crate) _result_marker: core::marker::PhantomData<V>,
 }
 
 impl<T, U, V> Sample<T, U, V>
@@ -231,8 +231,8 @@ where
 /// assert_eq!(g.generate(), DateTime::parse_from_rfc2822("Fri, 20 May 2022 15:16:00 GMT").unwrap());
 /// ```
 pub struct Time<T: chrono::TimeZone> {
-    instant: chrono::DateTime<T>,
-    step: chrono::Duration,
+    pub(crate) instant: chrono::DateTime<T>,
+    pub(crate) step: chrono::Duration,
 }
 
 impl<T: chrono::TimeZone> Time<T> {
@@ -309,8 +309,8 @@ impl<T: chrono::TimeZone + 'static> Generator for Time<T> {
 /// ```
 #[derive(Clone)]
 pub struct Subsets<T: Clone> {
-    base: Vec<T>,
-    index: usize,
+    pub(crate) base: Vec<T>,
+    pub(crate) index: usize,
 }
 
 impl<T: Clone> Subsets<T> {
@@ -356,8 +356,8 @@ impl<T: Clone + 'static> Generator for Subsets<T> {
 /// ```
 #[derive(Clone)]
 pub struct Repeat<T: Clone> {
-    base: Vec<T>,
-    index: usize,
+    pub(crate) base: Vec<T>,
+    pub(crate) index: usize,
 }
 
 impl<T: Clone> Repeat<T> {
