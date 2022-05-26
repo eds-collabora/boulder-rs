@@ -55,6 +55,22 @@ pub(crate) fn pattern_macro(call: StringPatternCall) -> pm2::TokenStream {
 
     let pattern = call.pattern;
 
+    let persian_rug = if cfg!(feature = "persian-rug") {
+        quote::quote! {
+            impl<BoulderContextParam: ::persian_rug::Context, #generics> ::boulder::GeneratorWithPersianRug<BoulderContextParam> for Pattern<#generics> where #wc {
+                type Output = String;
+                fn generate<'boulder_lifetime_param, BoulderFunctionParam>(&mut self, context: BoulderFunctionParam) -> (Self::Output, BoulderFunctionParam)
+                where
+                    BoulderFunctionParam: 'boulder_lifetime_param + ::persian_rug::Mutator<Context = BoulderContextParam>
+                {
+                    (format!(#pattern #fcall), context)
+                }
+            }
+        }
+    } else {
+        quote::quote! {}
+    };
+
     let res: pm2::TokenStream = quote::quote! {
         {
             #[derive(Clone)]
@@ -68,6 +84,8 @@ pub(crate) fn pattern_macro(call: StringPatternCall) -> pm2::TokenStream {
                     format!(#pattern #fcall)
                 }
             }
+
+            #persian_rug
 
             Pattern(#args)
         }

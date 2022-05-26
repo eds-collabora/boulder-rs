@@ -18,4 +18,4 @@ persian-rug = { path = "../../persian-rug/persian-rug", optional=true }
 
 [features]
 default = []
-persian-rug = ["dep:persian-rug" ]
+persian-rug = ["dep:persian-rug", "boulder_derive/persian-rug" ]
