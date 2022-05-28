@@ -176,7 +176,7 @@ pub fn derive_buildable_with_persian_rug(input: syn::DeriveInput) -> pm2::TokenS
                                     }
 
                                     #[persian_rug::constraints(#constraints)]
-                                    impl #generics ::boulder::persian_rug::GeneratorWithPersianRug<#context> for #new_generator_id #ty_generics #wc
+                                    impl #generics ::boulder::GeneratorWithPersianRug<#context> for #new_generator_id #ty_generics #wc
                                     {
                                         type Output = <#fieldtype as IntoIterator>::Item;
                                         fn generate<'boulder_mutator_lifetime, BoulderMutatorParam>(
@@ -221,7 +221,7 @@ pub fn derive_buildable_with_persian_rug(input: syn::DeriveInput) -> pm2::TokenS
                             } else {
                                 #sequence
                                 let mut gen = #gen_init;
-                                let mut iter = ::boulder::persian_rug::generator::GeneratorWithPersianRugIterator::new(gen, context);
+                                let mut iter = ::boulder::GeneratorWithPersianRugIterator::new(gen, context);
                                 let mut storage = Vec::new();
                                 for _ in 0..count {
                                     storage.push(iter.next().unwrap());
@@ -406,13 +406,13 @@ pub fn derive_buildable_with_persian_rug(input: syn::DeriveInput) -> pm2::TokenS
 
             #[automatically_derived]
             #[persian_rug::constraints(#constraints)]
-            impl #generics ::boulder::persian_rug::builder::guts::BoulderBase for #ident #ty_generics #wc {
+            impl #generics ::boulder::guts::persian_rug::builder::BoulderBase for #ident #ty_generics #wc {
                 type Base = #ident #ty_generics;
             }
 
             #[automatically_derived]
             #[persian_rug::constraints(#constraints)]
-            impl #generics ::boulder::persian_rug::builder::guts::MiniBuildableWithPersianRug<#ident #ty_generics, #context> for #ident #ty_generics #wc {
+            impl #generics ::boulder::guts::persian_rug::builder::MiniBuildableWithPersianRug<#ident #ty_generics, #context> for #ident #ty_generics #wc {
                 type Builder = Builder<#ident #ty_generics #bare_ty_generics>;
                 fn mini_builder() -> Self::Builder {
                     Builder::new()
@@ -421,7 +421,7 @@ pub fn derive_buildable_with_persian_rug(input: syn::DeriveInput) -> pm2::TokenS
 
             #[automatically_derived]
             #[persian_rug::constraints(#constraints)]
-            impl #generics ::boulder::persian_rug::builder::guts::MiniBuilderWithPersianRug<#context> for Builder<#ident #ty_generics #bare_ty_generics> #wc
+            impl #generics ::boulder::guts::persian_rug::builder::MiniBuilderWithPersianRug<#context> for Builder<#ident #ty_generics #bare_ty_generics> #wc
             {
                 type Result = #ident #ty_generics;
                 fn build<'boulder_mutator_lifetime, BoulderMutatorParam>(self, mut context: BoulderMutatorParam) -> (Self::Result, BoulderMutatorParam)
@@ -442,10 +442,10 @@ pub fn derive_buildable_with_persian_rug(input: syn::DeriveInput) -> pm2::TokenS
             // Option
             #[automatically_derived]
             #[persian_rug::constraints(#constraints)]
-            impl <BoulderExtraGenericParam #bare_generics> ::boulder::persian_rug::builder::guts::MiniBuildableWithPersianRug<#ident #ty_generics, #context> for Option<BoulderExtraGenericParam>
+            impl <BoulderExtraGenericParam #bare_generics> ::boulder::guts::persian_rug::builder::MiniBuildableWithPersianRug<#ident #ty_generics, #context> for Option<BoulderExtraGenericParam>
             where
-                BoulderExtraGenericParam: ::boulder::persian_rug::builder::guts::MiniBuildableWithPersianRug<#ident #ty_generics, #context>,
-                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::persian_rug::builder::guts::MiniBuilderWithPersianRug<#context, Result=BoulderExtraGenericParam>,
+                BoulderExtraGenericParam: ::boulder::guts::persian_rug::builder::MiniBuildableWithPersianRug<#ident #ty_generics, #context>,
+                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::guts::persian_rug::builder::MiniBuilderWithPersianRug<#context, Result=BoulderExtraGenericParam>,
                 #bare_wc
             {
                 type Builder = Builder<Option<BoulderExtraGenericParam> #bare_ty_generics>;
@@ -456,9 +456,9 @@ pub fn derive_buildable_with_persian_rug(input: syn::DeriveInput) -> pm2::TokenS
 
             #[automatically_derived]
             #[persian_rug::constraints(#constraints)]
-            impl <BoulderExtraGenericParam #bare_generics> ::boulder::persian_rug::builder::guts::MiniBuilderWithPersianRug<#context> for Builder<Option<BoulderExtraGenericParam> #bare_ty_generics>
+            impl <BoulderExtraGenericParam #bare_generics> ::boulder::guts::persian_rug::builder::MiniBuilderWithPersianRug<#context> for Builder<Option<BoulderExtraGenericParam> #bare_ty_generics>
             where
-                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::persian_rug::builder::guts::MiniBuilderWithPersianRug<#context, Result=BoulderExtraGenericParam>,
+                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::guts::persian_rug::builder::MiniBuilderWithPersianRug<#context, Result=BoulderExtraGenericParam>,
                 #bare_wc
             {
                 type Result = Option<BoulderExtraGenericParam>;
@@ -466,7 +466,7 @@ pub fn derive_buildable_with_persian_rug(input: syn::DeriveInput) -> pm2::TokenS
                 where
                     BoulderMutatorParam: 'boulder_mutator_lifetime + ::persian_rug::Mutator<Context=#context>
                 {
-                    let (result, context) = <Builder<BoulderExtraGenericParam #bare_ty_generics> as ::boulder::persian_rug::builder::guts::MiniBuilderWithPersianRug<#context>>::build(self.change_type(), context);
+                    let (result, context) = <Builder<BoulderExtraGenericParam #bare_ty_generics> as ::boulder::guts::persian_rug::builder::MiniBuilderWithPersianRug<#context>>::build(self.change_type(), context);
                     (Some(result), context)
                 }
             }
@@ -474,10 +474,10 @@ pub fn derive_buildable_with_persian_rug(input: syn::DeriveInput) -> pm2::TokenS
             // Proxy
             #[automatically_derived]
             #[persian_rug::constraints(#constraints, access(BoulderExtraGenericParam))]
-            impl <BoulderExtraGenericParam #bare_generics> ::boulder::persian_rug::builder::guts::MiniBuildableWithPersianRug<#ident #ty_generics, #context> for ::persian_rug::Proxy<BoulderExtraGenericParam>
+            impl <BoulderExtraGenericParam #bare_generics> ::boulder::guts::persian_rug::builder::MiniBuildableWithPersianRug<#ident #ty_generics, #context> for ::persian_rug::Proxy<BoulderExtraGenericParam>
             where
-                BoulderExtraGenericParam: ::boulder::persian_rug::builder::guts::MiniBuildableWithPersianRug<#ident #ty_generics, #context>,
-                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::persian_rug::builder::guts::MiniBuilderWithPersianRug<#context, Result=BoulderExtraGenericParam>,
+                BoulderExtraGenericParam: ::boulder::guts::persian_rug::builder::MiniBuildableWithPersianRug<#ident #ty_generics, #context>,
+                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::guts::persian_rug::builder::MiniBuilderWithPersianRug<#context, Result=BoulderExtraGenericParam>,
                 #bare_wc
             {
                 type Builder = Builder<::persian_rug::Proxy<BoulderExtraGenericParam> #bare_ty_generics>;
@@ -488,9 +488,9 @@ pub fn derive_buildable_with_persian_rug(input: syn::DeriveInput) -> pm2::TokenS
 
             #[automatically_derived]
             #[persian_rug::constraints(#constraints, access(BoulderExtraGenericParam))]
-            impl <BoulderExtraGenericParam #bare_generics> ::boulder::persian_rug::builder::guts::MiniBuilderWithPersianRug<#context> for Builder<::persian_rug::Proxy<BoulderExtraGenericParam> #bare_ty_generics>
+            impl <BoulderExtraGenericParam #bare_generics> ::boulder::guts::persian_rug::builder::MiniBuilderWithPersianRug<#context> for Builder<::persian_rug::Proxy<BoulderExtraGenericParam> #bare_ty_generics>
             where
-                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::persian_rug::builder::guts::MiniBuilderWithPersianRug<#context, Result=BoulderExtraGenericParam>,
+                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::guts::persian_rug::builder::MiniBuilderWithPersianRug<#context, Result=BoulderExtraGenericParam>,
                 #bare_wc
             {
                 type Result = ::persian_rug::Proxy<BoulderExtraGenericParam>;
@@ -498,7 +498,7 @@ pub fn derive_buildable_with_persian_rug(input: syn::DeriveInput) -> pm2::TokenS
                 where
                     BoulderMutatorParam: 'boulder_mutator_lifetime + ::persian_rug::Mutator<Context=#context>
                 {
-                    let (result, mut context) = <Builder<BoulderExtraGenericParam #bare_ty_generics> as ::boulder::persian_rug::builder::guts::MiniBuilderWithPersianRug<#context>>::build(self.change_type(), context);
+                    let (result, mut context) = <Builder<BoulderExtraGenericParam #bare_ty_generics> as ::boulder::guts::persian_rug::builder::MiniBuilderWithPersianRug<#context>>::build(self.change_type(), context);
                     (context.add(result), context)
                 }
             }
@@ -506,10 +506,10 @@ pub fn derive_buildable_with_persian_rug(input: syn::DeriveInput) -> pm2::TokenS
             // Arc
             #[automatically_derived]
             #[persian_rug::constraints(#constraints)]
-            impl <BoulderExtraGenericParam #bare_generics> ::boulder::persian_rug::builder::guts::MiniBuildableWithPersianRug<#ident #ty_generics, #context> for ::std::sync::Arc<BoulderExtraGenericParam>
+            impl <BoulderExtraGenericParam #bare_generics> ::boulder::guts::persian_rug::builder::MiniBuildableWithPersianRug<#ident #ty_generics, #context> for ::std::sync::Arc<BoulderExtraGenericParam>
             where
-                BoulderExtraGenericParam: ::boulder::persian_rug::builder::guts::MiniBuildableWithPersianRug<#ident #ty_generics, #context>,
-                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::persian_rug::builder::guts::MiniBuilderWithPersianRug<#context, Result=BoulderExtraGenericParam>,
+                BoulderExtraGenericParam: ::boulder::guts::persian_rug::builder::MiniBuildableWithPersianRug<#ident #ty_generics, #context>,
+                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::guts::persian_rug::builder::MiniBuilderWithPersianRug<#context, Result=BoulderExtraGenericParam>,
                 #bare_wc
             {
                 type Builder = Builder<::std::sync::Arc<BoulderExtraGenericParam> #bare_ty_generics>;
@@ -520,9 +520,9 @@ pub fn derive_buildable_with_persian_rug(input: syn::DeriveInput) -> pm2::TokenS
 
             #[automatically_derived]
             #[persian_rug::constraints(#constraints)]
-            impl <BoulderExtraGenericParam #bare_generics> ::boulder::persian_rug::builder::guts::MiniBuilderWithPersianRug<#context> for Builder<::std::sync::Arc<BoulderExtraGenericParam> #bare_ty_generics>
+            impl <BoulderExtraGenericParam #bare_generics> ::boulder::guts::persian_rug::builder::MiniBuilderWithPersianRug<#context> for Builder<::std::sync::Arc<BoulderExtraGenericParam> #bare_ty_generics>
             where
-                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::persian_rug::builder::guts::MiniBuilderWithPersianRug<#context, Result=BoulderExtraGenericParam>,
+                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::guts::persian_rug::builder::MiniBuilderWithPersianRug<#context, Result=BoulderExtraGenericParam>,
                 #bare_wc
             {
                 type Result = ::std::sync::Arc<BoulderExtraGenericParam>;
@@ -530,7 +530,7 @@ pub fn derive_buildable_with_persian_rug(input: syn::DeriveInput) -> pm2::TokenS
                 where
                     BoulderMutatorParam: 'boulder_mutator_lifetime + ::persian_rug::Mutator<Context=#context>
                 {
-                    let (result, context) = <Builder<BoulderExtraGenericParam #bare_ty_generics> as ::boulder::persian_rug::builder::guts::MiniBuilderWithPersianRug<#context>>::build(self.change_type(), context);
+                    let (result, context) = <Builder<BoulderExtraGenericParam #bare_ty_generics> as ::boulder::guts::persian_rug::builder::MiniBuilderWithPersianRug<#context>>::build(self.change_type(), context);
                     (::std::sync::Arc::new(result), context)
                 }
             }
@@ -538,10 +538,10 @@ pub fn derive_buildable_with_persian_rug(input: syn::DeriveInput) -> pm2::TokenS
             // Rc
             #[automatically_derived]
             #[persian_rug::constraints(#constraints)]
-            impl <BoulderExtraGenericParam #bare_generics> ::boulder::persian_rug::builder::guts::MiniBuildableWithPersianRug<#ident #ty_generics, #context> for ::std::rc::Rc<BoulderExtraGenericParam>
+            impl <BoulderExtraGenericParam #bare_generics> ::boulder::guts::persian_rug::builder::MiniBuildableWithPersianRug<#ident #ty_generics, #context> for ::std::rc::Rc<BoulderExtraGenericParam>
             where
-                BoulderExtraGenericParam: ::boulder::persian_rug::builder::guts::MiniBuildableWithPersianRug<#ident #ty_generics, #context>,
-                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::persian_rug::builder::guts::MiniBuilderWithPersianRug<#context, Result=BoulderExtraGenericParam>,
+                BoulderExtraGenericParam: ::boulder::guts::persian_rug::builder::MiniBuildableWithPersianRug<#ident #ty_generics, #context>,
+                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::guts::persian_rug::builder::MiniBuilderWithPersianRug<#context, Result=BoulderExtraGenericParam>,
                 #bare_wc
             {
                 type Builder = Builder<::std::rc::Rc<BoulderExtraGenericParam> #bare_ty_generics>;
@@ -552,9 +552,9 @@ pub fn derive_buildable_with_persian_rug(input: syn::DeriveInput) -> pm2::TokenS
 
             #[automatically_derived]
             #[persian_rug::constraints(#constraints)]
-            impl <BoulderExtraGenericParam #bare_generics> ::boulder::persian_rug::builder::guts::MiniBuilderWithPersianRug<#context> for Builder<::std::rc::Rc<BoulderExtraGenericParam> #bare_ty_generics>
+            impl <BoulderExtraGenericParam #bare_generics> ::boulder::guts::persian_rug::builder::MiniBuilderWithPersianRug<#context> for Builder<::std::rc::Rc<BoulderExtraGenericParam> #bare_ty_generics>
             where
-                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::persian_rug::builder::guts::MiniBuilderWithPersianRug<#context, Result=BoulderExtraGenericParam>,
+                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::guts::persian_rug::builder::MiniBuilderWithPersianRug<#context, Result=BoulderExtraGenericParam>,
                 #bare_wc
             {
                 type Result = ::std::rc::Rc<BoulderExtraGenericParam>;
@@ -562,7 +562,7 @@ pub fn derive_buildable_with_persian_rug(input: syn::DeriveInput) -> pm2::TokenS
                 where
                     BoulderMutatorParam: 'boulder_mutator_lifetime + ::persian_rug::Mutator<Context=#context>
                 {
-                    let (result, context) = <Builder<BoulderExtraGenericParam #bare_ty_generics> as ::boulder::persian_rug::builder::guts::MiniBuilderWithPersianRug<#context>>::build(self.change_type(), context);
+                    let (result, context) = <Builder<BoulderExtraGenericParam #bare_ty_generics> as ::boulder::guts::persian_rug::builder::MiniBuilderWithPersianRug<#context>>::build(self.change_type(), context);
                     (::std::rc::Rc::new(result), context)
                 }
             }
@@ -570,10 +570,10 @@ pub fn derive_buildable_with_persian_rug(input: syn::DeriveInput) -> pm2::TokenS
             // Cell
             #[automatically_derived]
             #[persian_rug::constraints(#constraints)]
-            impl <BoulderExtraGenericParam #bare_generics> ::boulder::persian_rug::builder::guts::MiniBuildableWithPersianRug<#ident #ty_generics, #context> for ::std::cell::Cell<BoulderExtraGenericParam>
+            impl <BoulderExtraGenericParam #bare_generics> ::boulder::guts::persian_rug::builder::MiniBuildableWithPersianRug<#ident #ty_generics, #context> for ::std::cell::Cell<BoulderExtraGenericParam>
             where
-                BoulderExtraGenericParam: ::boulder::persian_rug::builder::guts::MiniBuildableWithPersianRug<#ident #ty_generics, #context>,
-                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::persian_rug::builder::guts::MiniBuilderWithPersianRug<#context, Result=BoulderExtraGenericParam>,
+                BoulderExtraGenericParam: ::boulder::guts::persian_rug::builder::MiniBuildableWithPersianRug<#ident #ty_generics, #context>,
+                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::guts::persian_rug::builder::MiniBuilderWithPersianRug<#context, Result=BoulderExtraGenericParam>,
                 #bare_wc
             {
                 type Builder = Builder<::std::cell::Cell<BoulderExtraGenericParam> #bare_ty_generics>;
@@ -584,9 +584,9 @@ pub fn derive_buildable_with_persian_rug(input: syn::DeriveInput) -> pm2::TokenS
 
             #[automatically_derived]
             #[persian_rug::constraints(#constraints)]
-            impl <BoulderExtraGenericParam #bare_generics> ::boulder::persian_rug::builder::guts::MiniBuilderWithPersianRug<#context> for Builder<::std::cell::Cell<BoulderExtraGenericParam> #bare_ty_generics>
+            impl <BoulderExtraGenericParam #bare_generics> ::boulder::guts::persian_rug::builder::MiniBuilderWithPersianRug<#context> for Builder<::std::cell::Cell<BoulderExtraGenericParam> #bare_ty_generics>
             where
-                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::persian_rug::builder::guts::MiniBuilderWithPersianRug<#context, Result=BoulderExtraGenericParam>,
+                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::guts::persian_rug::builder::MiniBuilderWithPersianRug<#context, Result=BoulderExtraGenericParam>,
                 #bare_wc
             {
                 type Result = ::std::cell::Cell<BoulderExtraGenericParam>;
@@ -594,7 +594,7 @@ pub fn derive_buildable_with_persian_rug(input: syn::DeriveInput) -> pm2::TokenS
                 where
                     BoulderMutatorParam: 'boulder_mutator_lifetime + ::persian_rug::Mutator<Context=#context>
                 {
-                    let (result, context) = <Builder<BoulderExtraGenericParam #bare_ty_generics> as ::boulder::persian_rug::builder::guts::MiniBuilderWithPersianRug<#context>>::build(self.change_type(), context);
+                    let (result, context) = <Builder<BoulderExtraGenericParam #bare_ty_generics> as ::boulder::guts::persian_rug::builder::MiniBuilderWithPersianRug<#context>>::build(self.change_type(), context);
                     (::std::cell::Cell::new(result), context)
                 }
             }
@@ -602,10 +602,10 @@ pub fn derive_buildable_with_persian_rug(input: syn::DeriveInput) -> pm2::TokenS
             // RefCell
             #[automatically_derived]
             #[persian_rug::constraints(#constraints)]
-            impl <BoulderExtraGenericParam #bare_generics> ::boulder::persian_rug::builder::guts::MiniBuildableWithPersianRug<#ident #ty_generics, #context> for ::std::cell::RefCell<BoulderExtraGenericParam>
+            impl <BoulderExtraGenericParam #bare_generics> ::boulder::guts::persian_rug::builder::MiniBuildableWithPersianRug<#ident #ty_generics, #context> for ::std::cell::RefCell<BoulderExtraGenericParam>
             where
-                BoulderExtraGenericParam: ::boulder::persian_rug::builder::guts::MiniBuildableWithPersianRug<#ident #ty_generics, #context>,
-                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::persian_rug::builder::guts::MiniBuilderWithPersianRug<#context, Result=BoulderExtraGenericParam>,
+                BoulderExtraGenericParam: ::boulder::guts::persian_rug::builder::MiniBuildableWithPersianRug<#ident #ty_generics, #context>,
+                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::guts::persian_rug::builder::MiniBuilderWithPersianRug<#context, Result=BoulderExtraGenericParam>,
                 #bare_wc
             {
                 type Builder = Builder<::std::cell::RefCell<BoulderExtraGenericParam> #bare_ty_generics>;
@@ -616,9 +616,9 @@ pub fn derive_buildable_with_persian_rug(input: syn::DeriveInput) -> pm2::TokenS
 
             #[automatically_derived]
             #[persian_rug::constraints(#constraints)]
-            impl <BoulderExtraGenericParam #bare_generics> ::boulder::persian_rug::builder::guts::MiniBuilderWithPersianRug<#context> for Builder<::std::cell::RefCell<BoulderExtraGenericParam> #bare_ty_generics>
+            impl <BoulderExtraGenericParam #bare_generics> ::boulder::guts::persian_rug::builder::MiniBuilderWithPersianRug<#context> for Builder<::std::cell::RefCell<BoulderExtraGenericParam> #bare_ty_generics>
             where
-                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::persian_rug::builder::guts::MiniBuilderWithPersianRug<#context, Result=BoulderExtraGenericParam>,
+                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::guts::persian_rug::builder::MiniBuilderWithPersianRug<#context, Result=BoulderExtraGenericParam>,
                 #bare_wc
             {
                 type Result = ::std::cell::RefCell<BoulderExtraGenericParam>;
@@ -626,7 +626,7 @@ pub fn derive_buildable_with_persian_rug(input: syn::DeriveInput) -> pm2::TokenS
                 where
                     BoulderMutatorParam: 'boulder_mutator_lifetime + ::persian_rug::Mutator<Context=#context>
                 {
-                    let (result, context) = <Builder<BoulderExtraGenericParam #bare_ty_generics> as ::boulder::persian_rug::builder::guts::MiniBuilderWithPersianRug<#context>>::build(self.change_type(), context);
+                    let (result, context) = <Builder<BoulderExtraGenericParam #bare_ty_generics> as ::boulder::guts::persian_rug::builder::MiniBuilderWithPersianRug<#context>>::build(self.change_type(), context);
                     (::std::cell::RefCell::new(result), context)
                 }
             }
@@ -634,10 +634,10 @@ pub fn derive_buildable_with_persian_rug(input: syn::DeriveInput) -> pm2::TokenS
             // Mutex
             #[automatically_derived]
             #[persian_rug::constraints(#constraints)]
-            impl <BoulderExtraGenericParam #bare_generics> ::boulder::persian_rug::builder::guts::MiniBuildableWithPersianRug<#ident #ty_generics, #context> for ::std::sync::Mutex<BoulderExtraGenericParam>
+            impl <BoulderExtraGenericParam #bare_generics> ::boulder::guts::persian_rug::builder::MiniBuildableWithPersianRug<#ident #ty_generics, #context> for ::std::sync::Mutex<BoulderExtraGenericParam>
             where
-                BoulderExtraGenericParam: ::boulder::persian_rug::builder::guts::MiniBuildableWithPersianRug<#ident #ty_generics, #context>,
-                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::persian_rug::builder::guts::MiniBuilderWithPersianRug<#context, Result=BoulderExtraGenericParam>,
+                BoulderExtraGenericParam: ::boulder::guts::persian_rug::builder::MiniBuildableWithPersianRug<#ident #ty_generics, #context>,
+                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::guts::persian_rug::builder::MiniBuilderWithPersianRug<#context, Result=BoulderExtraGenericParam>,
                 #bare_wc
             {
                 type Builder = Builder<::std::sync::Mutex<BoulderExtraGenericParam> #bare_ty_generics>;
@@ -648,9 +648,9 @@ pub fn derive_buildable_with_persian_rug(input: syn::DeriveInput) -> pm2::TokenS
 
             #[automatically_derived]
             #[persian_rug::constraints(#constraints)]
-            impl <BoulderExtraGenericParam #bare_generics> ::boulder::persian_rug::builder::guts::MiniBuilderWithPersianRug<#context> for Builder<::std::sync::Mutex<BoulderExtraGenericParam> #bare_ty_generics>
+            impl <BoulderExtraGenericParam #bare_generics> ::boulder::guts::persian_rug::builder::MiniBuilderWithPersianRug<#context> for Builder<::std::sync::Mutex<BoulderExtraGenericParam> #bare_ty_generics>
             where
-                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::persian_rug::builder::guts::MiniBuilderWithPersianRug<#context, Result=BoulderExtraGenericParam>,
+                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::guts::persian_rug::builder::MiniBuilderWithPersianRug<#context, Result=BoulderExtraGenericParam>,
                 #bare_wc
             {
                 type Result = ::std::sync::Mutex<BoulderExtraGenericParam>;
@@ -658,7 +658,7 @@ pub fn derive_buildable_with_persian_rug(input: syn::DeriveInput) -> pm2::TokenS
                 where
                     BoulderMutatorParam: 'boulder_mutator_lifetime + ::persian_rug::Mutator<Context=#context>
                 {
-                    let (result, context) = <Builder<BoulderExtraGenericParam #bare_ty_generics> as ::boulder::persian_rug::builder::guts::MiniBuilderWithPersianRug<#context>>::build(self.change_type(), context);
+                    let (result, context) = <Builder<BoulderExtraGenericParam #bare_ty_generics> as ::boulder::guts::persian_rug::builder::MiniBuilderWithPersianRug<#context>>::build(self.change_type(), context);
                     (::std::sync::Mutex::new(result), context)
                 }
             }

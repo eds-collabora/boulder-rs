@@ -185,7 +185,7 @@ mod builder_coverage {
 
     #[derive(Generatable)]
     struct Parsnip2 {
-        #[boulder(generator=boulder::gen::Inc(0))]
+        #[boulder(generator=boulder::Inc(0))]
         c2: i32,
     }
 
@@ -208,7 +208,7 @@ mod builder_coverage {
     struct Elephant {
         // #[boulder(generator=Parsnip1Generator {c1: 1})]
         // v1: Parsnip2,
-        // #[boulder(generatable(c2=boulder::gen::Inc(2)))]
+        // #[boulder(generatable(c2=boulder::Inc(2)))]
         // v2: Parsnip2,
         #[boulder(buildable(c3 = 3))]
         v3: Parsnip3,
@@ -218,7 +218,7 @@ mod builder_coverage {
 
         #[boulder(generator=Parsnip1Generator { c1: 1}, sequence=1)]
         s1: Vec<Parsnip1>,
-        #[boulder(generatable(c2=boulder::gen::Inc(2)), sequence=2)]
+        #[boulder(generatable(c2=boulder::Inc(2)), sequence=2)]
         s2: Vec<Parsnip2>,
         #[boulder(buildable(c3 = 3), sequence = 3)]
         s3: Vec<Parsnip3>,
@@ -309,7 +309,7 @@ mod builder_coverage_generics {
 
     #[derive(Generatable)]
     struct Parsnip2 {
-        #[boulder(generator=boulder::gen::Inc(0))]
+        #[boulder(generator=boulder::Inc(0))]
         c2: i32,
     }
 
@@ -335,7 +335,7 @@ mod builder_coverage_generics {
     {
         // #[boulder(generator=Parsnip1Generator {c1: 1})]
         // v1: Parsnip2,
-        // #[boulder(generatable(c2=boulder::gen::Inc(2)))]
+        // #[boulder(generatable(c2=boulder::Inc(2)))]
         // v2: Parsnip2,
         #[boulder(buildable(c3 = 3))]
         v3: Parsnip3,
@@ -345,7 +345,7 @@ mod builder_coverage_generics {
 
         #[boulder(generator=Parsnip1Generator { c1: 1}, sequence=1)]
         s1: Vec<Parsnip1>,
-        #[boulder(generatable(c2=boulder::gen::Inc(2)), sequence=2)]
+        #[boulder(generatable(c2=boulder::Inc(2)), sequence=2)]
         s2: Vec<Parsnip2>,
         #[boulder(buildable(c3 = 3), sequence = 3)]
         s3: Vec<Parsnip3>,
@@ -418,7 +418,7 @@ mod builder_coverage_generics {
 pub struct Wizard {
     #[boulder(default = "hello")]
     a: String,
-    #[boulder(generator=boulder::gen::Inc(5))]
+    #[boulder(generator=boulder::Inc(5))]
     b: i32,
 }
 
@@ -618,7 +618,7 @@ mod generator_wrappers {
 
 #[test]
 fn test_string_pattern() {
-    let mut g = boulder::gen::Pattern!("example-{}", boulder::gen::Inc(2));
+    let mut g = boulder::Pattern!("example-{}", boulder::Inc(2));
     for i in 0..5 {
         assert_eq!(g.generate(), format!("example-{}", i + 2));
     }
@@ -626,9 +626,9 @@ fn test_string_pattern() {
 
 #[derive(Debug, Generatable)]
 pub struct Sorceress {
-    #[boulder(generator=boulder::gen::Pattern!("an-example-{}", boulder::gen::Inc(1)))]
+    #[boulder(generator=boulder::Pattern!("an-example-{}", boulder::Inc(1)))]
     a: String,
-    #[boulder(generator=boulder::gen::Inc(5))]
+    #[boulder(generator=boulder::Inc(5))]
     b: i32,
 }
 
@@ -647,9 +647,9 @@ fn test_generator2() {
 
 #[derive(Debug, Generatable)]
 pub struct Sorceress2 {
-    #[boulder(generator=boulder::gen::Pattern!("{}-an-example-{}", boulder::gen::Inc(1), boulder::gen::Inc(5)))]
+    #[boulder(generator=boulder::Pattern!("{}-an-example-{}", boulder::Inc(1), boulder::Inc(5)))]
     a: String,
-    #[boulder(generator=boulder::gen::Inc(5))]
+    #[boulder(generator=boulder::Inc(5))]
     b: i32,
 }
 
@@ -732,7 +732,7 @@ pub struct Zebra2 {
 #[derive(Debug, Buildable)]
 pub struct Zebra3 {
     a: i32,
-    #[boulder(sequence=4, generator=boulder::gen::Pattern!("a-{}", boulder::gen::Inc(0)))]
+    #[boulder(sequence=4, generator=boulder::Pattern!("a-{}", boulder::Inc(0)))]
     b: Vec<String>,
 }
 
@@ -745,8 +745,8 @@ struct Nested {
 #[derive(Debug, Buildable)]
 struct Zebra4 {
     a: i32,
-    #[boulder(sequence=5, generatable(a=boulder::gen::Inc(5),
-                                      b=boulder::gen::Pattern!("x{}", boulder::gen::Inc(2))))]
+    #[boulder(sequence=5, generatable(a=boulder::Inc(5),
+                                      b=boulder::Pattern!("x{}", boulder::Inc(2))))]
     b: Vec<Nested>,
 }
 
@@ -814,38 +814,38 @@ fn test_build_vector() {
 #[derive(Debug, Generatable)]
 pub struct Kangaroo1 {
     a: i32,
-    #[boulder(sequence_generator = boulder::gen::Inc(2usize))]
+    #[boulder(sequence_generator = boulder::Inc(2usize))]
     b: Vec<String>,
 }
 
 #[derive(Debug, Generatable)]
 pub struct Kangaroo2 {
     a: i32,
-    #[boulder(sequence_generator = boulder::gen::Inc(3usize), default = "hello")]
+    #[boulder(sequence_generator = boulder::Inc(3usize), default = "hello")]
     b: Vec<String>,
 }
 
 #[derive(Debug, Generatable)]
 pub struct Kangaroo3 {
     a: i32,
-    #[boulder(sequence_generator= boulder::gen::Inc(4usize),
-              generator=boulder::gen::Pattern!("a-{}", boulder::gen::Inc(0)))]
+    #[boulder(sequence_generator= boulder::Inc(4usize),
+              generator=boulder::Pattern!("a-{}", boulder::Inc(0)))]
     b: Vec<String>,
 }
 
 #[derive(Debug, Generatable)]
 struct Kangaroo4 {
     a: i32,
-    #[boulder(sequence_generator= boulder::gen::Inc(5usize),
-              generatable(a=boulder::gen::Inc(5),
-                          b=boulder::gen::Pattern!("x{}", boulder::gen::Inc(2))))]
+    #[boulder(sequence_generator= boulder::Inc(5usize),
+              generatable(a=boulder::Inc(5),
+                          b=boulder::Pattern!("x{}", boulder::Inc(2))))]
     b: Vec<Nested>,
 }
 
 #[derive(Debug, Generatable)]
 struct Kangaroo5 {
     a: i32,
-    #[boulder(sequence_generator = boulder::gen::Inc(6usize),
+    #[boulder(sequence_generator = boulder::Inc(6usize),
               buildable(a = 10, b = "hello"))]
     b: Vec<Nested>,
 }
@@ -854,8 +854,8 @@ struct Kangaroo5 {
 struct Kangaroo6 {
     a: i32,
     #[boulder(sequence = 3,
-              generatable(a=boulder::gen::Inc(5),
-                          b=boulder::gen::Pattern!("x{}", boulder::gen::Inc(2))))]
+              generatable(a=boulder::Inc(5),
+                          b=boulder::Pattern!("x{}", boulder::Inc(2))))]
     b: Vec<Nested>,
 }
 
@@ -1013,7 +1013,7 @@ mod generator_coverage {
 
     #[derive(Generatable)]
     struct Fig2 {
-        #[boulder(generator=boulder::gen::Inc(0))]
+        #[boulder(generator=boulder::Inc(0))]
         c2: i32,
     }
 
@@ -1036,7 +1036,7 @@ mod generator_coverage {
     struct Monkey {
         #[boulder(generator=Fig1Generator {c1: 1})]
         v1: Fig1,
-        #[boulder(generatable(c2=boulder::gen::Inc(2)))]
+        #[boulder(generatable(c2=boulder::Inc(2)))]
         v2: Fig2,
         #[boulder(buildable(c3 = 3))]
         v3: Fig3,
@@ -1046,7 +1046,7 @@ mod generator_coverage {
 
         #[boulder(generator=Fig1Generator { c1: 1 }, sequence=1)]
         s1: Vec<Fig1>,
-        #[boulder(generatable(c2=boulder::gen::Inc(2)), sequence=2)]
+        #[boulder(generatable(c2=boulder::Inc(2)), sequence=2)]
         s2: Vec<Fig2>,
         #[boulder(buildable(c3 = 3), sequence = 3)]
         s3: Vec<Fig3>,
@@ -1055,15 +1055,15 @@ mod generator_coverage {
         #[boulder(sequence = 5)]
         s5: Vec<Fig5>,
 
-        #[boulder(generator=Fig1Generator { c1: 1 }, sequence_generator=boulder::gen::Inc(1usize))]
+        #[boulder(generator=Fig1Generator { c1: 1 }, sequence_generator=boulder::Inc(1usize))]
         p1: Vec<Fig1>,
-        #[boulder(generatable(c2=boulder::gen::Inc(2)), sequence_generator=boulder::gen::Inc(2usize))]
+        #[boulder(generatable(c2=boulder::Inc(2)), sequence_generator=boulder::Inc(2usize))]
         p2: Vec<Fig2>,
-        #[boulder(buildable(c3 = 3), sequence_generator=boulder::gen::Inc(3usize))]
+        #[boulder(buildable(c3 = 3), sequence_generator=boulder::Inc(3usize))]
         p3: Vec<Fig3>,
-        #[boulder(default=Fig4 { c4: 4 }, sequence_generator=boulder::gen::Inc(4usize))]
+        #[boulder(default=Fig4 { c4: 4 }, sequence_generator=boulder::Inc(4usize))]
         p4: Vec<Fig4>,
-        #[boulder(sequence_generator = boulder::gen::Inc(5usize))]
+        #[boulder(sequence_generator = boulder::Inc(5usize))]
         p5: Vec<Fig5>,
     }
 
@@ -1243,7 +1243,7 @@ mod generator_coverage_generics {
 
     #[derive(Generatable)]
     struct Fig2 {
-        #[boulder(generator=boulder::gen::Inc(0))]
+        #[boulder(generator=boulder::Inc(0))]
         c2: i32,
     }
 
@@ -1269,7 +1269,7 @@ mod generator_coverage_generics {
     {
         #[boulder(generator=Fig1Generator {c1: 1})]
         v1: Fig1,
-        #[boulder(generatable(c2=boulder::gen::Inc(2)))]
+        #[boulder(generatable(c2=boulder::Inc(2)))]
         v2: Fig2,
         #[boulder(buildable(c3 = 3))]
         v3: Fig3,
@@ -1279,7 +1279,7 @@ mod generator_coverage_generics {
 
         #[boulder(generator=Fig1Generator { c1: 1 }, sequence=1)]
         s1: Vec<Fig1>,
-        #[boulder(generatable(c2=boulder::gen::Inc(2)), sequence=2)]
+        #[boulder(generatable(c2=boulder::Inc(2)), sequence=2)]
         s2: Vec<Fig2>,
         #[boulder(buildable(c3 = 3), sequence = 3)]
         s3: Vec<Fig3>,
@@ -1288,15 +1288,15 @@ mod generator_coverage_generics {
         #[boulder(sequence = 5)]
         s5: Vec<U>,
 
-        #[boulder(generator=Fig1Generator { c1: 1 }, sequence_generator=boulder::gen::Inc(1usize))]
+        #[boulder(generator=Fig1Generator { c1: 1 }, sequence_generator=boulder::Inc(1usize))]
         p1: Vec<Fig1>,
-        #[boulder(generatable(c2=boulder::gen::Inc(2)), sequence_generator=boulder::gen::Inc(2usize))]
+        #[boulder(generatable(c2=boulder::Inc(2)), sequence_generator=boulder::Inc(2usize))]
         p2: Vec<Fig2>,
-        #[boulder(buildable(c3 = 3), sequence_generator=boulder::gen::Inc(3usize))]
+        #[boulder(buildable(c3 = 3), sequence_generator=boulder::Inc(3usize))]
         p3: Vec<Fig3>,
-        #[boulder(default=Fig4 { c4: 4 }, sequence_generator=boulder::gen::Inc(4usize))]
+        #[boulder(default=Fig4 { c4: 4 }, sequence_generator=boulder::Inc(4usize))]
         p4: Vec<Fig4>,
-        #[boulder(sequence_generator = boulder::gen::Inc(5usize))]
+        #[boulder(sequence_generator = boulder::Inc(5usize))]
         p5: Vec<U>,
     }
 

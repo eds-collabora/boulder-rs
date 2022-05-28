@@ -1,16 +1,139 @@
+/// A type that has an associated default [`GeneratorWithPersianRug`]
+///
+/// This trait is implemented via the
+/// [`macro@GeneratableWithPersianRug`] derive macro. It cannot be
+/// directly implemented because the library itself provides a blanket
+/// implementation from a more complex underlying trait
+/// `MiniGeneratableWithPersianRug`, which is not currently
+/// documented.
+///
+/// This restriction may be removed in a future version; much of the
+/// complexity in this module stems from lacking generic associated
+/// types on stable.
+#[cfg_attr(docsrs, doc(cfg(feature = "persian-rug")))]
 pub trait GeneratableWithPersianRug<C>
 where
     C: persian_rug::Context,
 {
+    /// A default choice of [`GeneratorWithPersianRug`] for this type.
     type Generator: GeneratorWithPersianRug<C, Output = Self>;
+    /// Return this object's generator.
+    ///
+    /// Example
+    /// ```rust
+    /// use boulder::{GeneratableWithPersianRug, GeneratorWithPersianRug};
+    /// use persian_rug::{contextual, persian_rug, Context, Mutator};
+    ///
+    /// #[contextual(State)]
+    /// struct Foo {
+    ///    a: i32
+    /// }
+    ///
+    /// #[persian_rug]
+    /// struct State (
+    ///   #[table] Foo,
+    /// );
+    ///
+    /// struct FooGenerator {
+    ///   a: i32
+    /// };
+    ///
+    /// impl GeneratorWithPersianRug<State> for FooGenerator {
+    ///   type Output = Foo;
+    ///   fn generate<'b, B>(&mut self, context: B) -> (Foo, B)
+    ///   where
+    ///     B: 'b + Mutator<Context = State>
+    ///   {
+    ///     self.a += 1;
+    ///     (Foo { a: self.a }, context)
+    ///   }
+    /// }
+    ///
+    /// impl GeneratableWithPersianRug<State> for Foo {
+    ///   type Generator = FooGenerator;
+    ///   fn generator() -> Self::Generator {
+    ///     FooGenerator { a: 0 }
+    ///   }
+    /// }
+    ///
+    /// let mut s = State(Default::default());
+    /// let mut g = Foo::generator();
+    ///
+    /// let (f1, _) = g.generate(&mut s);
+    /// assert_eq!(f1.a, 1);
+    /// let (f2, _) = g.generate(&mut s);
+    /// assert_eq!(f2.a, 2);
+    /// ```
     fn generator() -> Self::Generator;
 }
 
+/// Something which can generate a sequence of objects of some type.
+///
+/// The only required function in this trait is
+/// ['generate'](GeneratorWithPersianRug::generate) which creates a
+/// new object, mutating the generator as a byproduct, using a
+/// [`Context`](persian_rug::Context). Most generators will allow
+/// customisation of the sequence of produced objects in some way.
+///
+/// An object implementing this trait will be automatically created
+/// for you as part of the [`macro@GeneratableWithPersianRug`] derive
+/// macro. That generator will have a method for each field of the
+/// result type, to allow you to set a generator for the field. It
+/// will produce a default sequence (as configured by the attributes
+/// placed on the type) for every field that is not customised.
+///
+/// Note that the generator produced by this macro changes type as its
+/// default sequences are altered; this is mostly transparent. This is
+/// required because this trait is not object safe, and therefore
+/// there is no overarching type that can represent any generator for
+/// a given field.
+#[cfg_attr(docsrs, doc(cfg(feature = "persian-rug")))]
 pub trait GeneratorWithPersianRug<C>
 where
     C: persian_rug::Context,
 {
+    /// The output type.
     type Output;
+    /// Make a new object.
+    ///
+    /// Example
+    /// ```rust
+    /// use boulder::GeneratorWithPersianRug;
+    /// use persian_rug::{contextual, persian_rug, Context, Mutator};
+    ///
+    /// #[contextual(State)]
+    /// struct Foo {
+    ///    a: i32
+    /// }
+    ///
+    /// #[persian_rug]
+    /// struct State (
+    ///   #[table] Foo,
+    /// );
+    ///
+    /// struct FooGenerator {
+    ///   next: i32
+    /// };
+    ///
+    /// impl GeneratorWithPersianRug<State> for FooGenerator {
+    ///   type Output = Foo;
+    ///   fn generate<'b, B>(&mut self, context: B) -> (Self::Output, B)
+    ///   where
+    ///     B: 'b + Mutator<Context = State>
+    ///   {
+    ///     let result = self.next;
+    ///     self.next = self.next + 1;
+    ///     (Foo { a: result }, context)
+    ///   }
+    /// }
+    ///
+    /// let mut s = State(Default::default());
+    /// let mut g = FooGenerator { next: 6 };
+    /// let (f1, _) = g.generate(&mut s);
+    /// assert_eq!(f1.a, 6);
+    /// let (f2, _) = g.generate(&mut s);
+    /// assert_eq!(f2.a, 7);
+    /// ```
     fn generate<'b, B>(&mut self, context: B) -> (Self::Output, B)
     where
         B: 'b + persian_rug::Mutator<Context = C>;
@@ -21,6 +144,7 @@ where
 /// It makes any generator into an infinite sequence. One reason not
 /// to use this type is that it prevents modifying the generator
 /// mid-sequence.
+#[cfg_attr(docsrs, doc(cfg(feature = "persian-rug")))]
 pub struct GeneratorWithPersianRugIterator<T, B>
 where
     B: persian_rug::Mutator,
@@ -64,6 +188,7 @@ where
 /// It makes any generator into an infinite sequence. Using this type
 /// prevents modifying the generator mid-sequence, but permits
 /// re-using it once the desired values have been extracted.
+#[cfg_attr(docsrs, doc(cfg(feature = "persian-rug")))]
 pub struct GeneratorWithPersianRugMutIterator<'a, B, T>
 where
     B: persian_rug::Mutator,
@@ -102,6 +227,7 @@ where
     }
 }
 
+#[cfg_attr(docsrs, doc(cfg(feature = "persian-rug")))]
 pub struct SequenceGeneratorWithPersianRug<S, T, V> {
     _marker: core::marker::PhantomData<V>,
     seq: S,
@@ -144,6 +270,7 @@ where
     }
 }
 
+#[cfg_attr(docsrs, doc(cfg(feature = "persian-rug")))]
 pub struct GeneratorWrapper<T> {
     gen: Box<dyn crate::Generator<Output = T>>,
 }
@@ -259,7 +386,7 @@ pub mod guts {
 
 mod gen {
     use super::GeneratorWithPersianRug;
-    use crate::gen::{Const, Cycle, Inc, Repeat, Sample, Some, Subsets, Time};
+    use crate::{Const, Cycle, Inc, Repeat, Sample, Some, Subsets, Time};
     use num::One;
 
     impl<C, T> GeneratorWithPersianRug<C> for Const<T>

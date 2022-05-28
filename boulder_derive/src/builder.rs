@@ -221,12 +221,12 @@ pub fn derive_buildable(input: syn::DeriveInput) -> pm2::TokenStream {
             }
 
             #[automatically_derived]
-            impl #generics ::boulder::builder::guts::BoulderBase for #ident #ty_generics #wc {
+            impl #generics ::boulder::guts::builder::BoulderBase for #ident #ty_generics #wc {
                 type Base = #ident #ty_generics;
             }
 
             #[automatically_derived]
-            impl #generics ::boulder::builder::guts::MiniBuildable<#ident #ty_generics> for #ident #ty_generics #wc {
+            impl #generics ::boulder::guts::builder::MiniBuildable<#ident #ty_generics> for #ident #ty_generics #wc {
                 type Builder = Builder<#ident #ty_generics #bare_ty_generics>;
                 fn mini_builder() -> Self::Builder {
                     Builder::new()
@@ -234,7 +234,7 @@ pub fn derive_buildable(input: syn::DeriveInput) -> pm2::TokenStream {
             }
 
             #[automatically_derived]
-            impl #generics ::boulder::builder::guts::MiniBuilder for Builder<#ident #ty_generics #bare_ty_generics> #wc
+            impl #generics ::boulder::guts::builder::MiniBuilder for Builder<#ident #ty_generics #bare_ty_generics> #wc
             {
                 type Result=#ident #ty_generics;
                 fn build(self) -> #ident #ty_generics {
@@ -245,10 +245,10 @@ pub fn derive_buildable(input: syn::DeriveInput) -> pm2::TokenStream {
             }
 
             #[automatically_derived]
-            impl <BoulderExtraGenericParam #bare_generics> ::boulder::builder::guts::MiniBuildable<#ident #ty_generics> for Option<BoulderExtraGenericParam>
+            impl <BoulderExtraGenericParam #bare_generics> ::boulder::guts::builder::MiniBuildable<#ident #ty_generics> for Option<BoulderExtraGenericParam>
             where
-                BoulderExtraGenericParam: ::boulder::builder::guts::MiniBuildable<#ident #ty_generics>,
-                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::builder::guts::MiniBuilder<Result=BoulderExtraGenericParam>,
+                BoulderExtraGenericParam: ::boulder::guts::builder::MiniBuildable<#ident #ty_generics>,
+                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::guts::builder::MiniBuilder<Result=BoulderExtraGenericParam>,
                 #bare_wc
             {
                 type Builder = Builder<Option<BoulderExtraGenericParam> #bare_ty_generics>;
@@ -258,22 +258,22 @@ pub fn derive_buildable(input: syn::DeriveInput) -> pm2::TokenStream {
             }
 
             #[automatically_derived]
-            impl <BoulderExtraGenericParam #bare_generics> ::boulder::builder::guts::MiniBuilder for Builder<Option<BoulderExtraGenericParam> #bare_ty_generics>
+            impl <BoulderExtraGenericParam #bare_generics> ::boulder::guts::builder::MiniBuilder for Builder<Option<BoulderExtraGenericParam> #bare_ty_generics>
             where
-                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::builder::guts::MiniBuilder<Result=BoulderExtraGenericParam>,
+                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::guts::builder::MiniBuilder<Result=BoulderExtraGenericParam>,
                 #bare_wc
             {
                 type Result = Option<BoulderExtraGenericParam>;
                 fn build(self) -> Option<BoulderExtraGenericParam> {
-                    Some( <Builder<BoulderExtraGenericParam #bare_ty_generics> as ::boulder::builder::guts::MiniBuilder>::build(self.change_type()) )
+                    Some( <Builder<BoulderExtraGenericParam #bare_ty_generics> as ::boulder::guts::builder::MiniBuilder>::build(self.change_type()) )
                 }
             }
 
             #[automatically_derived]
-            impl <BoulderExtraGenericParam #bare_generics> ::boulder::builder::guts::MiniBuildable<#ident #ty_generics> for ::std::sync::Arc<BoulderExtraGenericParam>
+            impl <BoulderExtraGenericParam #bare_generics> ::boulder::guts::builder::MiniBuildable<#ident #ty_generics> for ::std::sync::Arc<BoulderExtraGenericParam>
             where
-                BoulderExtraGenericParam: ::boulder::builder::guts::MiniBuildable<#ident #ty_generics>,
-                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::builder::guts::MiniBuilder<Result=BoulderExtraGenericParam>,
+                BoulderExtraGenericParam: ::boulder::guts::builder::MiniBuildable<#ident #ty_generics>,
+                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::guts::builder::MiniBuilder<Result=BoulderExtraGenericParam>,
                 #bare_wc
             {
                 type Builder = Builder<::std::sync::Arc<BoulderExtraGenericParam> #bare_ty_generics>;
@@ -283,22 +283,22 @@ pub fn derive_buildable(input: syn::DeriveInput) -> pm2::TokenStream {
             }
 
             #[automatically_derived]
-            impl <BoulderExtraGenericParam #bare_generics> ::boulder::builder::guts::MiniBuilder for Builder<::std::sync::Arc<BoulderExtraGenericParam> #bare_ty_generics>
+            impl <BoulderExtraGenericParam #bare_generics> ::boulder::guts::builder::MiniBuilder for Builder<::std::sync::Arc<BoulderExtraGenericParam> #bare_ty_generics>
             where
-                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::builder::guts::MiniBuilder<Result=BoulderExtraGenericParam>,
+                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::guts::builder::MiniBuilder<Result=BoulderExtraGenericParam>,
                 #bare_wc
             {
                 type Result = ::std::sync::Arc<BoulderExtraGenericParam>;
                 fn build(self) -> ::std::sync::Arc<BoulderExtraGenericParam> {
-                    ::std::sync::Arc::new( <Builder<BoulderExtraGenericParam #bare_ty_generics> as ::boulder::builder::guts::MiniBuilder>::build(self.change_type()) )
+                    ::std::sync::Arc::new( <Builder<BoulderExtraGenericParam #bare_ty_generics> as ::boulder::guts::builder::MiniBuilder>::build(self.change_type()) )
                 }
             }
 
             #[automatically_derived]
-            impl <BoulderExtraGenericParam #bare_generics> ::boulder::builder::guts::MiniBuildable<#ident #ty_generics> for ::std::rc::Rc<BoulderExtraGenericParam>
+            impl <BoulderExtraGenericParam #bare_generics> ::boulder::guts::builder::MiniBuildable<#ident #ty_generics> for ::std::rc::Rc<BoulderExtraGenericParam>
             where
-                BoulderExtraGenericParam: ::boulder::builder::guts::MiniBuildable<#ident #ty_generics>,
-                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::builder::guts::MiniBuilder<Result=BoulderExtraGenericParam>,
+                BoulderExtraGenericParam: ::boulder::guts::builder::MiniBuildable<#ident #ty_generics>,
+                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::guts::builder::MiniBuilder<Result=BoulderExtraGenericParam>,
                 #bare_wc
             {
                 type Builder = Builder<::std::rc::Rc<BoulderExtraGenericParam> #bare_ty_generics>;
@@ -308,22 +308,22 @@ pub fn derive_buildable(input: syn::DeriveInput) -> pm2::TokenStream {
             }
 
             #[automatically_derived]
-            impl <BoulderExtraGenericParam #bare_generics> ::boulder::builder::guts::MiniBuilder for Builder<::std::rc::Rc<BoulderExtraGenericParam> #bare_ty_generics>
+            impl <BoulderExtraGenericParam #bare_generics> ::boulder::guts::builder::MiniBuilder for Builder<::std::rc::Rc<BoulderExtraGenericParam> #bare_ty_generics>
             where
-                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::builder::guts::MiniBuilder<Result=BoulderExtraGenericParam>,
+                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::guts::builder::MiniBuilder<Result=BoulderExtraGenericParam>,
                 #bare_wc
             {
                 type Result = ::std::rc::Rc<BoulderExtraGenericParam>;
                 fn build(self) -> ::std::rc::Rc<BoulderExtraGenericParam> {
-                    ::std::rc::Rc::new( <Builder<BoulderExtraGenericParam #bare_ty_generics> as ::boulder::builder::guts::MiniBuilder>::build(self.change_type()) )
+                    ::std::rc::Rc::new( <Builder<BoulderExtraGenericParam #bare_ty_generics> as ::boulder::guts::builder::MiniBuilder>::build(self.change_type()) )
                 }
             }
 
             #[automatically_derived]
-            impl <BoulderExtraGenericParam #bare_generics> ::boulder::builder::guts::MiniBuildable<#ident #ty_generics> for ::std::sync::Mutex<BoulderExtraGenericParam>
+            impl <BoulderExtraGenericParam #bare_generics> ::boulder::guts::builder::MiniBuildable<#ident #ty_generics> for ::std::sync::Mutex<BoulderExtraGenericParam>
             where
-                BoulderExtraGenericParam: ::boulder::builder::guts::MiniBuildable<#ident #ty_generics>,
-                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::builder::guts::MiniBuilder<Result=BoulderExtraGenericParam>,
+                BoulderExtraGenericParam: ::boulder::guts::builder::MiniBuildable<#ident #ty_generics>,
+                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::guts::builder::MiniBuilder<Result=BoulderExtraGenericParam>,
                 #bare_wc
             {
                 type Builder = Builder<::std::sync::Mutex<BoulderExtraGenericParam> #bare_ty_generics>;
@@ -333,22 +333,22 @@ pub fn derive_buildable(input: syn::DeriveInput) -> pm2::TokenStream {
             }
 
             #[automatically_derived]
-            impl <BoulderExtraGenericParam #bare_generics> ::boulder::builder::guts::MiniBuilder for Builder<::std::sync::Mutex<BoulderExtraGenericParam> #bare_ty_generics>
+            impl <BoulderExtraGenericParam #bare_generics> ::boulder::guts::builder::MiniBuilder for Builder<::std::sync::Mutex<BoulderExtraGenericParam> #bare_ty_generics>
             where
-                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::builder::guts::MiniBuilder<Result=BoulderExtraGenericParam>,
+                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::guts::builder::MiniBuilder<Result=BoulderExtraGenericParam>,
                 #bare_wc
             {
                 type Result = ::std::sync::Mutex<BoulderExtraGenericParam>;
                 fn build(self) -> ::std::sync::Mutex<BoulderExtraGenericParam> {
-                    ::std::sync::Mutex::new( <Builder<BoulderExtraGenericParam #bare_ty_generics> as ::boulder::builder::guts::MiniBuilder>::build(self.change_type()) )
+                    ::std::sync::Mutex::new( <Builder<BoulderExtraGenericParam #bare_ty_generics> as ::boulder::guts::builder::MiniBuilder>::build(self.change_type()) )
                 }
             }
 
             #[automatically_derived]
-            impl <BoulderExtraGenericParam #bare_generics> ::boulder::builder::guts::MiniBuildable<#ident #ty_generics> for ::std::cell::Cell<BoulderExtraGenericParam>
+            impl <BoulderExtraGenericParam #bare_generics> ::boulder::guts::builder::MiniBuildable<#ident #ty_generics> for ::std::cell::Cell<BoulderExtraGenericParam>
             where
-                BoulderExtraGenericParam: ::boulder::builder::guts::MiniBuildable<#ident #ty_generics>,
-                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::builder::guts::MiniBuilder<Result=BoulderExtraGenericParam>,
+                BoulderExtraGenericParam: ::boulder::guts::builder::MiniBuildable<#ident #ty_generics>,
+                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::guts::builder::MiniBuilder<Result=BoulderExtraGenericParam>,
                 #bare_wc
             {
                 type Builder = Builder<::std::cell::Cell<BoulderExtraGenericParam> #bare_ty_generics>;
@@ -358,22 +358,22 @@ pub fn derive_buildable(input: syn::DeriveInput) -> pm2::TokenStream {
             }
 
             #[automatically_derived]
-            impl <BoulderExtraGenericParam #bare_generics> ::boulder::builder::guts::MiniBuilder for Builder<::std::cell::Cell<BoulderExtraGenericParam> #bare_ty_generics>
+            impl <BoulderExtraGenericParam #bare_generics> ::boulder::guts::builder::MiniBuilder for Builder<::std::cell::Cell<BoulderExtraGenericParam> #bare_ty_generics>
             where
-                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::builder::guts::MiniBuilder<Result=BoulderExtraGenericParam>,
+                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::guts::builder::MiniBuilder<Result=BoulderExtraGenericParam>,
                 #bare_wc
             {
                 type Result = ::std::cell::Cell<BoulderExtraGenericParam>;
                 fn build(self) -> ::std::cell::Cell<BoulderExtraGenericParam> {
-                    ::std::cell::Cell::new( <Builder<BoulderExtraGenericParam #bare_ty_generics> as ::boulder::builder::guts::MiniBuilder>::build(self.change_type()) )
+                    ::std::cell::Cell::new( <Builder<BoulderExtraGenericParam #bare_ty_generics> as ::boulder::guts::builder::MiniBuilder>::build(self.change_type()) )
                 }
             }
 
             #[automatically_derived]
-            impl <BoulderExtraGenericParam #bare_generics> ::boulder::builder::guts::MiniBuildable<#ident #ty_generics> for ::std::cell::RefCell<BoulderExtraGenericParam>
+            impl <BoulderExtraGenericParam #bare_generics> ::boulder::guts::builder::MiniBuildable<#ident #ty_generics> for ::std::cell::RefCell<BoulderExtraGenericParam>
             where
-                BoulderExtraGenericParam: ::boulder::builder::guts::MiniBuildable<#ident #ty_generics>,
-                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::builder::guts::MiniBuilder<Result=BoulderExtraGenericParam>,
+                BoulderExtraGenericParam: ::boulder::guts::builder::MiniBuildable<#ident #ty_generics>,
+                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::guts::builder::MiniBuilder<Result=BoulderExtraGenericParam>,
                 #bare_wc
             {
                 type Builder = Builder<::std::cell::RefCell<BoulderExtraGenericParam> #bare_ty_generics>;
@@ -383,14 +383,14 @@ pub fn derive_buildable(input: syn::DeriveInput) -> pm2::TokenStream {
             }
 
             #[automatically_derived]
-            impl <BoulderExtraGenericParam #bare_generics> ::boulder::builder::guts::MiniBuilder for Builder<::std::cell::RefCell<BoulderExtraGenericParam> #bare_ty_generics>
+            impl <BoulderExtraGenericParam #bare_generics> ::boulder::guts::builder::MiniBuilder for Builder<::std::cell::RefCell<BoulderExtraGenericParam> #bare_ty_generics>
             where
-                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::builder::guts::MiniBuilder<Result=BoulderExtraGenericParam>,
+                Builder<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::guts::builder::MiniBuilder<Result=BoulderExtraGenericParam>,
                 #bare_wc
             {
                 type Result = ::std::cell::RefCell<BoulderExtraGenericParam>;
                 fn build(self) -> ::std::cell::RefCell<BoulderExtraGenericParam> {
-                    ::std::cell::RefCell::new( <Builder<BoulderExtraGenericParam #bare_ty_generics> as ::boulder::builder::guts::MiniBuilder>::build(self.change_type()) )
+                    ::std::cell::RefCell::new( <Builder<BoulderExtraGenericParam #bare_ty_generics> as ::boulder::guts::builder::MiniBuilder>::build(self.change_type()) )
                 }
             }
 

@@ -62,7 +62,7 @@ pub trait Generatable {
     ///
     /// Example
     /// ```rust
-    /// use boulder::{Generatable, Generator, gen};
+    /// use boulder::{Generatable, Generator};
     ///
     /// struct FooGenerator {
     ///   a: i32

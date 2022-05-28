@@ -1,9 +1,9 @@
 /// A type that has an associated default [`BuilderWithPersianRug`]
 ///
-/// [persian_rug] is a crate that provides arena based management for
-/// objects of different types. The natural reason to derive this
-/// trait over [`Buildable`] is when your type belongs to a
-/// [`persian_rug::Context`].
+/// [persian-rug](persian_rug) is a crate that provides arena based
+/// management for objects of different types. The natural reason to
+/// derive this trait over [`Buildable`](crate::Buildable) is when
+/// your type belongs to a [`persian_rug::Context`].
 ///
 /// This trait is implemented via the
 /// [`macro@BuildableWithPersianRug`] derive macro.  It cannot be
@@ -14,6 +14,7 @@
 /// This restriction may be removed in a future version; much of the
 /// complexity in this module stems from lacking generic associated
 /// types on stable.
+#[cfg_attr(docsrs, doc(cfg(feature = "persian-rug")))]
 pub trait BuildableWithPersianRug<C>: Sized
 where
     C: persian_rug::Context,
@@ -24,10 +25,10 @@ where
 
 /// Something which can create a default object of some type.
 ///
-/// [persian_rug] is a crate that provides arena based management for
-/// objects of different types. The natural reason to derive this
-/// trait over [`Builder`] is when your target type belongs to a
-/// [`persian_rug::Context`].
+/// [persian-rug](persian_rug) is a crate that provides arena based
+/// management for objects of different types. The natural reason to
+/// derive this trait over [`Builder`](crate::Builder) is when your
+/// target type belongs to a [`persian_rug::Context`].
 ///
 /// The only required function in this trait is
 /// [`build`](BuilderWithPersianRug::build) which creates an object,
@@ -40,6 +41,7 @@ where
 /// macro. That builder will have a method for each field of the
 /// result type, to customise its value, and will produce a default
 /// value for every field which is not customised.
+#[cfg_attr(docsrs, doc(cfg(feature = "persian-rug")))]
 pub trait BuilderWithPersianRug<C>: Sized
 where
     C: persian_rug::Context,

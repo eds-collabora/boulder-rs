@@ -15,8 +15,7 @@ use num::One;
 ///
 /// Example:
 /// ```rust
-/// use boulder::Generator;
-/// use boulder::gen::Const;
+/// use boulder::{Const, Generator};
 ///
 /// let mut g = Const(1);
 /// assert_eq!(g.generate(), 1);
@@ -47,8 +46,7 @@ impl<T: Clone + 'static> Generator for Const<T> {
 ///
 /// Example:
 /// ```rust
-/// use boulder::Generator;
-/// use boulder::gen::Inc;
+/// use boulder::{Generator, Inc};
 ///
 /// let mut g = Inc(5);
 /// assert_eq!(g.generate(), 5);
@@ -77,8 +75,7 @@ where
 ///
 /// Example:
 /// ```rust
-/// use boulder::Generator;
-/// use boulder::gen::Cycle;
+/// use boulder::{Cycle, Generator};
 ///
 /// let mut g = Cycle::new((1..3_i32).into_iter());
 /// assert_eq!(g.generate(), 1);
@@ -110,8 +107,7 @@ where
 ///
 /// Example:
 /// ```rust
-/// use boulder::Generator;
-/// use boulder::gen::{Inc, Some as GSome};
+/// use boulder::{Generator, Inc, Some as GSome};
 ///
 /// let mut g = GSome(Inc(2));
 /// assert_eq!(g.generate(), Some(2));
@@ -144,8 +140,7 @@ where
 ///
 /// Example:
 /// ```rust
-/// use boulder::Generator;
-/// use boulder::gen::{Cycle, Repeat, Sample};
+/// use boulder::{Cycle, Generator, Repeat, Sample};
 ///
 /// let mut g = Sample::<_, _, Vec<_>>::new(Cycle::new((1..5).into_iter()), Repeat::new(1usize..3usize));
 /// assert_eq!(g.generate(), vec![1]);
@@ -173,8 +168,7 @@ where
     ///
     /// Example:
     /// ```rust
-    /// use boulder::Generator;
-    /// use boulder::gen::{Inc, Pattern, Sample};
+    /// use boulder::{Generator, Inc, Pattern, Sample};
     ///
     /// let mut g = Sample::new(
     ///     Pattern!("hello-{}", Inc(2i32)),
@@ -221,8 +215,7 @@ where
 ///
 /// Example:
 /// ```rust
-/// use boulder::Generator;
-/// use boulder::gen::Time;
+/// use boulder::{Generator, Time};
 /// use chrono::{DateTime, Duration};
 ///
 /// let mut g = Time::new(DateTime::parse_from_rfc2822("Wed, 18 May 2022 15:16:00 GMT").unwrap(), Duration::days(1));
@@ -248,8 +241,7 @@ impl<T: chrono::TimeZone> Time<T> {
     ///
     /// Example:
     /// ```rust
-    /// use boulder::Generator;
-    /// use boulder::gen::Time;
+    /// use boulder::{Generator, Time};
     /// use chrono::{DateTime, Duration};
     ///
     /// let mut g = Time::new(
@@ -298,8 +290,7 @@ impl<T: chrono::TimeZone + 'static> Generator for Time<T> {
 ///
 /// Example:
 /// ```rust
-/// use boulder::Generator;
-/// use boulder::gen::Subsets;
+/// use boulder::{Generator, Subsets};
 ///
 /// let mut g = Subsets::new(1..4);
 /// assert_eq!(g.generate(), vec![]);
@@ -346,8 +337,7 @@ impl<T: Clone + 'static> Generator for Subsets<T> {
 ///
 /// Example:
 /// ```rust
-/// use boulder::Generator;
-/// use boulder::gen::Repeat;
+/// use boulder::{Generator, Repeat};
 ///
 /// let mut g = Repeat::new(1..3);
 /// assert_eq!(g.generate(), 1);

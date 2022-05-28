@@ -226,7 +226,7 @@ pub fn derive_generatable(input: syn::DeriveInput) -> pm2::TokenStream {
             }
 
             #[automatically_derived]
-            impl<BoulderTypeMarkerParam #bare_generics> ::boulder::generator::guts::MiniGenerator for Generator<BoulderTypeMarkerParam #bare_ty_generics>
+            impl<BoulderTypeMarkerParam #bare_generics> ::boulder::guts::generator::MiniGenerator for Generator<BoulderTypeMarkerParam #bare_ty_generics>
 
             where
                 Self: NestedGenerate #ty_generics,
@@ -240,14 +240,14 @@ pub fn derive_generatable(input: syn::DeriveInput) -> pm2::TokenStream {
             }
 
             #[automatically_derived]
-            impl #generics ::boulder::generator::guts::BoulderBase for #ident #ty_generics #wc {
+            impl #generics ::boulder::guts::generator::BoulderBase for #ident #ty_generics #wc {
                 type Base = #ident #ty_generics;
             }
 
             // Base case
 
             #[automatically_derived]
-            impl #generics ::boulder::generator::guts::MiniGeneratable<#ident #ty_generics> for #ident #ty_generics #wc {
+            impl #generics ::boulder::guts::generator::MiniGeneratable<#ident #ty_generics> for #ident #ty_generics #wc {
                 type Generator = Generator<#ident #ty_generics #bare_ty_generics>;
                 fn mini_generator() -> Self::Generator {
                     Generator::new()
@@ -266,10 +266,10 @@ pub fn derive_generatable(input: syn::DeriveInput) -> pm2::TokenStream {
 
             // Option
             #[automatically_derived]
-            impl <BoulderExtraGenericParam #bare_generics> ::boulder::generator::guts::MiniGeneratable<#ident #ty_generics> for Option<BoulderExtraGenericParam>
+            impl <BoulderExtraGenericParam #bare_generics> ::boulder::guts::generator::MiniGeneratable<#ident #ty_generics> for Option<BoulderExtraGenericParam>
             where
-                BoulderExtraGenericParam: ::boulder::generator::guts::MiniGeneratable<#ident #ty_generics>,
-                Generator<Option<BoulderExtraGenericParam> #bare_ty_generics>: ::boulder::generator::guts::MiniGenerator<Output=Option<BoulderExtraGenericParam>>,
+                BoulderExtraGenericParam: ::boulder::guts::generator::MiniGeneratable<#ident #ty_generics>,
+                Generator<Option<BoulderExtraGenericParam> #bare_ty_generics>: ::boulder::guts::generator::MiniGenerator<Output=Option<BoulderExtraGenericParam>>,
                 #bare_wc
             {
                 type Generator = Generator<Option<BoulderExtraGenericParam> #bare_ty_generics>;
@@ -292,10 +292,10 @@ pub fn derive_generatable(input: syn::DeriveInput) -> pm2::TokenStream {
 
             // Rc
             #[automatically_derived]
-            impl <BoulderExtraGenericParam #bare_generics> ::boulder::generator::guts::MiniGeneratable<#ident #ty_generics> for ::std::rc::Rc<BoulderExtraGenericParam>
+            impl <BoulderExtraGenericParam #bare_generics> ::boulder::guts::generator::MiniGeneratable<#ident #ty_generics> for ::std::rc::Rc<BoulderExtraGenericParam>
             where
-                BoulderExtraGenericParam: ::boulder::generator::guts::MiniGeneratable<#ident #ty_generics>,
-                Generator<::std::rc::Rc<BoulderExtraGenericParam> #bare_ty_generics>: ::boulder::generator::guts::MiniGenerator<Output=::std::rc::Rc<BoulderExtraGenericParam>>,
+                BoulderExtraGenericParam: ::boulder::guts::generator::MiniGeneratable<#ident #ty_generics>,
+                Generator<::std::rc::Rc<BoulderExtraGenericParam> #bare_ty_generics>: ::boulder::guts::generator::MiniGenerator<Output=::std::rc::Rc<BoulderExtraGenericParam>>,
                 #bare_wc
             {
                 type Generator = Generator<::std::rc::Rc<BoulderExtraGenericParam> #bare_ty_generics>;
@@ -318,10 +318,10 @@ pub fn derive_generatable(input: syn::DeriveInput) -> pm2::TokenStream {
 
             // Arc
             #[automatically_derived]
-            impl <BoulderExtraGenericParam #bare_generics> ::boulder::generator::guts::MiniGeneratable<#ident #ty_generics> for ::std::sync::Arc<BoulderExtraGenericParam>
+            impl <BoulderExtraGenericParam #bare_generics> ::boulder::guts::generator::MiniGeneratable<#ident #ty_generics> for ::std::sync::Arc<BoulderExtraGenericParam>
             where
-                BoulderExtraGenericParam: ::boulder::generator::guts::MiniGeneratable<#ident #ty_generics>,
-                Generator<::std::sync::Arc<BoulderExtraGenericParam> #bare_ty_generics>: ::boulder::generator::guts::MiniGenerator<Output=::std::sync::Arc<BoulderExtraGenericParam>>,
+                BoulderExtraGenericParam: ::boulder::guts::generator::MiniGeneratable<#ident #ty_generics>,
+                Generator<::std::sync::Arc<BoulderExtraGenericParam> #bare_ty_generics>: ::boulder::guts::generator::MiniGenerator<Output=::std::sync::Arc<BoulderExtraGenericParam>>,
                 #bare_wc
             {
                 type Generator = Generator<::std::sync::Arc<BoulderExtraGenericParam> #bare_ty_generics>;
@@ -344,10 +344,10 @@ pub fn derive_generatable(input: syn::DeriveInput) -> pm2::TokenStream {
 
             // Mutex
             #[automatically_derived]
-            impl <BoulderExtraGenericParam #bare_generics> ::boulder::generator::guts::MiniGeneratable<#ident #ty_generics> for ::std::sync::Mutex<BoulderExtraGenericParam>
+            impl <BoulderExtraGenericParam #bare_generics> ::boulder::guts::generator::MiniGeneratable<#ident #ty_generics> for ::std::sync::Mutex<BoulderExtraGenericParam>
             where
-                BoulderExtraGenericParam: ::boulder::generator::guts::MiniGeneratable<#ident #ty_generics>,
-                Generator<::std::sync::Mutex<BoulderExtraGenericParam> #bare_ty_generics>: ::boulder::generator::guts::MiniGenerator<Output=::std::sync::Mutex<BoulderExtraGenericParam>>,
+                BoulderExtraGenericParam: ::boulder::guts::generator::MiniGeneratable<#ident #ty_generics>,
+                Generator<::std::sync::Mutex<BoulderExtraGenericParam> #bare_ty_generics>: ::boulder::guts::generator::MiniGenerator<Output=::std::sync::Mutex<BoulderExtraGenericParam>>,
                 #bare_wc
             {
                 type Generator = Generator<::std::sync::Mutex<BoulderExtraGenericParam> #bare_ty_generics>;
@@ -370,10 +370,10 @@ pub fn derive_generatable(input: syn::DeriveInput) -> pm2::TokenStream {
 
             // Cell
             #[automatically_derived]
-            impl <BoulderExtraGenericParam #bare_generics> ::boulder::generator::guts::MiniGeneratable<#ident #ty_generics> for ::std::cell::Cell<BoulderExtraGenericParam>
+            impl <BoulderExtraGenericParam #bare_generics> ::boulder::guts::generator::MiniGeneratable<#ident #ty_generics> for ::std::cell::Cell<BoulderExtraGenericParam>
             where
-                BoulderExtraGenericParam: ::boulder::generator::guts::MiniGeneratable<#ident #ty_generics>,
-                Generator<::std::cell::Cell<BoulderExtraGenericParam> #bare_ty_generics>: ::boulder::generator::guts::MiniGenerator<Output=::std::cell::Cell<BoulderExtraGenericParam>>,
+                BoulderExtraGenericParam: ::boulder::guts::generator::MiniGeneratable<#ident #ty_generics>,
+                Generator<::std::cell::Cell<BoulderExtraGenericParam> #bare_ty_generics>: ::boulder::guts::generator::MiniGenerator<Output=::std::cell::Cell<BoulderExtraGenericParam>>,
                 #bare_wc
             {
                 type Generator = Generator<::std::cell::Cell<BoulderExtraGenericParam> #bare_ty_generics>;
@@ -396,10 +396,10 @@ pub fn derive_generatable(input: syn::DeriveInput) -> pm2::TokenStream {
 
             // RefCell
             #[automatically_derived]
-            impl <BoulderExtraGenericParam #bare_generics> ::boulder::generator::guts::MiniGeneratable<#ident #ty_generics> for ::std::cell::RefCell<BoulderExtraGenericParam>
+            impl <BoulderExtraGenericParam #bare_generics> ::boulder::guts::generator::MiniGeneratable<#ident #ty_generics> for ::std::cell::RefCell<BoulderExtraGenericParam>
             where
-                BoulderExtraGenericParam: ::boulder::generator::guts::MiniGeneratable<#ident #ty_generics>,
-                Generator<::std::cell::RefCell<BoulderExtraGenericParam> #bare_ty_generics>: ::boulder::generator::guts::MiniGenerator<Output=::std::cell::RefCell<BoulderExtraGenericParam>>,
+                BoulderExtraGenericParam: ::boulder::guts::generator::MiniGeneratable<#ident #ty_generics>,
+                Generator<::std::cell::RefCell<BoulderExtraGenericParam> #bare_ty_generics>: ::boulder::guts::generator::MiniGenerator<Output=::std::cell::RefCell<BoulderExtraGenericParam>>,
                 #bare_wc
             {
                 type Generator = Generator<::std::cell::RefCell<BoulderExtraGenericParam> #bare_ty_generics>;
@@ -425,7 +425,7 @@ pub fn derive_generatable(input: syn::DeriveInput) -> pm2::TokenStream {
             #[automatically_derived]
             impl <BoulderExtraGenericParam #bare_generics> ::std::iter::IntoIterator for Generator<BoulderExtraGenericParam #bare_ty_generics>
             where
-                Generator<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::generator::guts::MiniGenerator<Output=BoulderExtraGenericParam>,
+                Generator<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::guts::generator::MiniGenerator<Output=BoulderExtraGenericParam>,
                 #bare_wc
             {
                 type Item = BoulderExtraGenericParam;
@@ -438,7 +438,7 @@ pub fn derive_generatable(input: syn::DeriveInput) -> pm2::TokenStream {
             #[automatically_derived]
             impl<'boulder_reference_lifetime, BoulderExtraGenericParam #bare_generics> ::std::iter::IntoIterator for &'boulder_reference_lifetime mut Generator<BoulderExtraGenericParam #bare_ty_generics>
             where
-                Generator<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::generator::guts::MiniGenerator<Output=BoulderExtraGenericParam>,
+                Generator<BoulderExtraGenericParam #bare_ty_generics>: ::boulder::guts::generator::MiniGenerator<Output=BoulderExtraGenericParam>,
                #bare_wc
             {
                 type Item = BoulderExtraGenericParam;

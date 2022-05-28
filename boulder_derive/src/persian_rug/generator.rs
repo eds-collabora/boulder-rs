@@ -258,8 +258,8 @@ pub fn derive_generatable_with_persian_rug(input: syn::DeriveInput) -> pm2::Toke
                             (quote::quote! { #expr }, quote::quote! { #ty })
                         } else {
                             (
-                                quote::quote! { ::boulder::persian_rug::generator::GeneratorWrapper::new(#expr) },
-                                quote::quote! { ::boulder::persian_rug::generator::GeneratorWrapper<#element_type> },
+                                quote::quote! { ::boulder::GeneratorWrapper::new(#expr) },
+                                quote::quote! { ::boulder::GeneratorWrapper<#element_type> },
                             )
                         }
                     }
@@ -294,10 +294,10 @@ pub fn derive_generatable_with_persian_rug(input: syn::DeriveInput) -> pm2::Toke
 
                             (
                                 quote::quote! {
-                                    ::boulder::persian_rug::generator::GeneratorWrapper::new(#value)
+                                    ::boulder::GeneratorWrapper::new(#value)
                                 },
                                 quote::quote! {
-                                    ::boulder::persian_rug::generator::GeneratorWrapper<#element_type>
+                                    ::boulder::GeneratorWrapper<#element_type>
                                 },
                             )
                         }
@@ -388,10 +388,10 @@ pub fn derive_generatable_with_persian_rug(input: syn::DeriveInput) -> pm2::Toke
                         } else {
                             (
                                 quote::quote! {
-                                    ::boulder::persian_rug::generator::GeneratorWrapper::new(|| { #static_value })
+                                    ::boulder::GeneratorWrapper::new(|| { #static_value })
                                 },
                                 quote::quote! {
-                                    ::boulder::persian_rug::generator::GeneratorWrapper<#element_type>
+                                    ::boulder::GeneratorWrapper<#element_type>
                                 },
                             )
                         }
@@ -406,17 +406,17 @@ pub fn derive_generatable_with_persian_rug(input: syn::DeriveInput) -> pm2::Toke
                             ).to_compile_error();
                         }
                         default_values.extend(quote::quote! {
-                            #fieldid: ::boulder::persian_rug::generator::SequenceGeneratorWithPersianRug::new(#sequence, #value),
+                            #fieldid: ::boulder::SequenceGeneratorWithPersianRug::new(#sequence, #value),
                         });
                         default_types.extend(quote::quote! {
-                            , ::boulder::persian_rug::generator::SequenceGeneratorWithPersianRug<#seq_ty, #value_type, #fieldtype>
+                            , ::boulder::SequenceGeneratorWithPersianRug<#seq_ty, #value_type, #fieldtype>
                         });
                     } else {
                         default_values.extend(quote::quote! {
-                            #fieldid: ::boulder::persian_rug::generator::SequenceGeneratorWithPersianRug::new(::boulder::persian_rug::generator::GeneratorWrapper::new(#sequence), #value),
+                            #fieldid: ::boulder::SequenceGeneratorWithPersianRug::new(::boulder::GeneratorWrapper::new(#sequence), #value),
                         });
                         default_types.extend(quote::quote! {
-                            , ::boulder::persian_rug::generator::SequenceGeneratorWithPersianRug<::boulder::persian_rug::generator::GeneratorWrapper<usize>, #value_type, #fieldtype>
+                            , ::boulder::SequenceGeneratorWithPersianRug<::boulder::GeneratorWrapper<usize>, #value_type, #fieldtype>
                         });
                     }
                 } else if let Some((sequence, _seq_ty)) = build_sequence {
@@ -444,19 +444,19 @@ pub fn derive_generatable_with_persian_rug(input: syn::DeriveInput) -> pm2::Toke
                         });
 
                         default_values.extend(quote::quote! {
-                            #fieldid: ::boulder::persian_rug::generator::SequenceGeneratorWithPersianRug::new(
+                            #fieldid: ::boulder::SequenceGeneratorWithPersianRug::new(
                                 #new_generator_id { _marker: Default::default() },
                                 #value),
                         });
                         default_types.extend(quote::quote! {
-                            , ::boulder::persian_rug::generator::SequenceGeneratorWithPersianRug<#new_generator_id #ty_generics, #value_type, #fieldtype>
+                            , ::boulder::SequenceGeneratorWithPersianRug<#new_generator_id #ty_generics, #value_type, #fieldtype>
                         });
                     } else {
                         default_values.extend(quote::quote! {
-                            #fieldid: ::boulder::persian_rug::generator::SequenceGeneratorWithPersianRug::new(::boulder::persian_rug::generator::GeneratorWrapper::new(|| (#sequence).into()), #value),
+                            #fieldid: ::boulder::SequenceGeneratorWithPersianRug::new(::boulder::GeneratorWrapper::new(|| (#sequence).into()), #value),
                         });
                         default_types.extend(quote::quote! {
-                            , ::boulder::persian_rug::generator::SequenceGeneratorWithPersianRug<::boulder::persian_rug::generator::GeneratorWrapper<usize>, #value_type, #fieldtype>
+                            , ::boulder::SequenceGeneratorWithPersianRug<::boulder::GeneratorWrapper<usize>, #value_type, #fieldtype>
                         });
                     }
                 } else {
@@ -514,7 +514,7 @@ pub fn derive_generatable_with_persian_rug(input: syn::DeriveInput) -> pm2::Toke
 
             #[automatically_derived]
             #[persian_rug::constraints(#constraints)]
-            impl<BoulderTypeMarkerParam #bare_generics #added_generics> ::boulder::persian_rug::generator::guts::MiniGeneratorWithPersianRug<#context> for Generator<BoulderTypeMarkerParam #bare_ty_generics #added_generics>
+            impl<BoulderTypeMarkerParam #bare_generics #added_generics> ::boulder::guts::persian_rug::generator::MiniGeneratorWithPersianRug<#context> for Generator<BoulderTypeMarkerParam #bare_ty_generics #added_generics>
 
             where
                 Self: NestedGenerate #gen_ty_generics,
@@ -535,7 +535,7 @@ pub fn derive_generatable_with_persian_rug(input: syn::DeriveInput) -> pm2::Toke
 
             #[automatically_derived]
             #[persian_rug::constraints(#constraints)]
-            impl #generics ::boulder::persian_rug::generator::guts::BoulderBase for #ident #ty_generics #wc {
+            impl #generics ::boulder::guts::persian_rug::generator::BoulderBase for #ident #ty_generics #wc {
                 type Base = #ident #ty_generics;
             }
 
@@ -545,7 +545,7 @@ pub fn derive_generatable_with_persian_rug(input: syn::DeriveInput) -> pm2::Toke
 
             #[automatically_derived]
             #[persian_rug::constraints(#constraints)]
-            impl #generics ::boulder::persian_rug::generator::guts::MiniGeneratableWithPersianRug<#ident #ty_generics, #context> for #ident #ty_generics #wc
+            impl #generics ::boulder::guts::persian_rug::generator::MiniGeneratableWithPersianRug<#ident #ty_generics, #context> for #ident #ty_generics #wc
 
             {
                 type Generator = Generator<#ident #ty_generics #bare_ty_generics #default_types>;
@@ -579,10 +579,10 @@ pub fn derive_generatable_with_persian_rug(input: syn::DeriveInput) -> pm2::Toke
             // Option
             #[automatically_derived]
             #[persian_rug::constraints(#constraints)]
-            impl <BoulderExtraGenericParam #bare_generics> ::boulder::persian_rug::generator::guts::MiniGeneratableWithPersianRug<#ident #ty_generics, #context> for Option<BoulderExtraGenericParam>
+            impl <BoulderExtraGenericParam #bare_generics> ::boulder::guts::persian_rug::generator::MiniGeneratableWithPersianRug<#ident #ty_generics, #context> for Option<BoulderExtraGenericParam>
             where
-                BoulderExtraGenericParam: ::boulder::persian_rug::generator::guts::MiniGeneratableWithPersianRug<#ident #ty_generics, #context>,
-                Generator<Option<BoulderExtraGenericParam> #bare_ty_generics #default_types>: ::boulder::persian_rug::generator::guts::MiniGeneratorWithPersianRug<#context, Output=Option<BoulderExtraGenericParam>>,
+                BoulderExtraGenericParam: ::boulder::guts::persian_rug::generator::MiniGeneratableWithPersianRug<#ident #ty_generics, #context>,
+                Generator<Option<BoulderExtraGenericParam> #bare_ty_generics #default_types>: ::boulder::guts::persian_rug::generator::MiniGeneratorWithPersianRug<#context, Output=Option<BoulderExtraGenericParam>>,
                 #bare_wc
             {
                 type Generator = Generator<Option<BoulderExtraGenericParam> #bare_ty_generics #default_types>;
@@ -613,10 +613,10 @@ pub fn derive_generatable_with_persian_rug(input: syn::DeriveInput) -> pm2::Toke
             // Proxy
             #[automatically_derived]
             #[persian_rug::constraints(#constraints, access(BoulderExtraGenericParam))]
-            impl <BoulderExtraGenericParam #bare_generics> ::boulder::persian_rug::generator::guts::MiniGeneratableWithPersianRug<#ident #ty_generics, #context> for ::persian_rug::Proxy<BoulderExtraGenericParam>
+            impl <BoulderExtraGenericParam #bare_generics> ::boulder::guts::persian_rug::generator::MiniGeneratableWithPersianRug<#ident #ty_generics, #context> for ::persian_rug::Proxy<BoulderExtraGenericParam>
             where
-                BoulderExtraGenericParam: ::boulder::persian_rug::generator::guts::MiniGeneratableWithPersianRug<#ident #ty_generics, #context>,
-                Generator<::persian_rug::Proxy<BoulderExtraGenericParam> #bare_ty_generics #default_types>: ::boulder::persian_rug::generator::guts::MiniGeneratorWithPersianRug<#context, Output=::persian_rug::Proxy<BoulderExtraGenericParam>>,
+                BoulderExtraGenericParam: ::boulder::guts::persian_rug::generator::MiniGeneratableWithPersianRug<#ident #ty_generics, #context>,
+                Generator<::persian_rug::Proxy<BoulderExtraGenericParam> #bare_ty_generics #default_types>: ::boulder::guts::persian_rug::generator::MiniGeneratorWithPersianRug<#context, Output=::persian_rug::Proxy<BoulderExtraGenericParam>>,
 
                 #bare_wc
             {
@@ -648,10 +648,10 @@ pub fn derive_generatable_with_persian_rug(input: syn::DeriveInput) -> pm2::Toke
             // Arc
             #[automatically_derived]
             #[persian_rug::constraints(#constraints)]
-            impl <BoulderExtraGenericParam #bare_generics> ::boulder::persian_rug::generator::guts::MiniGeneratableWithPersianRug<#ident #ty_generics, #context> for ::std::sync::Arc<BoulderExtraGenericParam>
+            impl <BoulderExtraGenericParam #bare_generics> ::boulder::guts::persian_rug::generator::MiniGeneratableWithPersianRug<#ident #ty_generics, #context> for ::std::sync::Arc<BoulderExtraGenericParam>
             where
-                BoulderExtraGenericParam: ::boulder::persian_rug::generator::guts::MiniGeneratableWithPersianRug<#ident #ty_generics, #context>,
-                Generator<::std::sync::Arc<BoulderExtraGenericParam> #bare_ty_generics #default_types>: ::boulder::persian_rug::generator::guts::MiniGeneratorWithPersianRug<#context, Output=::std::sync::Arc<BoulderExtraGenericParam>>,
+                BoulderExtraGenericParam: ::boulder::guts::persian_rug::generator::MiniGeneratableWithPersianRug<#ident #ty_generics, #context>,
+                Generator<::std::sync::Arc<BoulderExtraGenericParam> #bare_ty_generics #default_types>: ::boulder::guts::persian_rug::generator::MiniGeneratorWithPersianRug<#context, Output=::std::sync::Arc<BoulderExtraGenericParam>>,
                 #bare_wc
             {
                 type Generator = Generator<::std::sync::Arc<BoulderExtraGenericParam> #bare_ty_generics #default_types>;
@@ -682,10 +682,10 @@ pub fn derive_generatable_with_persian_rug(input: syn::DeriveInput) -> pm2::Toke
             // Rc
             #[automatically_derived]
             #[persian_rug::constraints(#constraints)]
-            impl <BoulderExtraGenericParam #bare_generics> ::boulder::persian_rug::generator::guts::MiniGeneratableWithPersianRug<#ident #ty_generics, #context> for ::std::rc::Rc<BoulderExtraGenericParam>
+            impl <BoulderExtraGenericParam #bare_generics> ::boulder::guts::persian_rug::generator::MiniGeneratableWithPersianRug<#ident #ty_generics, #context> for ::std::rc::Rc<BoulderExtraGenericParam>
             where
-                BoulderExtraGenericParam: ::boulder::persian_rug::generator::guts::MiniGeneratableWithPersianRug<#ident #ty_generics, #context>,
-                Generator<::std::rc::Rc<BoulderExtraGenericParam> #bare_ty_generics #default_types>: ::boulder::persian_rug::generator::guts::MiniGeneratorWithPersianRug<#context, Output=::std::rc::Rc<BoulderExtraGenericParam>>,
+                BoulderExtraGenericParam: ::boulder::guts::persian_rug::generator::MiniGeneratableWithPersianRug<#ident #ty_generics, #context>,
+                Generator<::std::rc::Rc<BoulderExtraGenericParam> #bare_ty_generics #default_types>: ::boulder::guts::persian_rug::generator::MiniGeneratorWithPersianRug<#context, Output=::std::rc::Rc<BoulderExtraGenericParam>>,
                 #bare_wc
             {
                 type Generator = Generator<::std::rc::Rc<BoulderExtraGenericParam> #bare_ty_generics #default_types>;
@@ -716,10 +716,10 @@ pub fn derive_generatable_with_persian_rug(input: syn::DeriveInput) -> pm2::Toke
             // Cell
             #[automatically_derived]
             #[persian_rug::constraints(#constraints)]
-            impl <BoulderExtraGenericParam #bare_generics> ::boulder::persian_rug::generator::guts::MiniGeneratableWithPersianRug<#ident #ty_generics, #context> for ::std::cell::Cell<BoulderExtraGenericParam>
+            impl <BoulderExtraGenericParam #bare_generics> ::boulder::guts::persian_rug::generator::MiniGeneratableWithPersianRug<#ident #ty_generics, #context> for ::std::cell::Cell<BoulderExtraGenericParam>
             where
-                BoulderExtraGenericParam: ::boulder::persian_rug::generator::guts::MiniGeneratableWithPersianRug<#ident #ty_generics, #context>,
-                Generator<::std::cell::Cell<BoulderExtraGenericParam> #bare_ty_generics #default_types>: ::boulder::persian_rug::generator::guts::MiniGeneratorWithPersianRug<#context, Output=::std::cell::Cell<BoulderExtraGenericParam>>,
+                BoulderExtraGenericParam: ::boulder::guts::persian_rug::generator::MiniGeneratableWithPersianRug<#ident #ty_generics, #context>,
+                Generator<::std::cell::Cell<BoulderExtraGenericParam> #bare_ty_generics #default_types>: ::boulder::guts::persian_rug::generator::MiniGeneratorWithPersianRug<#context, Output=::std::cell::Cell<BoulderExtraGenericParam>>,
                 #bare_wc
             {
                 type Generator = Generator<::std::cell::Cell<BoulderExtraGenericParam> #bare_ty_generics #default_types>;
@@ -750,10 +750,10 @@ pub fn derive_generatable_with_persian_rug(input: syn::DeriveInput) -> pm2::Toke
             // RefCell
             #[automatically_derived]
             #[persian_rug::constraints(#constraints)]
-            impl <BoulderExtraGenericParam #bare_generics> ::boulder::persian_rug::generator::guts::MiniGeneratableWithPersianRug<#ident #ty_generics, #context> for ::std::cell::RefCell<BoulderExtraGenericParam>
+            impl <BoulderExtraGenericParam #bare_generics> ::boulder::guts::persian_rug::generator::MiniGeneratableWithPersianRug<#ident #ty_generics, #context> for ::std::cell::RefCell<BoulderExtraGenericParam>
             where
-                BoulderExtraGenericParam: ::boulder::persian_rug::generator::guts::MiniGeneratableWithPersianRug<#ident #ty_generics, #context>,
-                Generator<::std::cell::RefCell<BoulderExtraGenericParam> #bare_ty_generics #default_types>: ::boulder::persian_rug::generator::guts::MiniGeneratorWithPersianRug<#context, Output=::std::cell::RefCell<BoulderExtraGenericParam>>,
+                BoulderExtraGenericParam: ::boulder::guts::persian_rug::generator::MiniGeneratableWithPersianRug<#ident #ty_generics, #context>,
+                Generator<::std::cell::RefCell<BoulderExtraGenericParam> #bare_ty_generics #default_types>: ::boulder::guts::persian_rug::generator::MiniGeneratorWithPersianRug<#context, Output=::std::cell::RefCell<BoulderExtraGenericParam>>,
                 #bare_wc
             {
                 type Generator = Generator<::std::cell::RefCell<BoulderExtraGenericParam> #bare_ty_generics #default_types>;
@@ -784,10 +784,10 @@ pub fn derive_generatable_with_persian_rug(input: syn::DeriveInput) -> pm2::Toke
             // Mutex
             #[automatically_derived]
             #[persian_rug::constraints(#constraints)]
-            impl <BoulderExtraGenericParam #bare_generics> ::boulder::persian_rug::generator::guts::MiniGeneratableWithPersianRug<#ident #ty_generics, #context> for ::std::sync::Mutex<BoulderExtraGenericParam>
+            impl <BoulderExtraGenericParam #bare_generics> ::boulder::guts::persian_rug::generator::MiniGeneratableWithPersianRug<#ident #ty_generics, #context> for ::std::sync::Mutex<BoulderExtraGenericParam>
             where
-                BoulderExtraGenericParam: ::boulder::persian_rug::generator::guts::MiniGeneratableWithPersianRug<#ident #ty_generics, #context>,
-                Generator<::std::sync::Mutex<BoulderExtraGenericParam> #bare_ty_generics #default_types>: ::boulder::persian_rug::generator::guts::MiniGeneratorWithPersianRug<#context, Output=::std::sync::Mutex<BoulderExtraGenericParam>>,
+                BoulderExtraGenericParam: ::boulder::guts::persian_rug::generator::MiniGeneratableWithPersianRug<#ident #ty_generics, #context>,
+                Generator<::std::sync::Mutex<BoulderExtraGenericParam> #bare_ty_generics #default_types>: ::boulder::guts::persian_rug::generator::MiniGeneratorWithPersianRug<#context, Output=::std::sync::Mutex<BoulderExtraGenericParam>>,
                 #bare_wc
             {
                 type Generator = Generator<::std::sync::Mutex<BoulderExtraGenericParam> #bare_ty_generics #default_types>;

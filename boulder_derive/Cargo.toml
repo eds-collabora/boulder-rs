@@ -17,10 +17,12 @@ proc-macro = true
 syn = { version="1.0", features=["full"] }
 quote = "1.0"
 proc-macro2 = "1.0"
+#persian-rug = { version="0.1", optional=true }
 
 [features]
 default = []
-persian-rug = []
+persian-rug = [] # "dep:persian-rug"
 
 [dev-dependencies]
 boulder = { path = "../boulder" }
+persian-rug = { version="0.1" }

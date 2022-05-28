@@ -133,8 +133,7 @@ pub fn builder(input: TokenStream) -> TokenStream {
 ///
 /// Example:
 /// ```rust
-/// use boulder::{Generatable, Generator};
-/// use boulder::gen::Inc;
+/// use boulder::{Generatable, Generator, Inc};
 ///
 /// #[derive(Generatable)]
 /// struct Foo {
@@ -200,8 +199,7 @@ pub fn generatable(input: TokenStream) -> TokenStream {
 ///
 /// Example:
 /// ```rust
-/// use boulder::Generator;
-/// use boulder::gen::{Const, Inc, Pattern};
+/// use boulder::{Const, Generator, Inc, Pattern};
 ///
 /// let mut g = Pattern!("hello-{}-{}", Inc(11i32), Const(4i32));
 /// assert_eq!(g.generate(), "hello-11-4");
@@ -221,8 +219,7 @@ pub fn string_pattern(input: TokenStream) -> TokenStream {
 ///
 /// Example:
 /// ```rust
-/// use boulder::{Generatable, Generator};
-/// use boulder::gen::Repeat;
+/// use boulder::{Generatable, Generator, Repeat};
 ///
 /// #[derive(Generatable)]
 /// struct Foo {

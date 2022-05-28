@@ -261,7 +261,7 @@ mod builder_coverage {
 
     #[derive(Generatable)]
     struct Carrot4 {
-        #[boulder(generator=boulder::gen::Inc(0))]
+        #[boulder(generator=boulder::Inc(0))]
         c4: i32,
     }
 
@@ -304,7 +304,7 @@ mod builder_coverage {
         // #[boulder(generator=Carrot2Generator {c2: 2})]
         // v2: Carrot2,
         // //v3: Carrot3,
-        // #[boulder(generatable(c4=boulder::gen::Inc(4)))]
+        // #[boulder(generatable(c4=boulder::Inc(4)))]
         // v4: Carrot4,
         #[boulder(buildable_with_persian_rug(c5 = 5))]
         v5: Carrot5<C>,
@@ -322,7 +322,7 @@ mod builder_coverage {
         s2: Vec<Carrot2>,
         #[boulder(generatable_with_persian_rug(c3=TestIndexGenerator { value: 3 }), sequence=3)]
         s3: Vec<Carrot3<C>>,
-        #[boulder(generatable(c4=boulder::gen::Inc(4)), sequence=4)]
+        #[boulder(generatable(c4=boulder::Inc(4)), sequence=4)]
         s4: Vec<Carrot4>,
         #[boulder(buildable_with_persian_rug(c5 = 5), sequence = 5)]
         s5: Vec<Carrot5<C>>,
@@ -341,7 +341,7 @@ mod builder_coverage {
         p2: Vec<Carrot2>,
         #[boulder(generatable_with_persian_rug(c3=TestIndexGenerator { value: 3 }), sequence_with_persian_rug=|context| (3, context))]
         p3: Vec<Carrot3<C>>,
-        #[boulder(generatable(c4=boulder::gen::Inc(4)), sequence_with_persian_rug=|context| (4, context))]
+        #[boulder(generatable(c4=boulder::Inc(4)), sequence_with_persian_rug=|context| (4, context))]
         p4: Vec<Carrot4>,
         #[boulder(buildable_with_persian_rug(c5=5), sequence_with_persian_rug=|context| (5, context))]
         p5: Vec<Carrot5<C>>,
@@ -646,7 +646,7 @@ mod builder_coverage_no_generics {
 
     #[derive(Generatable)]
     struct Carrot4 {
-        #[boulder(generator=boulder::gen::Inc(0))]
+        #[boulder(generator=boulder::Inc(0))]
         c4: i32,
     }
 
@@ -686,7 +686,7 @@ mod builder_coverage_no_generics {
         // #[boulder(generator=Carrot2Generator {c2: 2})]
         // v2: Carrot2,
         // //v3: Carrot3,
-        // #[boulder(generatable(c4=boulder::gen::Inc(4)))]
+        // #[boulder(generatable(c4=boulder::Inc(4)))]
         // v4: Carrot4,
         #[boulder(buildable_with_persian_rug(c5 = 5))]
         v5: Carrot5<HareState>,
@@ -704,7 +704,7 @@ mod builder_coverage_no_generics {
         s2: Vec<Carrot2>,
         #[boulder(generatable_with_persian_rug(c3=TestIndexGenerator { value: 3 }), sequence=3)]
         s3: Vec<Carrot3<HareState>>,
-        #[boulder(generatable(c4=boulder::gen::Inc(4)), sequence=4)]
+        #[boulder(generatable(c4=boulder::Inc(4)), sequence=4)]
         s4: Vec<Carrot4>,
         #[boulder(buildable_with_persian_rug(c5 = 5), sequence = 5)]
         s5: Vec<Carrot5<HareState>>,
@@ -723,7 +723,7 @@ mod builder_coverage_no_generics {
         p2: Vec<Carrot2>,
         #[boulder(generatable_with_persian_rug(c3=TestIndexGenerator { value: 3 }), sequence_with_persian_rug=|context| (3, context))]
         p3: Vec<Carrot3<HareState>>,
-        #[boulder(generatable(c4=boulder::gen::Inc(4)), sequence_with_persian_rug=|context| (4, context))]
+        #[boulder(generatable(c4=boulder::Inc(4)), sequence_with_persian_rug=|context| (4, context))]
         p4: Vec<Carrot4>,
         #[boulder(buildable_with_persian_rug(c5=5), sequence_with_persian_rug=|context| (5, context))]
         p5: Vec<Carrot5<HareState>>,
@@ -994,7 +994,7 @@ mod generators_basic {
         _marker: core::marker::PhantomData<C>,
         #[boulder(default = "hullo")]
         a: String,
-        #[boulder(generator=boulder::gen::Inc(5))]
+        #[boulder(generator=boulder::Inc(5))]
         b: i32,
     }
 
@@ -1074,7 +1074,7 @@ mod generator_coverage {
     #[boulder(persian_rug(context=C))]
     struct Strawberry3<C: 'static> {
         _marker: core::marker::PhantomData<C>,
-        #[boulder(generator=boulder::gen::Inc(3))]
+        #[boulder(generator=boulder::Inc(3))]
         c3: i32,
     }
 
@@ -1112,7 +1112,7 @@ mod generator_coverage {
 
     #[derive(Generatable)]
     struct Strawberry4 {
-        #[boulder(generator=boulder::gen::Inc(0))]
+        #[boulder(generator=boulder::Inc(0))]
         c4: i32,
     }
 
@@ -1156,7 +1156,7 @@ mod generator_coverage {
         v2: Strawberry2,
         #[boulder(generatable_with_persian_rug)]
         v3: Strawberry3<C>,
-        #[boulder(generatable(c4=boulder::gen::Inc(4)))]
+        #[boulder(generatable(c4=boulder::Inc(4)))]
         v4: Strawberry4,
         #[boulder(buildable_with_persian_rug(c5 = 5))]
         v5: Strawberry5<C>,
@@ -1174,7 +1174,7 @@ mod generator_coverage {
         s2: Vec<Strawberry2>,
         #[boulder(generatable_with_persian_rug, sequence = 3usize)]
         s3: Vec<Strawberry3<C>>,
-        #[boulder(generatable(c4=boulder::gen::Inc(4)), sequence=4usize)]
+        #[boulder(generatable(c4=boulder::Inc(4)), sequence=4usize)]
         s4: Vec<Strawberry4>,
         #[boulder(buildable_with_persian_rug(c5 = 5), sequence = 5usize)]
         s5: Vec<Strawberry5<C>>,
@@ -1193,7 +1193,7 @@ mod generator_coverage {
         p2: Vec<Strawberry2>,
         #[boulder(generatable_with_persian_rug, sequence_with_persian_rug=|context| (3usize, context))]
         p3: Vec<Strawberry3<C>>,
-        #[boulder(generatable(c4=boulder::gen::Inc(4)), sequence_with_persian_rug=|context| (4usize, context))]
+        #[boulder(generatable(c4=boulder::Inc(4)), sequence_with_persian_rug=|context| (4usize, context))]
         p4: Vec<Strawberry4>,
         #[boulder(buildable_with_persian_rug(c5 = 5), sequence_with_persian_rug=|context| (5usize, context))]
         p5: Vec<Strawberry5<C>>,
@@ -1206,23 +1206,23 @@ mod generator_coverage {
         #[boulder(sequence_with_persian_rug=|context| (9usize, context))]
         p9: Vec<Strawberry9>,
 
-        #[boulder(generator_with_persian_rug=Strawberry1Generator { c1: 1 }: Strawberry1Generator, sequence_generator=boulder::gen::Inc(1usize))]
+        #[boulder(generator_with_persian_rug=Strawberry1Generator { c1: 1 }: Strawberry1Generator, sequence_generator=boulder::Inc(1usize))]
         t1: Vec<Strawberry1>,
-        #[boulder(generator=Strawberry2Generator {c2: 2}, sequence_generator=boulder::gen::Inc(2usize))]
+        #[boulder(generator=Strawberry2Generator {c2: 2}, sequence_generator=boulder::Inc(2usize))]
         t2: Vec<Strawberry2>,
-        #[boulder(generatable_with_persian_rug, sequence_generator=boulder::gen::Inc(3usize))]
+        #[boulder(generatable_with_persian_rug, sequence_generator=boulder::Inc(3usize))]
         t3: Vec<Strawberry3<C>>,
-        #[boulder(generatable(c4=boulder::gen::Inc(4)), sequence_generator=boulder::gen::Inc(4usize))]
+        #[boulder(generatable(c4=boulder::Inc(4)), sequence_generator=boulder::Inc(4usize))]
         t4: Vec<Strawberry4>,
-        #[boulder(buildable_with_persian_rug(c5 = 5), sequence_generator = boulder::gen::Inc(5usize))]
+        #[boulder(buildable_with_persian_rug(c5 = 5), sequence_generator = boulder::Inc(5usize))]
         t5: Vec<Strawberry5<C>>,
-        #[boulder(buildable(c6 = 6), sequence_generator = boulder::gen::Inc(6usize))]
+        #[boulder(buildable(c6 = 6), sequence_generator = boulder::Inc(6usize))]
         t6: Vec<Strawberry6>,
-        #[boulder(default_with_persian_rug=|context| { (Strawberry7 { c7: 7 }, context) }, sequence_generator=boulder::gen::Inc(7usize))]
+        #[boulder(default_with_persian_rug=|context| { (Strawberry7 { c7: 7 }, context) }, sequence_generator=boulder::Inc(7usize))]
         t7: Vec<Strawberry7>,
-        #[boulder(default=Strawberry8 { c8: 8 }, sequence_generator=boulder::gen::Inc(8usize))]
+        #[boulder(default=Strawberry8 { c8: 8 }, sequence_generator=boulder::Inc(8usize))]
         t8: Vec<Strawberry8>,
-        #[boulder(sequence_generator = boulder::gen::Inc(9usize))]
+        #[boulder(sequence_generator = boulder::Inc(9usize))]
         t9: Vec<Strawberry9>,
 
         #[boulder(generator_with_persian_rug=Strawberry1Generator { c1: 1 }: Strawberry1Generator, sequence_generator_with_persian_rug=TestUsizeGenerator { value: 1usize }: TestUsizeGenerator)]
@@ -1231,7 +1231,7 @@ mod generator_coverage {
         q2: Vec<Strawberry2>,
         #[boulder(generatable_with_persian_rug, sequence_generator_with_persian_rug=TestUsizeGenerator { value: 3usize }: TestUsizeGenerator)]
         q3: Vec<Strawberry3<C>>,
-        #[boulder(generatable(c4=boulder::gen::Inc(4)), sequence_generator_with_persian_rug=TestUsizeGenerator { value: 4usize }: TestUsizeGenerator)]
+        #[boulder(generatable(c4=boulder::Inc(4)), sequence_generator_with_persian_rug=TestUsizeGenerator { value: 4usize }: TestUsizeGenerator)]
         q4: Vec<Strawberry4>,
         #[boulder(buildable_with_persian_rug(c5 = 5), sequence_generator_with_persian_rug=TestUsizeGenerator { value: 5usize }: TestUsizeGenerator)]
         q5: Vec<Strawberry5<C>>,
@@ -1744,187 +1744,153 @@ mod generator_coverage {
         let mut s: DonkeyState = Default::default();
 
         let mut g = Donkey::generator()
-            .v1(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || Strawberry1 { c1: 11 },
-            ))
-            .v2(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || Strawberry2 { c2: 22 },
-            ))
-            .v3(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || Strawberry3 {
+            .v1(boulder::GeneratorWrapper::new(|| Strawberry1 { c1: 11 }))
+            .v2(boulder::GeneratorWrapper::new(|| Strawberry2 { c2: 22 }))
+            .v3(boulder::GeneratorWrapper::new(|| Strawberry3 {
+                c3: 33,
+                _marker: Default::default(),
+            }))
+            .v4(boulder::GeneratorWrapper::new(|| Strawberry4 { c4: 44 }))
+            .v5(boulder::GeneratorWrapper::new(|| Strawberry5 {
+                c5: 55,
+                _marker: Default::default(),
+            }))
+            .v6(boulder::GeneratorWrapper::new(|| Strawberry6 { c6: 66 }))
+            .v7(boulder::GeneratorWrapper::new(|| Strawberry7 { c7: 77 }))
+            .v8(boulder::GeneratorWrapper::new(|| Strawberry8 { c8: 88 }))
+            .v9(boulder::GeneratorWrapper::new(|| Strawberry9 { c9: 99 }))
+            .s1(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry1 { c1: 11 }]
+            }))
+            .s2(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry2 { c2: 22 }]
+            }))
+            .s3(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry3 {
                     c3: 33,
                     _marker: Default::default(),
-                },
-            ))
-            .v4(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || Strawberry4 { c4: 44 },
-            ))
-            .v5(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || Strawberry5 {
+                }]
+            }))
+            .s4(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry4 { c4: 44 }]
+            }))
+            .s5(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry5 {
                     c5: 55,
                     _marker: Default::default(),
-                },
-            ))
-            .v6(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || Strawberry6 { c6: 66 },
-            ))
-            .v7(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || Strawberry7 { c7: 77 },
-            ))
-            .v8(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || Strawberry8 { c8: 88 },
-            ))
-            .v9(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || Strawberry9 { c9: 99 },
-            ))
-            .s1(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry1 { c1: 11 }],
-            ))
-            .s2(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry2 { c2: 22 }],
-            ))
-            .s3(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || {
-                    vec![Strawberry3 {
-                        c3: 33,
-                        _marker: Default::default(),
-                    }]
-                },
-            ))
-            .s4(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry4 { c4: 44 }],
-            ))
-            .s5(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || {
-                    vec![Strawberry5 {
-                        c5: 55,
-                        _marker: Default::default(),
-                    }]
-                },
-            ))
-            .s6(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry6 { c6: 66 }],
-            ))
-            .s7(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry7 { c7: 77 }],
-            ))
-            .s8(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry8 { c8: 88 }],
-            ))
-            .s9(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry9 { c9: 99 }],
-            ))
-            .p1(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry1 { c1: 11 }],
-            ))
-            .p2(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry2 { c2: 22 }],
-            ))
-            .p3(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || {
-                    vec![Strawberry3 {
-                        c3: 33,
-                        _marker: Default::default(),
-                    }]
-                },
-            ))
-            .p4(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry4 { c4: 44 }],
-            ))
-            .p5(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || {
-                    vec![Strawberry5 {
-                        c5: 55,
-                        _marker: Default::default(),
-                    }]
-                },
-            ))
-            .p6(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry6 { c6: 66 }],
-            ))
-            .p7(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry7 { c7: 77 }],
-            ))
-            .p8(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry8 { c8: 88 }],
-            ))
-            .p9(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry9 { c9: 99 }],
-            ))
-            .t1(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry1 { c1: 11 }],
-            ))
-            .t2(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry2 { c2: 22 }],
-            ))
-            .t3(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || {
-                    vec![Strawberry3 {
-                        c3: 33,
-                        _marker: Default::default(),
-                    }]
-                },
-            ))
-            .t4(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry4 { c4: 44 }],
-            ))
-            .t5(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || {
-                    vec![Strawberry5 {
-                        c5: 55,
-                        _marker: Default::default(),
-                    }]
-                },
-            ))
-            .t6(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry6 { c6: 66 }],
-            ))
-            .t7(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry7 { c7: 77 }],
-            ))
-            .t8(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry8 { c8: 88 }],
-            ))
-            .t9(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry9 { c9: 99 }],
-            ))
-            .q1(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry1 { c1: 11 }],
-            ))
-            .q2(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry2 { c2: 22 }],
-            ))
-            .q3(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || {
-                    vec![Strawberry3 {
-                        c3: 33,
-                        _marker: Default::default(),
-                    }]
-                },
-            ))
-            .q4(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry4 { c4: 44 }],
-            ))
-            .q5(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || {
-                    vec![Strawberry5 {
-                        c5: 55,
-                        _marker: Default::default(),
-                    }]
-                },
-            ))
-            .q6(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry6 { c6: 66 }],
-            ))
-            .q7(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry7 { c7: 77 }],
-            ))
-            .q8(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry8 { c8: 88 }],
-            ))
-            .q9(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry9 { c9: 99 }],
-            ));
+                }]
+            }))
+            .s6(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry6 { c6: 66 }]
+            }))
+            .s7(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry7 { c7: 77 }]
+            }))
+            .s8(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry8 { c8: 88 }]
+            }))
+            .s9(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry9 { c9: 99 }]
+            }))
+            .p1(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry1 { c1: 11 }]
+            }))
+            .p2(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry2 { c2: 22 }]
+            }))
+            .p3(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry3 {
+                    c3: 33,
+                    _marker: Default::default(),
+                }]
+            }))
+            .p4(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry4 { c4: 44 }]
+            }))
+            .p5(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry5 {
+                    c5: 55,
+                    _marker: Default::default(),
+                }]
+            }))
+            .p6(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry6 { c6: 66 }]
+            }))
+            .p7(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry7 { c7: 77 }]
+            }))
+            .p8(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry8 { c8: 88 }]
+            }))
+            .p9(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry9 { c9: 99 }]
+            }))
+            .t1(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry1 { c1: 11 }]
+            }))
+            .t2(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry2 { c2: 22 }]
+            }))
+            .t3(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry3 {
+                    c3: 33,
+                    _marker: Default::default(),
+                }]
+            }))
+            .t4(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry4 { c4: 44 }]
+            }))
+            .t5(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry5 {
+                    c5: 55,
+                    _marker: Default::default(),
+                }]
+            }))
+            .t6(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry6 { c6: 66 }]
+            }))
+            .t7(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry7 { c7: 77 }]
+            }))
+            .t8(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry8 { c8: 88 }]
+            }))
+            .t9(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry9 { c9: 99 }]
+            }))
+            .q1(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry1 { c1: 11 }]
+            }))
+            .q2(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry2 { c2: 22 }]
+            }))
+            .q3(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry3 {
+                    c3: 33,
+                    _marker: Default::default(),
+                }]
+            }))
+            .q4(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry4 { c4: 44 }]
+            }))
+            .q5(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry5 {
+                    c5: 55,
+                    _marker: Default::default(),
+                }]
+            }))
+            .q6(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry6 { c6: 66 }]
+            }))
+            .q7(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry7 { c7: 77 }]
+            }))
+            .q8(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry8 { c8: 88 }]
+            }))
+            .q9(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry9 { c9: 99 }]
+            }));
 
         let (d, _) = g.generate(&mut s);
 
@@ -2063,7 +2029,7 @@ mod generator_coverage_no_generics {
     #[boulder(persian_rug(context=C))]
     struct Strawberry3<C: 'static> {
         _marker: core::marker::PhantomData<C>,
-        #[boulder(generator=boulder::gen::Inc(3))]
+        #[boulder(generator=boulder::Inc(3))]
         c3: i32,
     }
 
@@ -2101,7 +2067,7 @@ mod generator_coverage_no_generics {
 
     #[derive(Generatable)]
     struct Strawberry4 {
-        #[boulder(generator=boulder::gen::Inc(0))]
+        #[boulder(generator=boulder::Inc(0))]
         c4: i32,
     }
 
@@ -2142,7 +2108,7 @@ mod generator_coverage_no_generics {
         v2: Strawberry2,
         #[boulder(generatable_with_persian_rug)]
         v3: Strawberry3<MuleState>,
-        #[boulder(generatable(c4=boulder::gen::Inc(4)))]
+        #[boulder(generatable(c4=boulder::Inc(4)))]
         v4: Strawberry4,
         #[boulder(buildable_with_persian_rug(c5 = 5))]
         v5: Strawberry5<MuleState>,
@@ -2160,7 +2126,7 @@ mod generator_coverage_no_generics {
         s2: Vec<Strawberry2>,
         #[boulder(generatable_with_persian_rug, sequence = 3usize)]
         s3: Vec<Strawberry3<MuleState>>,
-        #[boulder(generatable(c4=boulder::gen::Inc(4)), sequence=4usize)]
+        #[boulder(generatable(c4=boulder::Inc(4)), sequence=4usize)]
         s4: Vec<Strawberry4>,
         #[boulder(buildable_with_persian_rug(c5 = 5), sequence = 5usize)]
         s5: Vec<Strawberry5<MuleState>>,
@@ -2179,7 +2145,7 @@ mod generator_coverage_no_generics {
         p2: Vec<Strawberry2>,
         #[boulder(generatable_with_persian_rug, sequence_with_persian_rug=|context| (3usize, context))]
         p3: Vec<Strawberry3<MuleState>>,
-        #[boulder(generatable(c4=boulder::gen::Inc(4)), sequence_with_persian_rug=|context| (4usize, context))]
+        #[boulder(generatable(c4=boulder::Inc(4)), sequence_with_persian_rug=|context| (4usize, context))]
         p4: Vec<Strawberry4>,
         #[boulder(buildable_with_persian_rug(c5 = 5), sequence_with_persian_rug=|context| (5usize, context))]
         p5: Vec<Strawberry5<MuleState>>,
@@ -2192,23 +2158,23 @@ mod generator_coverage_no_generics {
         #[boulder(sequence_with_persian_rug=|context| (9usize, context))]
         p9: Vec<Strawberry9>,
 
-        #[boulder(generator_with_persian_rug=Strawberry1Generator { c1: 1 }: Strawberry1Generator, sequence_generator=boulder::gen::Inc(1usize))]
+        #[boulder(generator_with_persian_rug=Strawberry1Generator { c1: 1 }: Strawberry1Generator, sequence_generator=boulder::Inc(1usize))]
         t1: Vec<Strawberry1>,
-        #[boulder(generator=Strawberry2Generator {c2: 2}, sequence_generator=boulder::gen::Inc(2usize))]
+        #[boulder(generator=Strawberry2Generator {c2: 2}, sequence_generator=boulder::Inc(2usize))]
         t2: Vec<Strawberry2>,
-        #[boulder(generatable_with_persian_rug, sequence_generator=boulder::gen::Inc(3usize))]
+        #[boulder(generatable_with_persian_rug, sequence_generator=boulder::Inc(3usize))]
         t3: Vec<Strawberry3<MuleState>>,
-        #[boulder(generatable(c4=boulder::gen::Inc(4)), sequence_generator=boulder::gen::Inc(4usize))]
+        #[boulder(generatable(c4=boulder::Inc(4)), sequence_generator=boulder::Inc(4usize))]
         t4: Vec<Strawberry4>,
-        #[boulder(buildable_with_persian_rug(c5 = 5), sequence_generator = boulder::gen::Inc(5usize))]
+        #[boulder(buildable_with_persian_rug(c5 = 5), sequence_generator = boulder::Inc(5usize))]
         t5: Vec<Strawberry5<MuleState>>,
-        #[boulder(buildable(c6 = 6), sequence_generator = boulder::gen::Inc(6usize))]
+        #[boulder(buildable(c6 = 6), sequence_generator = boulder::Inc(6usize))]
         t6: Vec<Strawberry6>,
-        #[boulder(default_with_persian_rug=|context| { (Strawberry7 { c7: 7 }, context) }, sequence_generator=boulder::gen::Inc(7usize))]
+        #[boulder(default_with_persian_rug=|context| { (Strawberry7 { c7: 7 }, context) }, sequence_generator=boulder::Inc(7usize))]
         t7: Vec<Strawberry7>,
-        #[boulder(default=Strawberry8 { c8: 8 }, sequence_generator=boulder::gen::Inc(8usize))]
+        #[boulder(default=Strawberry8 { c8: 8 }, sequence_generator=boulder::Inc(8usize))]
         t8: Vec<Strawberry8>,
-        #[boulder(sequence_generator = boulder::gen::Inc(9usize))]
+        #[boulder(sequence_generator = boulder::Inc(9usize))]
         t9: Vec<Strawberry9>,
 
         #[boulder(generator_with_persian_rug=Strawberry1Generator { c1: 1 }: Strawberry1Generator, sequence_generator_with_persian_rug=TestUsizeGenerator { value: 1usize }: TestUsizeGenerator)]
@@ -2217,7 +2183,7 @@ mod generator_coverage_no_generics {
         q2: Vec<Strawberry2>,
         #[boulder(generatable_with_persian_rug, sequence_generator_with_persian_rug=TestUsizeGenerator { value: 3usize }: TestUsizeGenerator)]
         q3: Vec<Strawberry3<MuleState>>,
-        #[boulder(generatable(c4=boulder::gen::Inc(4)), sequence_generator_with_persian_rug=TestUsizeGenerator { value: 4usize }: TestUsizeGenerator)]
+        #[boulder(generatable(c4=boulder::Inc(4)), sequence_generator_with_persian_rug=TestUsizeGenerator { value: 4usize }: TestUsizeGenerator)]
         q4: Vec<Strawberry4>,
         #[boulder(buildable_with_persian_rug(c5 = 5), sequence_generator_with_persian_rug=TestUsizeGenerator { value: 5usize }: TestUsizeGenerator)]
         q5: Vec<Strawberry5<MuleState>>,
@@ -2726,187 +2692,153 @@ mod generator_coverage_no_generics {
         let mut s: MuleState = Default::default();
 
         let mut g = Mule::generator()
-            .v1(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || Strawberry1 { c1: 11 },
-            ))
-            .v2(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || Strawberry2 { c2: 22 },
-            ))
-            .v3(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || Strawberry3 {
+            .v1(boulder::GeneratorWrapper::new(|| Strawberry1 { c1: 11 }))
+            .v2(boulder::GeneratorWrapper::new(|| Strawberry2 { c2: 22 }))
+            .v3(boulder::GeneratorWrapper::new(|| Strawberry3 {
+                c3: 33,
+                _marker: Default::default(),
+            }))
+            .v4(boulder::GeneratorWrapper::new(|| Strawberry4 { c4: 44 }))
+            .v5(boulder::GeneratorWrapper::new(|| Strawberry5 {
+                c5: 55,
+                _marker: Default::default(),
+            }))
+            .v6(boulder::GeneratorWrapper::new(|| Strawberry6 { c6: 66 }))
+            .v7(boulder::GeneratorWrapper::new(|| Strawberry7 { c7: 77 }))
+            .v8(boulder::GeneratorWrapper::new(|| Strawberry8 { c8: 88 }))
+            .v9(boulder::GeneratorWrapper::new(|| Strawberry9 { c9: 99 }))
+            .s1(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry1 { c1: 11 }]
+            }))
+            .s2(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry2 { c2: 22 }]
+            }))
+            .s3(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry3 {
                     c3: 33,
                     _marker: Default::default(),
-                },
-            ))
-            .v4(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || Strawberry4 { c4: 44 },
-            ))
-            .v5(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || Strawberry5 {
+                }]
+            }))
+            .s4(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry4 { c4: 44 }]
+            }))
+            .s5(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry5 {
                     c5: 55,
                     _marker: Default::default(),
-                },
-            ))
-            .v6(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || Strawberry6 { c6: 66 },
-            ))
-            .v7(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || Strawberry7 { c7: 77 },
-            ))
-            .v8(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || Strawberry8 { c8: 88 },
-            ))
-            .v9(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || Strawberry9 { c9: 99 },
-            ))
-            .s1(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry1 { c1: 11 }],
-            ))
-            .s2(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry2 { c2: 22 }],
-            ))
-            .s3(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || {
-                    vec![Strawberry3 {
-                        c3: 33,
-                        _marker: Default::default(),
-                    }]
-                },
-            ))
-            .s4(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry4 { c4: 44 }],
-            ))
-            .s5(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || {
-                    vec![Strawberry5 {
-                        c5: 55,
-                        _marker: Default::default(),
-                    }]
-                },
-            ))
-            .s6(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry6 { c6: 66 }],
-            ))
-            .s7(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry7 { c7: 77 }],
-            ))
-            .s8(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry8 { c8: 88 }],
-            ))
-            .s9(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry9 { c9: 99 }],
-            ))
-            .p1(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry1 { c1: 11 }],
-            ))
-            .p2(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry2 { c2: 22 }],
-            ))
-            .p3(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || {
-                    vec![Strawberry3 {
-                        c3: 33,
-                        _marker: Default::default(),
-                    }]
-                },
-            ))
-            .p4(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry4 { c4: 44 }],
-            ))
-            .p5(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || {
-                    vec![Strawberry5 {
-                        c5: 55,
-                        _marker: Default::default(),
-                    }]
-                },
-            ))
-            .p6(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry6 { c6: 66 }],
-            ))
-            .p7(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry7 { c7: 77 }],
-            ))
-            .p8(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry8 { c8: 88 }],
-            ))
-            .p9(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry9 { c9: 99 }],
-            ))
-            .t1(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry1 { c1: 11 }],
-            ))
-            .t2(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry2 { c2: 22 }],
-            ))
-            .t3(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || {
-                    vec![Strawberry3 {
-                        c3: 33,
-                        _marker: Default::default(),
-                    }]
-                },
-            ))
-            .t4(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry4 { c4: 44 }],
-            ))
-            .t5(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || {
-                    vec![Strawberry5 {
-                        c5: 55,
-                        _marker: Default::default(),
-                    }]
-                },
-            ))
-            .t6(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry6 { c6: 66 }],
-            ))
-            .t7(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry7 { c7: 77 }],
-            ))
-            .t8(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry8 { c8: 88 }],
-            ))
-            .t9(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry9 { c9: 99 }],
-            ))
-            .q1(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry1 { c1: 11 }],
-            ))
-            .q2(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry2 { c2: 22 }],
-            ))
-            .q3(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || {
-                    vec![Strawberry3 {
-                        c3: 33,
-                        _marker: Default::default(),
-                    }]
-                },
-            ))
-            .q4(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry4 { c4: 44 }],
-            ))
-            .q5(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || {
-                    vec![Strawberry5 {
-                        c5: 55,
-                        _marker: Default::default(),
-                    }]
-                },
-            ))
-            .q6(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry6 { c6: 66 }],
-            ))
-            .q7(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry7 { c7: 77 }],
-            ))
-            .q8(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry8 { c8: 88 }],
-            ))
-            .q9(boulder::persian_rug::generator::GeneratorWrapper::new(
-                || vec![Strawberry9 { c9: 99 }],
-            ));
+                }]
+            }))
+            .s6(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry6 { c6: 66 }]
+            }))
+            .s7(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry7 { c7: 77 }]
+            }))
+            .s8(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry8 { c8: 88 }]
+            }))
+            .s9(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry9 { c9: 99 }]
+            }))
+            .p1(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry1 { c1: 11 }]
+            }))
+            .p2(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry2 { c2: 22 }]
+            }))
+            .p3(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry3 {
+                    c3: 33,
+                    _marker: Default::default(),
+                }]
+            }))
+            .p4(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry4 { c4: 44 }]
+            }))
+            .p5(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry5 {
+                    c5: 55,
+                    _marker: Default::default(),
+                }]
+            }))
+            .p6(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry6 { c6: 66 }]
+            }))
+            .p7(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry7 { c7: 77 }]
+            }))
+            .p8(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry8 { c8: 88 }]
+            }))
+            .p9(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry9 { c9: 99 }]
+            }))
+            .t1(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry1 { c1: 11 }]
+            }))
+            .t2(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry2 { c2: 22 }]
+            }))
+            .t3(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry3 {
+                    c3: 33,
+                    _marker: Default::default(),
+                }]
+            }))
+            .t4(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry4 { c4: 44 }]
+            }))
+            .t5(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry5 {
+                    c5: 55,
+                    _marker: Default::default(),
+                }]
+            }))
+            .t6(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry6 { c6: 66 }]
+            }))
+            .t7(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry7 { c7: 77 }]
+            }))
+            .t8(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry8 { c8: 88 }]
+            }))
+            .t9(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry9 { c9: 99 }]
+            }))
+            .q1(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry1 { c1: 11 }]
+            }))
+            .q2(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry2 { c2: 22 }]
+            }))
+            .q3(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry3 {
+                    c3: 33,
+                    _marker: Default::default(),
+                }]
+            }))
+            .q4(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry4 { c4: 44 }]
+            }))
+            .q5(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry5 {
+                    c5: 55,
+                    _marker: Default::default(),
+                }]
+            }))
+            .q6(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry6 { c6: 66 }]
+            }))
+            .q7(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry7 { c7: 77 }]
+            }))
+            .q8(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry8 { c8: 88 }]
+            }))
+            .q9(boulder::GeneratorWrapper::new(|| {
+                vec![Strawberry9 { c9: 99 }]
+            }));
 
         let (d, _) = g.generate(&mut s);
 
@@ -3001,8 +2933,7 @@ mod generator_coverage_no_generics {
 mod generator_wrappers {
     use super::*;
 
-    use boulder::persian_rug::generator::GeneratorWrapper;
-    use boulder::{GeneratableWithPersianRug, GeneratorWithPersianRug};
+    use boulder::{GeneratableWithPersianRug, GeneratorWithPersianRug, GeneratorWrapper};
     use persian_rug::Proxy;
     use std::any::Any;
     use std::cell::{Cell, RefCell};
