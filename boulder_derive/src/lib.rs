@@ -240,6 +240,140 @@ pub fn repeat(input: TokenStream) -> TokenStream {
 mod persian_rug;
 
 #[cfg(feature = "persian-rug")]
+/// Derive the `BuildableWithPersianRug` trait for a type, creating a
+/// suitable `BuilderWithPersianRug`.
+///
+/// This is only implemented for structs with named fields; there is
+/// no implementation for either enums or structs with unnamed fields.
+/// All fields will be default constructed in the absence of other
+/// instructions. You can customise the construction process for your
+/// type by using the `boulder` attribute on its fields, as follows:
+///
+/// - `#[boulder(default=Foo)]` The default value for this field is
+///   `Foo`, where an arbitrary well-formed Rust expression can be
+///   used in place of `Foo`.
+///
+/// - `#[boulder(default_with_persian_rug=|context| {(Foo,
+///   context)})]` The default value for this field is derived from
+///   the context alone, via a lambda or function which receives the
+///   context, and must return it.
+///
+/// - `#[boulder(buildable)]` The type for this field implements
+///   `Buildable` itself, so new values should be constructed using
+///   `T::builder().build()`.
+///
+/// - `#[boulder(buildable_with_persian_rug)]` The type for this field implements
+///   `BuildableWithPersianRug` itself, so new values should be constructed using
+///   `T::builder().build(context)`.
+///
+/// - `#[boulder(buildable(a=5, b=10))]` The type for this field implements
+///   `Buildable`, and new instances should be customised from the
+///    default by setting `a=5` and `b=10` where `a` and `b` are
+///    member names, and `5` and `10` can be replaced by arbitrary
+///    well-formed Rust expressions.
+///
+/// - `#[boulder(buildable_with_persian_rug(a=5, b=10))]` The type for
+///   this field implements `BuildableWithPersianRug`, and new
+///   instances should be customised from the default by setting `a=5`
+///   and `b=10` where `a` and `b` are member names, and `5` and `10`
+///   can be replaced by arbitrary well-formed Rust expressions.
+///
+/// - `#[boulder(sequence=3)]` This field is assumed to be a
+///   collection type (a type which can be the target of
+///   `collect()`). Generate 3 items and initialize a new collection
+///   from them, where `3` can be replaced by an arbitrary well-formed
+///   Rust expression. The generation mechanism will be taken from any
+///   generator specification (`generator` or `generatable`) if one is
+///   given; otherwise it will be from the builder specification
+///   (`default` or `buildable`, as described above) if one is given;
+///   otherwise the items will be default initialized.
+///
+/// - `#[boulder(sequence_with_persian_rug=|context| {(f(context),
+///   context)}]` This field is assumed to be a collection type (a
+///   type which can be the target of `collect()`). Generate a number
+///   of items dependent on the context, and initialize a new
+///   collection from them, where `f(context)` can be replaced by an
+///   arbitrary well-formed Rust expression. The generation mechanism
+///   will be taken from any generator specification (`generator`,
+///   `generatable`, `generator_with_persian_rug` or
+///   `generatable_with_persian_rug`) if one is given; otherwise it
+///   will be from the builder specification (`default`, `buildable`,
+///   `default_with_persian_rug` or `buildable_with_persian_rug` as
+///   described above) if one is given; otherwise the items will be
+///   default initialized.
+///
+/// Example:
+/// ```rust
+/// use boulder::{BuildableWithPersianRug, GeneratableWithPersianRug, BuilderWithPersianRug};
+/// use persian_rug::{contextual, persian_rug, Context, Proxy};
+///
+/// #[contextual(Rug)]
+/// #[derive(BuildableWithPersianRug)]
+/// #[boulder(persian_rug(context=Rug))]
+/// struct Foo {
+///   // This field will be default-initialized (a=0)
+///   a: i32,
+///   // This field will be initialized from the number of Bars currently in the context
+///   #[boulder(default_with_persian_rug=|context| (context.get_iter::<Bar>().count(), context))]
+///   b: i32,
+/// }
+///
+/// #[contextual(Rug)]
+/// #[derive(BuildableWithPersianRug)]
+/// #[boulder(persian_rug(context=Rug))]
+/// struct Bar {
+///   // This field will be initialized as Foo::builder().build()
+///   #[boulder(buildable_with_persian_rug)]
+///   f1: Proxy<Foo>,
+///   // This field will be initialized as Foo::builder().a(1).build()
+///   #[boulder(buildable_with_persian_rug(a=1))]
+///   f2: Proxy<Foo>,
+///   // This field will be initialized with as many items as there are
+///   // pre-existing Foos of Foo::builder().build()
+///   #[boulder(buildable_with_persian_rug, sequence_with_persian_rug=|context| (context.get_proxy_iter::<Foo>().count(), context))]
+///   f3: Vec<Proxy<Foo>>,
+/// }
+///
+/// #[persian_rug]
+/// struct Rug(#[table] Foo, #[table] Bar);
+///
+/// let mut r = Rug(Default::default(), Default::default());
+/// let (foo, _) = Proxy::<Foo>::builder().build(&mut r);
+/// assert_eq!(r.get(&foo).a, 0);
+/// assert_eq!(r.get(&foo).b, 0);
+///
+/// let (bar, _) = Proxy::<Bar>::builder().build(&mut r);
+/// assert_eq!(r.get(&r.get(&bar).f1).a, 0);
+/// assert_eq!(r.get(&r.get(&bar).f1).b, 0);
+/// assert_eq!(r.get(&r.get(&bar).f2).a, 1);
+/// assert_eq!(r.get(&r.get(&bar).f2).b, 0);
+/// assert_eq!(r.get(&bar).f3.len(), 3);
+/// assert_eq!(r.get(&r.get(&bar).f3[0]).a, 0);
+/// assert_eq!(r.get(&r.get(&bar).f3[0]).b, 0);
+/// assert_eq!(r.get(&r.get(&bar).f3[1]).a, 0);
+/// assert_eq!(r.get(&r.get(&bar).f3[1]).b, 0);
+/// assert_eq!(r.get(&r.get(&bar).f3[2]).a, 0);
+/// assert_eq!(r.get(&r.get(&bar).f3[2]).b, 0);
+///
+/// let (foo, _) = Proxy::<Foo>::builder().build(&mut r);
+/// assert_eq!(r.get(&foo).a, 0);
+/// assert_eq!(r.get(&foo).b, 1);
+///
+/// let (bar, _) = Proxy::<Bar>::builder().build(&mut r);
+/// assert_eq!(r.get(&r.get(&bar).f1).a, 0);
+/// assert_eq!(r.get(&r.get(&bar).f1).b, 1);
+/// assert_eq!(r.get(&r.get(&bar).f2).a, 1);
+/// assert_eq!(r.get(&r.get(&bar).f2).b, 1);
+/// assert_eq!(r.get(&bar).f3.len(), 9);
+/// assert_eq!(r.get(&r.get(&bar).f3[0]).a, 0);
+/// assert_eq!(r.get(&r.get(&bar).f3[0]).b, 1);
+/// assert_eq!(r.get(&r.get(&bar).f3[1]).a, 0);
+/// assert_eq!(r.get(&r.get(&bar).f3[1]).b, 1);
+/// assert_eq!(r.get(&r.get(&bar).f3[2]).a, 0);
+/// assert_eq!(r.get(&r.get(&bar).f3[2]).b, 1);
+/// assert_eq!(r.get(&r.get(&bar).f3[8]).a, 0);
+/// assert_eq!(r.get(&r.get(&bar).f3[8]).b, 1);
+/// ```
 #[proc_macro_derive(BuildableWithPersianRug, attributes(boulder))]
 pub fn buildable_with_persian_rug(input: TokenStream) -> TokenStream {
     persian_rug::builder::derive_buildable_with_persian_rug(syn::parse_macro_input!(input)).into()

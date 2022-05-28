@@ -67,7 +67,8 @@ where
     fn generator() -> Self::Generator;
 }
 
-/// Something which can generate a sequence of objects of some type.
+/// Something which can generate a sequence of objects of some
+/// [`persian_rug::Contextual`] type.
 ///
 /// The only required function in this trait is
 /// ['generate'](GeneratorWithPersianRug::generate) which creates a
@@ -144,6 +145,36 @@ where
 /// It makes any generator into an infinite sequence. One reason not
 /// to use this type is that it prevents modifying the generator
 /// mid-sequence.
+///
+/// Example:
+/// ```rust
+/// use boulder::{GeneratableWithPersianRug, GeneratorWithPersianRug, GeneratorWithPersianRugIterator, Inc};
+/// use persian_rug::{contextual, persian_rug, Context, Proxy};
+///
+/// #[contextual(Rug)]
+/// #[derive(GeneratableWithPersianRug)]
+/// #[boulder(persian_rug(context=Rug))]
+/// struct Foo {
+///    #[boulder(generator=Inc(1))]
+///    a: i32
+/// }
+///
+/// #[persian_rug]
+/// struct Rug (
+///   #[table] Foo,
+/// );
+///
+/// let mut r = Rug(Default::default());
+/// let g = Proxy::<Foo>::generator();
+/// let mut iter = GeneratorWithPersianRugIterator::new(g, &mut r);
+/// let f1 = iter.next().unwrap();
+/// let f2 = iter.next().unwrap();
+/// let (mut g, _) = iter.into_inner();
+/// assert_eq!(r.get(&f1).a, 1);
+/// assert_eq!(r.get(&f2).a, 2);
+/// let (f3, _) = g.generate(&mut r);
+/// assert_eq!(r.get(&f3).a, 3);
+/// ```
 #[cfg_attr(docsrs, doc(cfg(feature = "persian-rug")))]
 pub struct GeneratorWithPersianRugIterator<T, B>
 where
@@ -157,6 +188,7 @@ impl<T, B> GeneratorWithPersianRugIterator<T, B>
 where
     B: persian_rug::Mutator,
 {
+    /// Create a new iterator from a generator and a mutator
     pub fn new(generator: T, mutator: B) -> Self {
         Self {
             gen: generator,
@@ -164,6 +196,7 @@ where
         }
     }
 
+    /// Destroy the iterator, recovering the generator and mutator inside.
     pub fn into_inner(self) -> (T, B) {
         (self.gen, self.mutator.unwrap())
     }
@@ -188,6 +221,36 @@ where
 /// It makes any generator into an infinite sequence. Using this type
 /// prevents modifying the generator mid-sequence, but permits
 /// re-using it once the desired values have been extracted.
+///
+/// Example:
+/// ```rust
+/// use boulder::{GeneratableWithPersianRug, GeneratorWithPersianRug, GeneratorWithPersianRugMutIterator, Inc};
+/// use persian_rug::{contextual, persian_rug, Context, Proxy};
+///
+/// #[contextual(Rug)]
+/// #[derive(GeneratableWithPersianRug)]
+/// #[boulder(persian_rug(context=Rug))]
+/// struct Foo {
+///    #[boulder(generator=Inc(1))]
+///    a: i32
+/// }
+///
+/// #[persian_rug]
+/// struct Rug (
+///   #[table] Foo,
+/// );
+///
+/// let mut r = Rug(Default::default());
+/// let mut g = Proxy::<Foo>::generator();
+/// let mut iter = GeneratorWithPersianRugMutIterator::new(&mut g, &mut r);
+/// let f1 = iter.next().unwrap();
+/// let f2 = iter.next().unwrap();
+/// let _ = iter.into_inner();
+/// assert_eq!(r.get(&f1).a, 1);
+/// assert_eq!(r.get(&f2).a, 2);
+/// let (f3, _) = g.generate(&mut r);
+/// assert_eq!(r.get(&f3).a, 3);
+/// ```
 #[cfg_attr(docsrs, doc(cfg(feature = "persian-rug")))]
 pub struct GeneratorWithPersianRugMutIterator<'a, B, T>
 where
@@ -227,6 +290,12 @@ where
     }
 }
 
+/// Collections drawn from an underlying generator.
+///
+/// This wraps an underlying generator that produces items, which this
+/// then gathers into collections. A separate
+/// [`GeneratorWithPersianRug`] is used to determine how many elements
+/// are present in each successively yielded collection.
 #[cfg_attr(docsrs, doc(cfg(feature = "persian-rug")))]
 pub struct SequenceGeneratorWithPersianRug<S, T, V> {
     _marker: core::marker::PhantomData<V>,
@@ -235,6 +304,14 @@ pub struct SequenceGeneratorWithPersianRug<S, T, V> {
 }
 
 impl<S, T, V> SequenceGeneratorWithPersianRug<S, T, V> {
+    /// Create a new instance
+    ///
+    /// - `seq` is a [`GeneratorWithPersianRug`] that produces
+    ///   something that can be converted into `usize`, which will
+    ///   be the number of elements in each yielded collection.
+    /// - `elt` is a [`GeneratorWithPersianRug`] that produces
+    ///   something that can be convered into the the container
+    ///   element type.
     pub fn new(seq: S, elt: T) -> Self {
         Self {
             _marker: Default::default(),
@@ -270,6 +347,7 @@ where
     }
 }
 
+/// Convert a [`Generator`](crate::Generator) into a [`GeneratorWithPersianRug`].
 #[cfg_attr(docsrs, doc(cfg(feature = "persian-rug")))]
 pub struct GeneratorWrapper<T> {
     gen: Box<dyn crate::Generator<Output = T>>,

@@ -98,6 +98,27 @@ pub trait Generatable {
 ///
 /// This type converts any generator into an iterator over an infinite
 /// sequence.
+///
+/// Example:
+/// ```rust
+/// use boulder::{Generatable, Generator, GeneratorIterator, Inc};
+///
+/// #[derive(Generatable)]
+/// struct Foo {
+///    #[boulder(generator=Inc(1))]
+///    a: i32
+/// }
+///
+/// let g = Foo::generator();
+/// let mut iter = GeneratorIterator::new(g);
+/// let f1 = iter.next().unwrap();
+/// let f2 = iter.next().unwrap();
+/// let mut g = iter.into_inner();
+/// assert_eq!(f1.a, 1);
+/// assert_eq!(f2.a, 2);
+/// let f3 = g.generate();
+/// assert_eq!(f3.a, 3);
+/// ```
 pub struct GeneratorIterator<T> {
     gen: T,
 }
@@ -129,6 +150,26 @@ where
 /// This type is an iterator over the infinite sequence of values
 /// produced by a generator. This type holds a mutable reference to
 /// the generator, but does not take ownership.
+///
+/// Example:
+/// ```rust
+/// use boulder::{Generatable, Generator, GeneratorMutIterator, Inc};
+///
+/// #[derive(Generatable)]
+/// struct Foo {
+///    #[boulder(generator=Inc(1))]
+///    a: i32
+/// }
+///
+/// let mut g = Foo::generator();
+/// let mut iter = GeneratorMutIterator::new(&mut g);
+/// let f1 = iter.next().unwrap();
+/// let f2 = iter.next().unwrap();
+/// assert_eq!(f1.a, 1);
+/// assert_eq!(f2.a, 2);
+/// let f3 = g.generate();
+/// assert_eq!(f3.a, 3);
+/// ```
 pub struct GeneratorMutIterator<'a, T> {
     gen: &'a mut T,
 }

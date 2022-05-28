@@ -23,7 +23,8 @@ where
     fn builder() -> Self::Builder;
 }
 
-/// Something which can create a default object of some type.
+/// Something which can create a default object of some
+/// [`persian_rug::Contextual`] type.
 ///
 /// [persian-rug](persian_rug) is a crate that provides arena based
 /// management for objects of different types. The natural reason to

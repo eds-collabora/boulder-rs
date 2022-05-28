@@ -67,16 +67,71 @@
 //! ```
 //!
 
-// #[cfg_attr(docsrs, doc(cfg(feature = "persian-rug")))]
-// #[doc= r##"
-// # persian-rug
+#![cfg_attr(
+    feature = "persian-rug",
+    doc = r##"
 
-// When the `"persian-rug"` feature is enabled, a parallel set of types,
-// traits and derive macros are enabled, i.e. [`BuildableWithPersianRug`]
-// and [`GeneratableWithPersianRug`]. These provide similar facilities,
-// but for types based on the [persian_rug] crate.
+# persian-rug
 
-// "##]
+When the `"persian-rug"` feature is enabled, a parallel set of types,
+traits and derive macros are enabled, i.e. [`BuildableWithPersianRug`]
+and [`GeneratableWithPersianRug`]. These provide similar facilities,
+but for types based on the [persian-rug](::persian_rug) crate.
+
+Briefly, [persian-rug](::persian_rug) moves ownership of all values
+into a single container (the "rug" or
+[`Context`](::persian_rug::Context)). Client code then deals with handles
+(in the form [`Proxy<T>`](::persian_rug::Proxy)) to these values. The
+builders and generators take a mutator for the type's context in their
+[`build`](BuilderWithPersianRug::build) and
+[`generate`](GeneratorWithPersianRug::generate) methods, which means
+at the point of construction, the set of other constructed instances
+(of all types in that context) is available.
+
+Since the derived generators pass through
+[`Proxy<T>`](::persian_rug::Proxy), and since to get the most benefit from
+this system you should work with proxies where possible, the most common
+usage is to use these solely through the pass throughs.
+
+Example:
+```rust
+use boulder::{BuilderWithPersianRug, BuildableWithPersianRug};
+use persian_rug::{contextual, persian_rug, Context, Proxy};
+
+#[persian_rug]
+struct Rug(
+  #[table] Foo,
+  #[table] Bar,
+);
+
+#[contextual(Rug)]
+#[derive(BuildableWithPersianRug)]
+#[boulder(persian_rug(context=Rug))]
+struct Foo {
+   #[boulder(default=5)]
+   pub a: i32,
+   #[boulder(buildable_with_persian_rug(a=5))]
+   pub b: Proxy<Bar>,
+}
+
+#[contextual(Rug)]
+#[derive(BuildableWithPersianRug)]
+#[boulder(persian_rug(context=Rug))]
+struct Bar {
+  #[boulder(default=2)]
+  pub a: i32
+}
+
+let mut r = Rug(Default::default(), Default::default());
+let (f, _) = Proxy::<Foo>::builder()
+         .a(27)
+         .build(&mut r);
+assert_eq!(r.get(&f).a, 27);
+assert_eq!(r.get(&r.get(&f).b).a, 5);
+```
+
+"##
+)]
 
 mod builder;
 mod generator;
