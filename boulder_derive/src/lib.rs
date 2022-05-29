@@ -379,6 +379,145 @@ pub fn buildable_with_persian_rug(input: TokenStream) -> TokenStream {
     persian_rug::builder::derive_buildable_with_persian_rug(syn::parse_macro_input!(input)).into()
 }
 
+/// Derive the `GeneratableWithPersianRug` trait for a type, creating
+/// a suitable `GeneratorWithPersianRug`.
+///
+/// This is only implemented for structs with named fields; there is
+/// no implementation for either enums or structs with unnamed fields.
+/// All fields will be default constructed (i.e. `Default::default()`)
+/// in the absence of other instructions. You can customise the
+/// construction process for your type by using the `boulder`
+/// attribute as follows:
+///
+/// - `#[boulder(generator=Inc(0))]` Each successive instance produced
+///   by this generator should, by default, have a value one higher
+///   for this field than the previous one. The first generated value for
+///   this field should be 0. `Inc(0)` can be replaced by an arbitrary
+///   expression which evaluates to a `Generator`.
+///
+/// - `#[boulder(generator_with_persian_rug=Inc(0): Inc)]` The
+///   expression must evaluate to a `GeneratorWithPersianRug`, and
+///   must be followed by a type annotation. All of the built-in
+///   `Generator` instances are also `GeneratorWithPersianRug`
+///   instances for convenience, but this is most useful when you need
+///   to use the contents of a `persian_rug::Context` as part of the
+///   generation process.
+///
+/// - `#[boulder(generatable)]` The type for this field implements
+///   `Generatable`, so new instances of the containing type should
+///   have values for this field taken from the default sequence for
+///   the field type.
+///
+/// - `#[boulder(generatable_with_persian_rug)]` The type for this
+///   field implements `GeneratableWithPersianRug`, so new instances
+///   of the containing type should have values for this field taken
+///   from the default sequence for the field type. Note that this can
+///   never take arguments.
+///
+/// - `#[boulder(generatable(a=Inc(3i32)))]` The type for this field
+///   implements `Generatable`, and the generator for values for this
+///   field should be customised, such that the nested field `a` uses
+///   the generator `Inc(3i32)`. `Inc(3i32)` can be replaced by an
+///   arbitrary expression which evaluates to a `Generator` instance.
+///   Note that there is no equivalent form of
+///   `generatable_with_persian_rug` with arguments due to the
+///   difficulty of naming the resulting type in the current version
+///   of Rust.
+///
+/// - `#[boulder(sequence_generator=Repeat(2usize, 3usize))]` This
+///   field is assumed to be a collection type (a type which can be
+///   the target of `collect()`). Successive instances should have
+///   alternately 2 and 3 items. The items will be default
+///   initialized. This tag stacks with `generatable`, `buildable` and
+///   `default` to provide more control of the container contents.
+///   `Repeat(2usize, 3usize)` can be replaced by an arbitrary
+///   expression which evaluates to a `Generator`.
+///
+/// - `#[boulder(sequence_generator_with_persian_rug=Repeat(2usize,
+///   3usize): Repeat)]` This field is assumed to be a collection type
+///   (a type which can be the target of `collect()`). This behaves
+///   similarly to `sequence_generator`, but now the expression must
+///   be a `GeneratorWithPersianRug` and receives the context when it
+///   is asked to produce each new collection size. The expression
+///   must have a type annotation, so that the starting type for the
+///   generator is known.
+///
+/// The generator will additionally use all tags defined for
+/// `BuildableWithPersianRug` if those specific to
+/// `GeneratableWithPersianRug` are not present. In this case, all
+/// instances in the sequence the generator produces will receive the
+/// same value for the given field. This includes the `sequence` and
+/// `sequence_with_persian_rug` tags.
+///
+/// Example:
+/// ```rust
+/// use boulder::{GeneratableWithPersianRug, GeneratorWithPersianRug};
+/// use persian_rug::{contextual, persian_rug, Context, Mutator, Proxy};
+///
+/// struct FooCounter;
+///
+/// impl GeneratorWithPersianRug<Rug> for FooCounter {
+///    type Output = usize;
+///    fn generate<'b, B>(&mut self, context: B) -> (usize, B)
+///    where
+///       B: 'b + Mutator<Context = Rug>
+///    {
+///       (context.get_iter::<Foo>().count(), context)
+///    }
+/// }
+///
+/// struct BarCounter;
+///
+/// impl GeneratorWithPersianRug<Rug> for BarCounter {
+///    type Output = usize;
+///    fn generate<'b, B>(&mut self, context: B) -> (usize, B)
+///    where
+///       B: 'b + Mutator<Context = Rug>
+///    {
+///       (context.get_iter::<Bar>().count(), context)
+///    }
+/// }
+///
+/// #[contextual(Rug)]
+/// #[derive(GeneratableWithPersianRug)]
+/// #[boulder(persian_rug(context=Rug))]
+/// struct Foo {
+///   // This field will be default initialized in every instance (a=0)
+///   a: i32,
+///   // This field will be the number of Foo instances in existence when this instance was made.
+///   #[boulder(generator_with_persian_rug=FooCounter: FooCounter)]
+///   b: usize,
+/// }
+///
+/// #[contextual(Rug)]
+/// #[derive(GeneratableWithPersianRug)]
+/// #[boulder(persian_rug(context=Rug))]
+/// struct Bar {
+///   // This field will take values from Foo::generator()
+///   #[boulder(generatable_with_persian_rug)]
+///   f1: Proxy<Foo>,
+///   // This field will be initialized with an instance of Foo for every
+///   // existing instance of Bar.
+///   #[boulder(generatable_with_persian_rug, sequence_generator_with_persian_rug=BarCounter: BarCounter)]
+///   f2: Vec<Proxy<Foo>>,
+/// }
+///
+/// #[persian_rug]
+/// struct Rug(#[table] Foo, #[table] Bar);
+///
+/// let mut r = Rug(Default::default(), Default::default());
+/// let mut gen = Proxy::<Bar>::generator();
+/// let (bar, _) = gen.generate(&mut r);
+/// assert_eq!(r.get(&r.get(&bar).f1).a, 0);
+/// assert_eq!(r.get(&r.get(&bar).f1).b, 0);
+/// assert_eq!(r.get(&bar).f2.len(), 0);
+/// let (bar, _) = gen.generate(&mut r);
+/// assert_eq!(r.get(&r.get(&bar).f1).a, 0);
+/// assert_eq!(r.get(&r.get(&bar).f1).b, 1);
+/// assert_eq!(r.get(&bar).f2.len(), 1);
+/// assert_eq!(r.get(&r.get(&bar).f2[0]).a, 0);
+/// assert_eq!(r.get(&r.get(&bar).f2[0]).b, 2);
+/// ```
 #[cfg(feature = "persian-rug")]
 #[proc_macro_derive(GeneratableWithPersianRug, attributes(boulder))]
 pub fn generatable_with_persian_rug(input: TokenStream) -> TokenStream {
