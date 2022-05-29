@@ -149,7 +149,7 @@ pub fn derive_buildable_with_persian_rug(input: syn::DeriveInput) -> pm2::TokenS
                                 BuildType::Value { expr: value, .. } => {
                                     if needs_context {
                                         static_value.extend(quote::quote! {
-                                            let closure = { #value };
+                                            let closure: fn(BoulderMutatorParam) -> (<#fieldtype as std::iter::IntoIterator>::Item, BoulderMutatorParam) = { #value };
                                             let (result, context) = closure(context);
                                             (result.into(), context)
                                         });
@@ -204,7 +204,7 @@ pub fn derive_buildable_with_persian_rug(input: syn::DeriveInput) -> pm2::TokenS
                         let (seq, _ty) = sequence;
                         if sequence_needs_context {
                             quote::quote! {
-                                let closure = { #seq };
+                                let closure: fn(BoulderMutatorParam) -> (usize, BoulderMutatorParam) = { #seq };
                                 let (count, mut context) = closure(context);
                             }
                         } else {
@@ -290,8 +290,9 @@ pub fn derive_buildable_with_persian_rug(input: syn::DeriveInput) -> pm2::TokenS
                                     let (#fieldid, context) = if let Some(value) = self.#fieldid {
                                         (value, context)
                                     } else {
-                                        let closure = { #value };
-                                        closure(context)
+                                        let closure: fn(BoulderMutatorParam) -> (#fieldtype, BoulderMutatorParam) = { #value };
+                                        let (value, context) = closure(context);
+                                        (value.into(), context)
                                     };
                                 });
                             } else {

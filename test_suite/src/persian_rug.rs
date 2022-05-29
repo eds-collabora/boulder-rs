@@ -310,7 +310,7 @@ mod builder_coverage {
         v5: Carrot5<C>,
         #[boulder(buildable(c6 = 6))]
         v6: Carrot6,
-        #[boulder(default_with_persian_rug=|context| { (Carrot7 { c7: 7 }, context) })]
+        #[boulder(default_with_persian_rug=|context| { context.get_iter::<Rabbit<_>>().count(); (Carrot7 { c7: 7 }, context) })]
         v7: Carrot7,
         #[boulder(default=Carrot8 { c8: 8 })]
         v8: Carrot8,
@@ -328,30 +328,30 @@ mod builder_coverage {
         s5: Vec<Carrot5<C>>,
         #[boulder(buildable(c6 = 6), sequence = 6)]
         s6: Vec<Carrot6>,
-        #[boulder(default_with_persian_rug=|context| { (Carrot7 { c7: 7 }, context) }, sequence=7)]
+        #[boulder(default_with_persian_rug=|context| { context.get_iter::<Rabbit<_>>().count(); (Carrot7 { c7: 7 }, context) }, sequence=7)]
         s7: Vec<Carrot7>,
         #[boulder(default=Carrot8 { c8: 8 }, sequence=8)]
         s8: Vec<Carrot8>,
         #[boulder(sequence = 9)]
         s9: Vec<Carrot9>,
 
-        #[boulder(generator_with_persian_rug=Carrot1Generator { c1: 1 }, sequence_with_persian_rug=|context| (1, context))]
+        #[boulder(generator_with_persian_rug=Carrot1Generator { c1: 1 }, sequence_with_persian_rug=|context| { context.get_iter::<Rabbit<_>>().count(); (1, context) } )]
         p1: Vec<Carrot1>,
-        #[boulder(generator=Carrot2Generator {c2: 2}, sequence_with_persian_rug=|context| (2, context))]
+        #[boulder(generator=Carrot2Generator {c2: 2}, sequence_with_persian_rug=|context| { context.get_iter::<Rabbit<_>>().count(); (2, context) })]
         p2: Vec<Carrot2>,
-        #[boulder(generatable_with_persian_rug(c3=TestIndexGenerator { value: 3 }), sequence_with_persian_rug=|context| (3, context))]
+        #[boulder(generatable_with_persian_rug(c3=TestIndexGenerator { value: 3 }), sequence_with_persian_rug=|context| { context.get_iter::<Rabbit<_>>().count();  (3, context)})]
         p3: Vec<Carrot3<C>>,
-        #[boulder(generatable(c4=boulder::Inc(4)), sequence_with_persian_rug=|context| (4, context))]
+        #[boulder(generatable(c4=boulder::Inc(4)), sequence_with_persian_rug=|context| {context.get_iter::<Rabbit<_>>().count(); (4, context)})]
         p4: Vec<Carrot4>,
-        #[boulder(buildable_with_persian_rug(c5=5), sequence_with_persian_rug=|context| (5, context))]
+        #[boulder(buildable_with_persian_rug(c5=5), sequence_with_persian_rug=|context| {context.get_iter::<Rabbit<_>>().count(); (5, context)})]
         p5: Vec<Carrot5<C>>,
-        #[boulder(buildable(c6=6), sequence_with_persian_rug=|context| (6, context))]
+        #[boulder(buildable(c6=6), sequence_with_persian_rug=|context| {context.get_iter::<Rabbit<_>>().count(); (6, context)})]
         p6: Vec<Carrot6>,
-        #[boulder(default_with_persian_rug=|context| { (Carrot7 { c7: 7 }, context) }, sequence_with_persian_rug=|context| (7, context))]
+        #[boulder(default_with_persian_rug=|context| {context.get_iter::<Rabbit<_>>().count(); (Carrot7 { c7: 7 }, context) }, sequence_with_persian_rug=|context| {context.get_iter::<Rabbit<_>>().count(); (7, context)})]
         p7: Vec<Carrot7>,
-        #[boulder(default=Carrot8 { c8: 8 }, sequence_with_persian_rug=|context| (8, context))]
+        #[boulder(default=Carrot8 { c8: 8 }, sequence_with_persian_rug=|context| {context.get_iter::<Rabbit<_>>().count(); (8, context)})]
         p8: Vec<Carrot8>,
-        #[boulder(sequence_with_persian_rug=|context| (9, context))]
+        #[boulder(sequence_with_persian_rug=|context| {context.get_iter::<Rabbit<_>>().count(); (9, context)})]
         p9: Vec<Carrot9>,
     }
 
@@ -692,7 +692,7 @@ mod builder_coverage_no_generics {
         v5: Carrot5<HareState>,
         #[boulder(buildable(c6 = 6))]
         v6: Carrot6,
-        #[boulder(default_with_persian_rug=|context| { (Carrot7 { c7: 7 }, context) })]
+        #[boulder(default_with_persian_rug=|context| { context.get_iter::<Hare>().count(); (Carrot7 { c7: 7 }, context) })]
         v7: Carrot7,
         #[boulder(default=Carrot8 { c8: 8 })]
         v8: Carrot8,
@@ -710,30 +710,30 @@ mod builder_coverage_no_generics {
         s5: Vec<Carrot5<HareState>>,
         #[boulder(buildable(c6 = 6), sequence = 6)]
         s6: Vec<Carrot6>,
-        #[boulder(default_with_persian_rug=|context| { (Carrot7 { c7: 7 }, context) }, sequence=7)]
+        #[boulder(default_with_persian_rug=|context| { context.get_iter::<Hare>().count(); (Carrot7 { c7: 7 }, context) }, sequence=7)]
         s7: Vec<Carrot7>,
         #[boulder(default=Carrot8 { c8: 8 }, sequence=8)]
         s8: Vec<Carrot8>,
         #[boulder(sequence = 9)]
         s9: Vec<Carrot9>,
 
-        #[boulder(generator_with_persian_rug=Carrot1Generator { c1: 1 }, sequence_with_persian_rug=|context| (1, context))]
+        #[boulder(generator_with_persian_rug=Carrot1Generator { c1: 1 }, sequence_with_persian_rug=|context| {context.get_iter::<Hare>().count(); (1, context)})]
         p1: Vec<Carrot1>,
-        #[boulder(generator=Carrot2Generator {c2: 2}, sequence_with_persian_rug=|context| (2, context))]
+        #[boulder(generator=Carrot2Generator {c2: 2}, sequence_with_persian_rug=|context| {context.get_iter::<Hare>().count(); (2, context)})]
         p2: Vec<Carrot2>,
-        #[boulder(generatable_with_persian_rug(c3=TestIndexGenerator { value: 3 }), sequence_with_persian_rug=|context| (3, context))]
+        #[boulder(generatable_with_persian_rug(c3=TestIndexGenerator { value: 3 }), sequence_with_persian_rug=|context| {context.get_iter::<Hare>().count(); (3, context)})]
         p3: Vec<Carrot3<HareState>>,
-        #[boulder(generatable(c4=boulder::Inc(4)), sequence_with_persian_rug=|context| (4, context))]
+        #[boulder(generatable(c4=boulder::Inc(4)), sequence_with_persian_rug=|context| {context.get_iter::<Hare>().count(); (4, context)})]
         p4: Vec<Carrot4>,
-        #[boulder(buildable_with_persian_rug(c5=5), sequence_with_persian_rug=|context| (5, context))]
+        #[boulder(buildable_with_persian_rug(c5=5), sequence_with_persian_rug=|context| {context.get_iter::<Hare>().count(); (5, context)})]
         p5: Vec<Carrot5<HareState>>,
-        #[boulder(buildable(c6=6), sequence_with_persian_rug=|context| (6, context))]
+        #[boulder(buildable(c6=6), sequence_with_persian_rug=|context| {context.get_iter::<Hare>().count(); (6, context)})]
         p6: Vec<Carrot6>,
-        #[boulder(default_with_persian_rug=|context| { (Carrot7 { c7: 7 }, context) }, sequence_with_persian_rug=|context| (7, context))]
+        #[boulder(default_with_persian_rug=|context| {context.get_iter::<Hare>().count(); (Carrot7 { c7: 7 }, context) }, sequence_with_persian_rug=|context| {context.get_iter::<Hare>().count(); (7, context)})]
         p7: Vec<Carrot7>,
-        #[boulder(default=Carrot8 { c8: 8 }, sequence_with_persian_rug=|context| (8, context))]
+        #[boulder(default=Carrot8 { c8: 8 }, sequence_with_persian_rug=|context| {context.get_iter::<Hare>().count(); (8, context)})]
         p8: Vec<Carrot8>,
-        #[boulder(sequence_with_persian_rug=|context| (9, context))]
+        #[boulder(sequence_with_persian_rug=|context| {context.get_iter::<Hare>().count(); (9, context)})]
         p9: Vec<Carrot9>,
     }
 
@@ -1162,7 +1162,7 @@ mod generator_coverage {
         v5: Strawberry5<C>,
         #[boulder(buildable(c6 = 6))]
         v6: Strawberry6,
-        #[boulder(default_with_persian_rug=|context| { (Strawberry7 { c7: 7 }, context) })]
+        #[boulder(default_with_persian_rug=|context| {context.get_iter::<Donkey<_>>().count(); (Strawberry7 { c7: 7 }, context) })]
         v7: Strawberry7,
         #[boulder(default=Strawberry8 { c8: 8 })]
         v8: Strawberry8,
@@ -1180,30 +1180,30 @@ mod generator_coverage {
         s5: Vec<Strawberry5<C>>,
         #[boulder(buildable(c6 = 6), sequence = 6usize)]
         s6: Vec<Strawberry6>,
-        #[boulder(default_with_persian_rug=|context| { (Strawberry7 { c7: 7 }, context) }, sequence=7usize)]
+        #[boulder(default_with_persian_rug=|context| {context.get_iter::<Donkey<_>>().count(); (Strawberry7 { c7: 7 }, context) }, sequence=7usize)]
         s7: Vec<Strawberry7>,
         #[boulder(default=Strawberry8 { c8: 8 }, sequence=8usize)]
         s8: Vec<Strawberry8>,
         #[boulder(sequence = 9usize)]
         s9: Vec<Strawberry9>,
 
-        #[boulder(generator_with_persian_rug=Strawberry1Generator { c1: 1 }: Strawberry1Generator, sequence_with_persian_rug=|context| (1usize, context))]
+        #[boulder(generator_with_persian_rug=Strawberry1Generator { c1: 1 }: Strawberry1Generator, sequence_with_persian_rug=|context| {context.get_iter::<Donkey<_>>().count(); (1usize, context)})]
         p1: Vec<Strawberry1>,
-        #[boulder(generator=Strawberry2Generator {c2: 2}, sequence_with_persian_rug=|context| (2usize, context))]
+        #[boulder(generator=Strawberry2Generator {c2: 2}, sequence_with_persian_rug=|context| {context.get_iter::<Donkey<_>>().count(); (2usize, context)})]
         p2: Vec<Strawberry2>,
-        #[boulder(generatable_with_persian_rug, sequence_with_persian_rug=|context| (3usize, context))]
+        #[boulder(generatable_with_persian_rug, sequence_with_persian_rug=|context| {context.get_iter::<Donkey<_>>().count(); (3usize, context)})]
         p3: Vec<Strawberry3<C>>,
-        #[boulder(generatable(c4=boulder::Inc(4)), sequence_with_persian_rug=|context| (4usize, context))]
+        #[boulder(generatable(c4=boulder::Inc(4)), sequence_with_persian_rug=|context| {context.get_iter::<Donkey<_>>().count(); (4usize, context)})]
         p4: Vec<Strawberry4>,
-        #[boulder(buildable_with_persian_rug(c5 = 5), sequence_with_persian_rug=|context| (5usize, context))]
+        #[boulder(buildable_with_persian_rug(c5 = 5), sequence_with_persian_rug=|context| {context.get_iter::<Donkey<_>>().count(); (5usize, context)})]
         p5: Vec<Strawberry5<C>>,
-        #[boulder(buildable(c6 = 6), sequence_with_persian_rug=|context| (6usize, context))]
+        #[boulder(buildable(c6 = 6), sequence_with_persian_rug=|context| {context.get_iter::<Donkey<_>>().count(); (6usize, context)})]
         p6: Vec<Strawberry6>,
-        #[boulder(default_with_persian_rug=|context| { (Strawberry7 { c7: 7 }, context) }, sequence_with_persian_rug=|context| (7usize, context))]
+        #[boulder(default_with_persian_rug=|context| {context.get_iter::<Donkey<_>>().count(); (Strawberry7 { c7: 7 }, context) }, sequence_with_persian_rug=|context| {context.get_iter::<Donkey<_>>().count(); (7usize, context)})]
         p7: Vec<Strawberry7>,
-        #[boulder(default=Strawberry8 { c8: 8 }, sequence_with_persian_rug=|context| (8usize, context))]
+        #[boulder(default=Strawberry8 { c8: 8 }, sequence_with_persian_rug=|context| {context.get_iter::<Donkey<_>>().count(); (8usize, context)})]
         p8: Vec<Strawberry8>,
-        #[boulder(sequence_with_persian_rug=|context| (9usize, context))]
+        #[boulder(sequence_with_persian_rug=|context| {context.get_iter::<Donkey<_>>().count(); (9usize, context)})]
         p9: Vec<Strawberry9>,
 
         #[boulder(generator_with_persian_rug=Strawberry1Generator { c1: 1 }: Strawberry1Generator, sequence_generator=boulder::Inc(1usize))]
@@ -1218,7 +1218,7 @@ mod generator_coverage {
         t5: Vec<Strawberry5<C>>,
         #[boulder(buildable(c6 = 6), sequence_generator = boulder::Inc(6usize))]
         t6: Vec<Strawberry6>,
-        #[boulder(default_with_persian_rug=|context| { (Strawberry7 { c7: 7 }, context) }, sequence_generator=boulder::Inc(7usize))]
+        #[boulder(default_with_persian_rug=|context| { context.get_iter::<Donkey<_>>().count(); (Strawberry7 { c7: 7 }, context) }, sequence_generator=boulder::Inc(7usize))]
         t7: Vec<Strawberry7>,
         #[boulder(default=Strawberry8 { c8: 8 }, sequence_generator=boulder::Inc(8usize))]
         t8: Vec<Strawberry8>,
@@ -1237,7 +1237,7 @@ mod generator_coverage {
         q5: Vec<Strawberry5<C>>,
         #[boulder(buildable(c6 = 6), sequence_generator_with_persian_rug=TestUsizeGenerator { value: 6usize }: TestUsizeGenerator)]
         q6: Vec<Strawberry6>,
-        #[boulder(default_with_persian_rug=|context| { (Strawberry7 { c7: 7 }, context) }, sequence_generator_with_persian_rug=TestUsizeGenerator { value: 7usize }: TestUsizeGenerator)]
+        #[boulder(default_with_persian_rug=|context| { context.get_iter::<Donkey<_>>().count(); (Strawberry7 { c7: 7 }, context) }, sequence_generator_with_persian_rug=TestUsizeGenerator { value: 7usize }: TestUsizeGenerator)]
         q7: Vec<Strawberry7>,
         #[boulder(default=Strawberry8 { c8: 8 }, sequence_generator_with_persian_rug=TestUsizeGenerator { value: 8usize }: TestUsizeGenerator)]
         q8: Vec<Strawberry8>,
@@ -2114,7 +2114,7 @@ mod generator_coverage_no_generics {
         v5: Strawberry5<MuleState>,
         #[boulder(buildable(c6 = 6))]
         v6: Strawberry6,
-        #[boulder(default_with_persian_rug=|context| { (Strawberry7 { c7: 7 }, context) })]
+        #[boulder(default_with_persian_rug=|context| {context.get_iter::<Mule>().count(); (Strawberry7 { c7: 7 }, context) })]
         v7: Strawberry7,
         #[boulder(default=Strawberry8 { c8: 8 })]
         v8: Strawberry8,
@@ -2132,30 +2132,30 @@ mod generator_coverage_no_generics {
         s5: Vec<Strawberry5<MuleState>>,
         #[boulder(buildable(c6 = 6), sequence = 6usize)]
         s6: Vec<Strawberry6>,
-        #[boulder(default_with_persian_rug=|context| { (Strawberry7 { c7: 7 }, context) }, sequence=7usize)]
+        #[boulder(default_with_persian_rug=|context| {context.get_iter::<Mule>().count(); (Strawberry7 { c7: 7 }, context) }, sequence=7usize)]
         s7: Vec<Strawberry7>,
         #[boulder(default=Strawberry8 { c8: 8 }, sequence=8usize)]
         s8: Vec<Strawberry8>,
         #[boulder(sequence = 9usize)]
         s9: Vec<Strawberry9>,
 
-        #[boulder(generator_with_persian_rug=Strawberry1Generator { c1: 1 }: Strawberry1Generator, sequence_with_persian_rug=|context| (1usize, context))]
+        #[boulder(generator_with_persian_rug=Strawberry1Generator { c1: 1 }: Strawberry1Generator, sequence_with_persian_rug=|context| {context.get_iter::<Mule>().count(); (1usize, context)})]
         p1: Vec<Strawberry1>,
-        #[boulder(generator=Strawberry2Generator {c2: 2}, sequence_with_persian_rug=|context| (2usize, context))]
+        #[boulder(generator=Strawberry2Generator {c2: 2}, sequence_with_persian_rug=|context| {context.get_iter::<Mule>().count(); (2usize, context)})]
         p2: Vec<Strawberry2>,
-        #[boulder(generatable_with_persian_rug, sequence_with_persian_rug=|context| (3usize, context))]
+        #[boulder(generatable_with_persian_rug, sequence_with_persian_rug=|context| {context.get_iter::<Mule>().count(); (3usize, context)})]
         p3: Vec<Strawberry3<MuleState>>,
-        #[boulder(generatable(c4=boulder::Inc(4)), sequence_with_persian_rug=|context| (4usize, context))]
+        #[boulder(generatable(c4=boulder::Inc(4)), sequence_with_persian_rug=|context| {context.get_iter::<Mule>().count(); (4usize, context)})]
         p4: Vec<Strawberry4>,
-        #[boulder(buildable_with_persian_rug(c5 = 5), sequence_with_persian_rug=|context| (5usize, context))]
+        #[boulder(buildable_with_persian_rug(c5 = 5), sequence_with_persian_rug=|context| {context.get_iter::<Mule>().count(); (5usize, context)})]
         p5: Vec<Strawberry5<MuleState>>,
-        #[boulder(buildable(c6 = 6), sequence_with_persian_rug=|context| (6usize, context))]
+        #[boulder(buildable(c6 = 6), sequence_with_persian_rug=|context| {context.get_iter::<Mule>().count(); (6usize, context)})]
         p6: Vec<Strawberry6>,
-        #[boulder(default_with_persian_rug=|context| { (Strawberry7 { c7: 7 }, context) }, sequence_with_persian_rug=|context| (7usize, context))]
+        #[boulder(default_with_persian_rug=|context| {context.get_iter::<Mule>().count(); (Strawberry7 { c7: 7 }, context) }, sequence_with_persian_rug=|context| {context.get_iter::<Mule>().count(); (7usize, context)})]
         p7: Vec<Strawberry7>,
-        #[boulder(default=Strawberry8 { c8: 8 }, sequence_with_persian_rug=|context| (8usize, context))]
+        #[boulder(default=Strawberry8 { c8: 8 }, sequence_with_persian_rug=|context| {context.get_iter::<Mule>().count(); (8usize, context)})]
         p8: Vec<Strawberry8>,
-        #[boulder(sequence_with_persian_rug=|context| (9usize, context))]
+        #[boulder(sequence_with_persian_rug=|context| {context.get_iter::<Mule>().count(); (9usize, context)})]
         p9: Vec<Strawberry9>,
 
         #[boulder(generator_with_persian_rug=Strawberry1Generator { c1: 1 }: Strawberry1Generator, sequence_generator=boulder::Inc(1usize))]
@@ -2170,7 +2170,7 @@ mod generator_coverage_no_generics {
         t5: Vec<Strawberry5<MuleState>>,
         #[boulder(buildable(c6 = 6), sequence_generator = boulder::Inc(6usize))]
         t6: Vec<Strawberry6>,
-        #[boulder(default_with_persian_rug=|context| { (Strawberry7 { c7: 7 }, context) }, sequence_generator=boulder::Inc(7usize))]
+        #[boulder(default_with_persian_rug=|context| {context.get_iter::<Mule>().count(); (Strawberry7 { c7: 7 }, context) }, sequence_generator=boulder::Inc(7usize))]
         t7: Vec<Strawberry7>,
         #[boulder(default=Strawberry8 { c8: 8 }, sequence_generator=boulder::Inc(8usize))]
         t8: Vec<Strawberry8>,
@@ -2189,7 +2189,7 @@ mod generator_coverage_no_generics {
         q5: Vec<Strawberry5<MuleState>>,
         #[boulder(buildable(c6 = 6), sequence_generator_with_persian_rug=TestUsizeGenerator { value: 6usize }: TestUsizeGenerator)]
         q6: Vec<Strawberry6>,
-        #[boulder(default_with_persian_rug=|context| { (Strawberry7 { c7: 7 }, context) }, sequence_generator_with_persian_rug=TestUsizeGenerator { value: 7usize }: TestUsizeGenerator)]
+        #[boulder(default_with_persian_rug=|context| {context.get_iter::<Mule>().count(); (Strawberry7 { c7: 7 }, context) }, sequence_generator_with_persian_rug=TestUsizeGenerator { value: 7usize }: TestUsizeGenerator)]
         q7: Vec<Strawberry7>,
         #[boulder(default=Strawberry8 { c8: 8 }, sequence_generator_with_persian_rug=TestUsizeGenerator { value: 8usize }: TestUsizeGenerator)]
         q8: Vec<Strawberry8>,

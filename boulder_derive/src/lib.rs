@@ -314,7 +314,7 @@ mod persian_rug;
 ///   // This field will be default-initialized (a=0)
 ///   a: i32,
 ///   // This field will be initialized from the number of Bars currently in the context
-///   #[boulder(default_with_persian_rug=|context| (context.get_iter::<Bar>().count(), context))]
+///   #[boulder(default_with_persian_rug=|context| (context.get_iter::<Bar>().count().try_into().unwrap(), context))]
 ///   b: i32,
 /// }
 ///

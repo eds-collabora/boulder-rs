@@ -337,7 +337,7 @@ pub fn derive_generatable_with_persian_rug(input: syn::DeriveInput) -> pm2::Toke
                             BuildType::Value { expr: value, .. } => {
                                 if builder_needs_context {
                                     static_value.extend(quote::quote! {
-                                        let closure = { #value };
+                                        let closure: fn(BoulderMutatorParam) -> (#element_type, BoulderMutatorParam) = { #value };
                                         let (result, context) = closure(context);
                                         (result.into(), context)
                                     });
@@ -363,6 +363,8 @@ pub fn derive_generatable_with_persian_rug(input: syn::DeriveInput) -> pm2::Toke
                                     _marker: core::marker::PhantomData<#ident #ty_generics>
                                 }
 
+                                #[automatically_derived]
+                                #[persian_rug::constraints(#constraints)]
                                 impl #generics GeneratorWithPersianRug<#context> for #new_generator_id #ty_generics #wc
                                 {
                                     type Output = #element_type;
@@ -428,6 +430,8 @@ pub fn derive_generatable_with_persian_rug(input: syn::DeriveInput) -> pm2::Toke
                                 _marker: core::marker::PhantomData<#ident #ty_generics>
                             }
 
+                            #[automatically_derived]
+                            #[persian_rug::constraints(#constraints)]
                             impl #generics GeneratorWithPersianRug<#context> for #new_generator_id #ty_generics #wc
                             {
                                 type Output = usize;
@@ -437,7 +441,7 @@ pub fn derive_generatable_with_persian_rug(input: syn::DeriveInput) -> pm2::Toke
                                 where
                                     BoulderMutatorParam: 'boulder_mutator_lifetime + ::persian_rug::Mutator<Context = #context>
                                 {
-                                    let closure = { #sequence };
+                                    let closure: fn(BoulderMutatorParam) -> (_, BoulderMutatorParam) = { #sequence };
                                     closure(context).into()
                                 }
                             }
