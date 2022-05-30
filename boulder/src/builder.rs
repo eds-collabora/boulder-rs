@@ -1,9 +1,17 @@
-use core::ops::{Deref, DerefMut};
-use std::rc::Rc;
-use std::sync::{Arc, Mutex};
-
-/// Something which can be turned into an object of type `Result`
+/// Something which can create a default object of some type.
+///
+/// The only required function in this trait is
+/// [`build`](Builder::build) which creates an object, consuming the
+/// builder. Most builders will allow customisation of the produced
+/// object in some way.
+///
+/// An object implementing this trait will be automatically created
+/// for you as part of the [`macro@Buildable`] derive macro. That
+/// builder will have a method for each field of the result type, to
+/// customise its value, and will produce a default value for every
+/// field which is not customised.
 pub trait Builder {
+    /// The output type.
     type Result;
     /// Create the final object.
     ///
@@ -33,38 +41,32 @@ pub trait Builder {
     fn build(self) -> Self::Result;
 }
 
-/// A type that has an associated default `Builder`.
+/// A type that has an associated default [`Builder`].
 ///
-/// The convenient way to implement this trait is via the `Buildable`
-/// derive macro.
-pub trait Buildable {
+/// This trait is implemented via the [`macro@Buildable`] derive
+/// macro. It cannot be directly implemented because the library
+/// itself provides a blanket implementation from a more complex
+/// underlying trait `MiniBuildable`, which is not currently
+/// documented.
+///
+/// This restriction may be removed in a future version; much of the
+/// complexity in this module stems from lacking generic associated
+/// types on stable.
+pub trait Buildable: Sized
+where
+    Self: guts::BoulderBase,
+{
+    /// A default choice of [`Builder`] for this type.
     type Builder: Builder<Result = Self>;
-    /// Create a new builder for this type.
+    /// Create a new default builder.
     ///
     /// Example
     /// ```rust
     /// use boulder::{Builder, Buildable};
     ///
+    /// #[derive(Buildable)]
     /// struct Foo {
     ///    a: i32
-    /// }
-    ///
-    /// impl Buildable for Foo {
-    ///    type Builder = FooBuilder;
-    ///    fn builder() -> Self::Builder {
-    ///       FooBuilder { a: 0 }
-    ///    }
-    /// }
-    ///
-    /// struct FooBuilder {
-    ///    a: i32
-    /// }
-    ///
-    /// impl Builder for FooBuilder {
-    ///    type Result = Foo;
-    ///    fn build(self) -> Self::Result {
-    ///       Foo { a: self.a }
-    ///    }
     /// }
     ///
     /// let b = Foo::builder();
@@ -74,144 +76,77 @@ pub trait Buildable {
     fn builder() -> Self::Builder;
 }
 
-impl<T> Buildable for Option<T>
-where
-    T: Buildable,
-{
-    type Builder = OptionBuilder<<T as Buildable>::Builder>;
-    fn builder() -> Self::Builder {
-        OptionBuilder(T::builder())
-    }
-}
-
-pub struct OptionBuilder<T>(T);
-
-impl<T> Deref for OptionBuilder<T> {
-    type Target = T;
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl<T> DerefMut for OptionBuilder<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
-    }
-}
-
-impl<T> Builder for OptionBuilder<T>
-where
-    T: Builder,
-{
-    type Result = Option<<T as Builder>::Result>;
-    fn build(self) -> Self::Result {
-        Some(self.0.build())
-    }
-}
-
-impl<T> Buildable for Rc<T>
-where
-    T: Buildable,
-{
-    type Builder = RcBuilder<<T as Buildable>::Builder>;
-    fn builder() -> Self::Builder {
-        RcBuilder(T::builder())
-    }
-}
-
-pub struct RcBuilder<T>(T);
-
-impl<T> Deref for RcBuilder<T> {
-    type Target = T;
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl<T> DerefMut for RcBuilder<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
-    }
-}
-
-impl<T> Builder for RcBuilder<T>
-where
-    T: Builder,
-{
-    type Result = Rc<<T as Builder>::Result>;
-    fn build(self) -> Self::Result {
-        Rc::new(self.0.build())
-    }
-}
-
-impl<T> Buildable for Arc<T>
-where
-    T: Buildable,
-{
-    type Builder = ArcBuilder<<T as Buildable>::Builder>;
-    fn builder() -> Self::Builder {
-        ArcBuilder(T::builder())
-    }
-}
-
-pub struct ArcBuilder<T>(T);
-
-impl<T> Deref for ArcBuilder<T> {
-    type Target = T;
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl<T> DerefMut for ArcBuilder<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
-    }
-}
-
-impl<T> Builder for ArcBuilder<T>
-where
-    T: Builder,
-{
-    type Result = Arc<<T as Builder>::Result>;
-    fn build(self) -> Self::Result {
-        Arc::new(self.0.build())
-    }
-}
-
-impl<T> Buildable for Mutex<T>
-where
-    T: Buildable,
-{
-    type Builder = MutexBuilder<<T as Buildable>::Builder>;
-    fn builder() -> Self::Builder {
-        MutexBuilder(T::builder())
-    }
-}
-
-pub struct MutexBuilder<T>(T);
-
-impl<T> Deref for MutexBuilder<T> {
-    type Target = T;
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl<T> DerefMut for MutexBuilder<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
-    }
-}
-
-impl<T> Builder for MutexBuilder<T>
-where
-    T: Builder,
-{
-    type Result = Mutex<<T as Builder>::Result>;
-    fn build(self) -> Self::Result {
-        Mutex::new(self.0.build())
-    }
-}
-
 pub use boulder_derive::Buildable;
+
+#[doc(hidden)]
+pub mod guts {
+    use super::Buildable;
+
+    use std::cell::{Cell, RefCell};
+    use std::rc::Rc;
+    use std::sync::{Arc, Mutex};
+
+    pub use super::Builder as MiniBuilder;
+
+    pub trait MiniBuildable<T>: Sized {
+        type Builder: MiniBuilder<Result = Self>;
+        fn mini_builder() -> Self::Builder;
+    }
+
+    impl<T> Buildable for T
+    where
+        T: BoulderBase,
+        T: MiniBuildable<<T as BoulderBase>::Base>,
+    {
+        type Builder = <T as MiniBuildable<<T as BoulderBase>::Base>>::Builder;
+        fn builder() -> Self::Builder {
+            <T as MiniBuildable<<T as BoulderBase>::Base>>::mini_builder()
+        }
+    }
+
+    pub trait BoulderBase {
+        type Base;
+    }
+
+    impl<T> BoulderBase for Option<T>
+    where
+        T: BoulderBase,
+    {
+        type Base = <T as BoulderBase>::Base;
+    }
+
+    impl<T> BoulderBase for Arc<T>
+    where
+        T: BoulderBase,
+    {
+        type Base = <T as BoulderBase>::Base;
+    }
+
+    impl<T> BoulderBase for Rc<T>
+    where
+        T: BoulderBase,
+    {
+        type Base = <T as BoulderBase>::Base;
+    }
+
+    impl<T> BoulderBase for RefCell<T>
+    where
+        T: BoulderBase,
+    {
+        type Base = <T as BoulderBase>::Base;
+    }
+
+    impl<T> BoulderBase for Cell<T>
+    where
+        T: BoulderBase,
+    {
+        type Base = <T as BoulderBase>::Base;
+    }
+
+    impl<T> BoulderBase for Mutex<T>
+    where
+        T: BoulderBase,
+    {
+        type Base = <T as BoulderBase>::Base;
+    }
+}

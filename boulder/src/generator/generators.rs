@@ -7,7 +7,21 @@ pub use boulder_derive::string_pattern as Pattern;
 
 use num::One;
 
-/// Returns the same value every time.
+/// The same value every time.
+///
+/// In general, using a lambda has fewer restrictions than using
+/// [`Const`], because you can avoid the [`Clone`] requirement on
+/// your type.
+///
+/// Example:
+/// ```rust
+/// use boulder::{Const, Generator};
+///
+/// let mut g = Const(1);
+/// assert_eq!(g.generate(), 1);
+/// assert_eq!(g.generate(), 1);
+/// assert_eq!(g.generate(), 1);
+/// ```
 #[derive(Clone)]
 pub struct Const<T>(pub T);
 
@@ -24,10 +38,21 @@ impl<T: Clone + 'static> Generator for Const<T> {
     }
 }
 
-/// Each result is 1 larger than the previous.
+/// An increasing sequence.
 ///
-/// The type `T` must implement `AddAssign + num::One + Clone`, which
-/// is true for all primitive numeric types.
+/// The type `T` must implement [`AddAssign`](std::ops::AddAssign) +
+/// [`num::One`] + [`Clone`], which is true for all primitive numeric
+/// types. The output value increases by 1 on each call.
+///
+/// Example:
+/// ```rust
+/// use boulder::{Generator, Inc};
+///
+/// let mut g = Inc(5);
+/// assert_eq!(g.generate(), 5);
+/// assert_eq!(g.generate(), 6);
+/// assert_eq!(g.generate(), 7);
+/// ```
 #[derive(Clone)]
 pub struct Inc<T>(pub T);
 
@@ -43,9 +68,21 @@ where
     }
 }
 
-/// Yield values from an iterator, repeating them when the iterator is
-/// exhausted.
-pub struct Cycle<T>(::std::iter::Cycle<T>);
+/// Recycle values from an iterator.
+///
+/// Since generators must produce an infinite sequence, this cycles
+/// the iterator to prevent it being exhausted.
+///
+/// Example:
+/// ```rust
+/// use boulder::{Cycle, Generator};
+///
+/// let mut g = Cycle::new((1..3_i32).into_iter());
+/// assert_eq!(g.generate(), 1);
+/// assert_eq!(g.generate(), 2);
+/// assert_eq!(g.generate(), 1);
+/// ```
+pub struct Cycle<T>(pub(crate) ::std::iter::Cycle<T>);
 
 impl<T: Iterator + Clone> Cycle<T> {
     pub fn new(iter: T) -> Self {
@@ -63,8 +100,20 @@ where
     }
 }
 
-/// Convert a stream of `T` into a stream of `Option<T>` by wrapping
-/// each value in `Some`.
+/// Wrap sequence of `T` in [`Option<T>`].
+///
+/// This converts a generator of `T` into a stream of [`Option<T>`] by
+/// wrapping each value in `Some`.
+///
+/// Example:
+/// ```rust
+/// use boulder::{Generator, Inc, Some as GSome};
+///
+/// let mut g = GSome(Inc(2));
+/// assert_eq!(g.generate(), Some(2));
+/// assert_eq!(g.generate(), Some(3));
+/// assert_eq!(g.generate(), Some(4));
+/// ```
 pub struct Some<T>(pub T);
 
 impl<T: Generator> Generator for Some<T> {
@@ -84,15 +133,32 @@ where
     }
 }
 
+/// Collections from an underlying sequence.
+///
 /// Produce collections from a pair of generators, one for the values
 /// themselves, one for the size of yielded collection.
+///
+/// Example:
+/// ```rust
+/// use boulder::{Cycle, Generator, Repeat, Sample};
+///
+/// let mut g = Sample::<_, _, Vec<_>>::new(Cycle::new((1..5).into_iter()), Repeat::new(1usize..3usize));
+/// assert_eq!(g.generate(), vec![1]);
+/// assert_eq!(g.generate(), vec![2, 3]);
+/// assert_eq!(g.generate(), vec![4]);
+/// ```
 pub struct Sample<T, U, V> {
-    value: T,
-    count: U,
-    _result_marker: core::marker::PhantomData<V>,
+    pub(crate) value: T,
+    pub(crate) count: U,
+    pub(crate) _result_marker: core::marker::PhantomData<V>,
 }
 
-impl<T, U, V> Sample<T, U, V> {
+impl<T, U, V> Sample<T, U, V>
+where
+    T: Generator,
+    U: Generator<Output = usize>,
+    V: FromIterator<<T as Generator>::Output> + 'static,
+{
     /// Create a new generator.
     ///
     /// The values it yields (of type `V`) will contain a number of
@@ -102,8 +168,7 @@ impl<T, U, V> Sample<T, U, V> {
     ///
     /// Example:
     /// ```rust
-    /// use boulder::Generator;
-    /// use boulder::gen::{Inc, Pattern, Sample};
+    /// use boulder::{Generator, Inc, Pattern, Sample};
     ///
     /// let mut g = Sample::new(
     ///     Pattern!("hello-{}", Inc(2i32)),
@@ -142,21 +207,41 @@ where
     }
 }
 
-/// A sequence of evenly spaced times.
+/// Increasing timestamps.
+///
+/// Each output is a [`DateTime`](chrono::DateTime), which is
+/// separated from the previous value by a fixed
+/// [`Duration`](chrono::Duration).
+///
+/// Example:
+/// ```rust
+/// use boulder::{Generator, Time};
+/// use chrono::{DateTime, Duration};
+///
+/// let mut g = Time::new(DateTime::parse_from_rfc2822("Wed, 18 May 2022 15:16:00 GMT").unwrap(), Duration::days(1));
+/// assert_eq!(g.generate(), DateTime::parse_from_rfc2822("Wed, 18 May 2022 15:16:00 GMT").unwrap());
+/// assert_eq!(g.generate(), DateTime::parse_from_rfc2822("Thu, 19 May 2022 15:16:00 GMT").unwrap());
+/// assert_eq!(g.generate(), DateTime::parse_from_rfc2822("Fri, 20 May 2022 15:16:00 GMT").unwrap());
+/// ```
 pub struct Time<T: chrono::TimeZone> {
-    instant: chrono::DateTime<T>,
-    step: chrono::Duration,
+    pub(crate) instant: chrono::DateTime<T>,
+    pub(crate) step: chrono::Duration,
 }
 
 impl<T: chrono::TimeZone> Time<T> {
-    /// Create a new `Time` generator. Here
-    /// - `start` is the first `DateTime` in the sequence.
-    /// - `step` is the duration separating any two adjacent times in
-    ///    the sequence.
+    /// Create a new [`Time`] generator.
+    ///
+    /// Here
+    ///
+    /// - `start` is the first [`DateTime`](chrono::DateTime) in the
+    ///   sequence.
+    ///
+    /// - `step` is the [`Duration`](chrono::Duration) separating any
+    ///   two adjacent times in the sequence.
+    ///
     /// Example:
     /// ```rust
-    /// use boulder::Generator;
-    /// use boulder::gen::Time;
+    /// use boulder::{Generator, Time};
     /// use chrono::{DateTime, Duration};
     ///
     /// let mut g = Time::new(
@@ -187,28 +272,42 @@ impl<T: chrono::TimeZone + 'static> Generator for Time<T> {
     }
 }
 
-/// A predictable sequence of subsets of a base collection.
+/// Subsets of a base collection.
 ///
 /// The pattern for the yielded values is:
-/// 1. vec!\[\]
-/// 2. vec!\[a\]
-/// 3. vec!\[b\]
-/// 4. vec!\[a,b\]
-/// 5. vec!\[c\]
-/// 6. vec!\[a,c\]
-/// 7. vec!\[b,c\]
-/// 8. vec!\[a,b,c\]
+/// 1. `vec![]`
+/// 2. `vec![a]`
+/// 3. `vec![b]`
+/// 4. `vec![a,b]`
+/// 5. `vec![c]`
+/// 6. `vec![a,c]`
+/// 7. `vec![b,c]`
+/// 8. `vec![a,b,c]`
 /// 9. ...
 ///
 /// where the `a` is the first element of the base collection, `b` is
 /// the second, and so on.
+///
+/// Example:
+/// ```rust
+/// use boulder::{Generator, Subsets};
+///
+/// let mut g = Subsets::new(1..4);
+/// assert_eq!(g.generate(), vec![]);
+/// assert_eq!(g.generate(), vec![1]);
+/// assert_eq!(g.generate(), vec![2]);
+/// assert_eq!(g.generate(), vec![1,2]);
+/// ```
 #[derive(Clone)]
 pub struct Subsets<T: Clone> {
-    base: Vec<T>,
-    index: usize,
+    pub(crate) base: Vec<T>,
+    pub(crate) index: usize,
 }
 
 impl<T: Clone> Subsets<T> {
+    /// Create a new generator.
+    ///
+    /// `base` will be collected into a [`Vec`] for re-sampling.
     pub fn new<X: IntoIterator<Item = T>>(base: X) -> Self {
         Self {
             base: base.into_iter().collect(),
@@ -231,14 +330,24 @@ impl<T: Clone + 'static> Generator for Subsets<T> {
     }
 }
 
-/// Recycle a fixed base collection.
+/// Repeat a provided collection.
 ///
 /// This is a less flexible, but more concisely constructed, version
-/// of `Cycle`.
+/// of [`Cycle`] that starts from a container instead of an iterator.
+///
+/// Example:
+/// ```rust
+/// use boulder::{Generator, Repeat};
+///
+/// let mut g = Repeat::new(1..3);
+/// assert_eq!(g.generate(), 1);
+/// assert_eq!(g.generate(), 2);
+/// assert_eq!(g.generate(), 1);
+/// ```
 #[derive(Clone)]
 pub struct Repeat<T: Clone> {
-    base: Vec<T>,
-    index: usize,
+    pub(crate) base: Vec<T>,
+    pub(crate) index: usize,
 }
 
 impl<T: Clone> Repeat<T> {
