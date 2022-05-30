@@ -146,6 +146,7 @@ pub use self::generator::{GeneratorIterator, GeneratorMutIterator};
 #[cfg(feature = "persian-rug")]
 mod persian_rug;
 #[cfg(feature = "persian-rug")]
+#[cfg_attr(docsrs, doc(cfg(feature = "persian-rug")))]
 pub use self::persian_rug::{
     BuildableWithPersianRug, BuilderWithPersianRug, GeneratableWithPersianRug,
     GeneratorWithPersianRug, GeneratorWithPersianRugIterator, GeneratorWithPersianRugMutIterator,

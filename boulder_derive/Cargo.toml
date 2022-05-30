@@ -1,6 +1,6 @@
 [package]
 name = "boulder_derive"
-version = "0.1.1"
+version = "0.2.0"
 authors = ["Ed Smith <ed.smith@collabora.com>"]
 edition = "2021"
 license = "Apache-2.0 OR MIT"
@@ -17,11 +17,10 @@ proc-macro = true
 syn = { version="1.0", features=["full"] }
 quote = "1.0"
 proc-macro2 = "1.0"
-#persian-rug = { version="0.1", optional=true }
 
 [features]
 default = []
-persian-rug = [] # "dep:persian-rug"
+persian-rug = []
 
 [dev-dependencies]
 boulder = { path = "../boulder" }

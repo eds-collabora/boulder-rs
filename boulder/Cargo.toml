@@ -1,6 +1,6 @@
 [package]
 name = "boulder"
-version = "0.1.1"
+version = "0.2.0"
 authors = ["Ed Smith <ed.smith@collabora.com>"]
 edition = "2021"
 license = "Apache-2.0 OR MIT"
@@ -11,7 +11,7 @@ categories = [ "rust-patterns" ]
 readme = "../README.md"
 
 [dependencies]
-boulder_derive = { version="0.1.0", path = "../boulder_derive" }
+boulder_derive = { version="0.2", path = "../boulder_derive" }
 chrono = "0.4"
 num = "0.4"
 persian-rug = { version="0.1", optional=true }
@@ -19,3 +19,7 @@ persian-rug = { version="0.1", optional=true }
 [features]
 default = []
 persian-rug = ["dep:persian-rug", "boulder_derive/persian-rug" ]
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]

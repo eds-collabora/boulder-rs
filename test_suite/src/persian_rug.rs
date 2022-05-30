@@ -1025,8 +1025,6 @@ mod generators_basic {
     }
 }
 
-// FIXME: test no-generics coverage too
-
 mod generator_coverage {
     use boulder::{Buildable, BuildableWithPersianRug, Builder, BuilderWithPersianRug};
     use boulder::{Generatable, GeneratableWithPersianRug, Generator, GeneratorWithPersianRug};
