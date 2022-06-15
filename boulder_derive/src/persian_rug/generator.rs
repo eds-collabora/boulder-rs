@@ -258,8 +258,8 @@ pub fn derive_generatable_with_persian_rug(input: syn::DeriveInput) -> pm2::Toke
                             (quote::quote! { #expr }, quote::quote! { #ty })
                         } else {
                             (
-                                quote::quote! { ::boulder::GeneratorWrapper::new(#expr) },
-                                quote::quote! { ::boulder::GeneratorWrapper<#element_type> },
+                                quote::quote! { ::boulder::GeneratorToGeneratorWithPersianRugWrapper::new(#expr) },
+                                quote::quote! { ::boulder::GeneratorToGeneratorWithPersianRugWrapper<#element_type> },
                             )
                         }
                     }
@@ -294,10 +294,10 @@ pub fn derive_generatable_with_persian_rug(input: syn::DeriveInput) -> pm2::Toke
 
                             (
                                 quote::quote! {
-                                    ::boulder::GeneratorWrapper::new(#value)
+                                    ::boulder::GeneratorToGeneratorWithPersianRugWrapper::new(#value)
                                 },
                                 quote::quote! {
-                                    ::boulder::GeneratorWrapper<#element_type>
+                                    ::boulder::GeneratorToGeneratorWithPersianRugWrapper<#element_type>
                                 },
                             )
                         }
@@ -390,10 +390,10 @@ pub fn derive_generatable_with_persian_rug(input: syn::DeriveInput) -> pm2::Toke
                         } else {
                             (
                                 quote::quote! {
-                                    ::boulder::GeneratorWrapper::new(|| { #static_value })
+                                    ::boulder::GeneratorToGeneratorWithPersianRugWrapper::new(|| { #static_value })
                                 },
                                 quote::quote! {
-                                    ::boulder::GeneratorWrapper<#element_type>
+                                    ::boulder::GeneratorToGeneratorWithPersianRugWrapper<#element_type>
                                 },
                             )
                         }
@@ -415,10 +415,10 @@ pub fn derive_generatable_with_persian_rug(input: syn::DeriveInput) -> pm2::Toke
                         });
                     } else {
                         default_values.extend(quote::quote! {
-                            #fieldid: ::boulder::SequenceGeneratorWithPersianRug::new(::boulder::GeneratorWrapper::new(#sequence), #value),
+                            #fieldid: ::boulder::SequenceGeneratorWithPersianRug::new(::boulder::GeneratorToGeneratorWithPersianRugWrapper::new(#sequence), #value),
                         });
                         default_types.extend(quote::quote! {
-                            , ::boulder::SequenceGeneratorWithPersianRug<::boulder::GeneratorWrapper<usize>, #value_type, #fieldtype>
+                            , ::boulder::SequenceGeneratorWithPersianRug<::boulder::GeneratorToGeneratorWithPersianRugWrapper<usize>, #value_type, #fieldtype>
                         });
                     }
                 } else if let Some((sequence, _seq_ty)) = build_sequence {
@@ -457,10 +457,10 @@ pub fn derive_generatable_with_persian_rug(input: syn::DeriveInput) -> pm2::Toke
                         });
                     } else {
                         default_values.extend(quote::quote! {
-                            #fieldid: ::boulder::SequenceGeneratorWithPersianRug::new(::boulder::GeneratorWrapper::new(|| (#sequence).into()), #value),
+                            #fieldid: ::boulder::SequenceGeneratorWithPersianRug::new(::boulder::GeneratorToGeneratorWithPersianRugWrapper::new(|| (#sequence).into()), #value),
                         });
                         default_types.extend(quote::quote! {
-                            , ::boulder::SequenceGeneratorWithPersianRug<::boulder::GeneratorWrapper<usize>, #value_type, #fieldtype>
+                            , ::boulder::SequenceGeneratorWithPersianRug<::boulder::GeneratorToGeneratorWithPersianRugWrapper<usize>, #value_type, #fieldtype>
                         });
                     }
                 } else {
