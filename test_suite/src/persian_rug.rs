@@ -1739,156 +1739,101 @@ mod generator_coverage {
 
     #[test]
     fn test_customise() {
+        use boulder::GeneratorToGeneratorWithPersianRugWrapper as GeneratorWrapper;
         let mut s: DonkeyState = Default::default();
 
         let mut g = Donkey::generator()
-            .v1(boulder::GeneratorWrapper::new(|| Strawberry1 { c1: 11 }))
-            .v2(boulder::GeneratorWrapper::new(|| Strawberry2 { c2: 22 }))
-            .v3(boulder::GeneratorWrapper::new(|| Strawberry3 {
+            .v1(GeneratorWrapper::new(|| Strawberry1 { c1: 11 }))
+            .v2(GeneratorWrapper::new(|| Strawberry2 { c2: 22 }))
+            .v3(GeneratorWrapper::new(|| Strawberry3 {
                 c3: 33,
                 _marker: Default::default(),
             }))
-            .v4(boulder::GeneratorWrapper::new(|| Strawberry4 { c4: 44 }))
-            .v5(boulder::GeneratorWrapper::new(|| Strawberry5 {
+            .v4(GeneratorWrapper::new(|| Strawberry4 { c4: 44 }))
+            .v5(GeneratorWrapper::new(|| Strawberry5 {
                 c5: 55,
                 _marker: Default::default(),
             }))
-            .v6(boulder::GeneratorWrapper::new(|| Strawberry6 { c6: 66 }))
-            .v7(boulder::GeneratorWrapper::new(|| Strawberry7 { c7: 77 }))
-            .v8(boulder::GeneratorWrapper::new(|| Strawberry8 { c8: 88 }))
-            .v9(boulder::GeneratorWrapper::new(|| Strawberry9 { c9: 99 }))
-            .s1(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry1 { c1: 11 }]
-            }))
-            .s2(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry2 { c2: 22 }]
-            }))
-            .s3(boulder::GeneratorWrapper::new(|| {
+            .v6(GeneratorWrapper::new(|| Strawberry6 { c6: 66 }))
+            .v7(GeneratorWrapper::new(|| Strawberry7 { c7: 77 }))
+            .v8(GeneratorWrapper::new(|| Strawberry8 { c8: 88 }))
+            .v9(GeneratorWrapper::new(|| Strawberry9 { c9: 99 }))
+            .s1(GeneratorWrapper::new(|| vec![Strawberry1 { c1: 11 }]))
+            .s2(GeneratorWrapper::new(|| vec![Strawberry2 { c2: 22 }]))
+            .s3(GeneratorWrapper::new(|| {
                 vec![Strawberry3 {
                     c3: 33,
                     _marker: Default::default(),
                 }]
             }))
-            .s4(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry4 { c4: 44 }]
-            }))
-            .s5(boulder::GeneratorWrapper::new(|| {
+            .s4(GeneratorWrapper::new(|| vec![Strawberry4 { c4: 44 }]))
+            .s5(GeneratorWrapper::new(|| {
                 vec![Strawberry5 {
                     c5: 55,
                     _marker: Default::default(),
                 }]
             }))
-            .s6(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry6 { c6: 66 }]
-            }))
-            .s7(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry7 { c7: 77 }]
-            }))
-            .s8(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry8 { c8: 88 }]
-            }))
-            .s9(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry9 { c9: 99 }]
-            }))
-            .p1(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry1 { c1: 11 }]
-            }))
-            .p2(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry2 { c2: 22 }]
-            }))
-            .p3(boulder::GeneratorWrapper::new(|| {
+            .s6(GeneratorWrapper::new(|| vec![Strawberry6 { c6: 66 }]))
+            .s7(GeneratorWrapper::new(|| vec![Strawberry7 { c7: 77 }]))
+            .s8(GeneratorWrapper::new(|| vec![Strawberry8 { c8: 88 }]))
+            .s9(GeneratorWrapper::new(|| vec![Strawberry9 { c9: 99 }]))
+            .p1(GeneratorWrapper::new(|| vec![Strawberry1 { c1: 11 }]))
+            .p2(GeneratorWrapper::new(|| vec![Strawberry2 { c2: 22 }]))
+            .p3(GeneratorWrapper::new(|| {
                 vec![Strawberry3 {
                     c3: 33,
                     _marker: Default::default(),
                 }]
             }))
-            .p4(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry4 { c4: 44 }]
-            }))
-            .p5(boulder::GeneratorWrapper::new(|| {
+            .p4(GeneratorWrapper::new(|| vec![Strawberry4 { c4: 44 }]))
+            .p5(GeneratorWrapper::new(|| {
                 vec![Strawberry5 {
                     c5: 55,
                     _marker: Default::default(),
                 }]
             }))
-            .p6(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry6 { c6: 66 }]
-            }))
-            .p7(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry7 { c7: 77 }]
-            }))
-            .p8(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry8 { c8: 88 }]
-            }))
-            .p9(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry9 { c9: 99 }]
-            }))
-            .t1(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry1 { c1: 11 }]
-            }))
-            .t2(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry2 { c2: 22 }]
-            }))
-            .t3(boulder::GeneratorWrapper::new(|| {
+            .p6(GeneratorWrapper::new(|| vec![Strawberry6 { c6: 66 }]))
+            .p7(GeneratorWrapper::new(|| vec![Strawberry7 { c7: 77 }]))
+            .p8(GeneratorWrapper::new(|| vec![Strawberry8 { c8: 88 }]))
+            .p9(GeneratorWrapper::new(|| vec![Strawberry9 { c9: 99 }]))
+            .t1(GeneratorWrapper::new(|| vec![Strawberry1 { c1: 11 }]))
+            .t2(GeneratorWrapper::new(|| vec![Strawberry2 { c2: 22 }]))
+            .t3(GeneratorWrapper::new(|| {
                 vec![Strawberry3 {
                     c3: 33,
                     _marker: Default::default(),
                 }]
             }))
-            .t4(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry4 { c4: 44 }]
-            }))
-            .t5(boulder::GeneratorWrapper::new(|| {
+            .t4(GeneratorWrapper::new(|| vec![Strawberry4 { c4: 44 }]))
+            .t5(GeneratorWrapper::new(|| {
                 vec![Strawberry5 {
                     c5: 55,
                     _marker: Default::default(),
                 }]
             }))
-            .t6(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry6 { c6: 66 }]
-            }))
-            .t7(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry7 { c7: 77 }]
-            }))
-            .t8(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry8 { c8: 88 }]
-            }))
-            .t9(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry9 { c9: 99 }]
-            }))
-            .q1(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry1 { c1: 11 }]
-            }))
-            .q2(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry2 { c2: 22 }]
-            }))
-            .q3(boulder::GeneratorWrapper::new(|| {
+            .t6(GeneratorWrapper::new(|| vec![Strawberry6 { c6: 66 }]))
+            .t7(GeneratorWrapper::new(|| vec![Strawberry7 { c7: 77 }]))
+            .t8(GeneratorWrapper::new(|| vec![Strawberry8 { c8: 88 }]))
+            .t9(GeneratorWrapper::new(|| vec![Strawberry9 { c9: 99 }]))
+            .q1(GeneratorWrapper::new(|| vec![Strawberry1 { c1: 11 }]))
+            .q2(GeneratorWrapper::new(|| vec![Strawberry2 { c2: 22 }]))
+            .q3(GeneratorWrapper::new(|| {
                 vec![Strawberry3 {
                     c3: 33,
                     _marker: Default::default(),
                 }]
             }))
-            .q4(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry4 { c4: 44 }]
-            }))
-            .q5(boulder::GeneratorWrapper::new(|| {
+            .q4(GeneratorWrapper::new(|| vec![Strawberry4 { c4: 44 }]))
+            .q5(GeneratorWrapper::new(|| {
                 vec![Strawberry5 {
                     c5: 55,
                     _marker: Default::default(),
                 }]
             }))
-            .q6(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry6 { c6: 66 }]
-            }))
-            .q7(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry7 { c7: 77 }]
-            }))
-            .q8(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry8 { c8: 88 }]
-            }))
-            .q9(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry9 { c9: 99 }]
-            }));
+            .q6(GeneratorWrapper::new(|| vec![Strawberry6 { c6: 66 }]))
+            .q7(GeneratorWrapper::new(|| vec![Strawberry7 { c7: 77 }]))
+            .q8(GeneratorWrapper::new(|| vec![Strawberry8 { c8: 88 }]))
+            .q9(GeneratorWrapper::new(|| vec![Strawberry9 { c9: 99 }]));
 
         let (d, _) = g.generate(&mut s);
 
@@ -2687,156 +2632,102 @@ mod generator_coverage_no_generics {
 
     #[test]
     fn test_customise() {
+        use boulder::GeneratorToGeneratorWithPersianRugWrapper as GeneratorWrapper;
+
         let mut s: MuleState = Default::default();
 
         let mut g = Mule::generator()
-            .v1(boulder::GeneratorWrapper::new(|| Strawberry1 { c1: 11 }))
-            .v2(boulder::GeneratorWrapper::new(|| Strawberry2 { c2: 22 }))
-            .v3(boulder::GeneratorWrapper::new(|| Strawberry3 {
+            .v1(GeneratorWrapper::new(|| Strawberry1 { c1: 11 }))
+            .v2(GeneratorWrapper::new(|| Strawberry2 { c2: 22 }))
+            .v3(GeneratorWrapper::new(|| Strawberry3 {
                 c3: 33,
                 _marker: Default::default(),
             }))
-            .v4(boulder::GeneratorWrapper::new(|| Strawberry4 { c4: 44 }))
-            .v5(boulder::GeneratorWrapper::new(|| Strawberry5 {
+            .v4(GeneratorWrapper::new(|| Strawberry4 { c4: 44 }))
+            .v5(GeneratorWrapper::new(|| Strawberry5 {
                 c5: 55,
                 _marker: Default::default(),
             }))
-            .v6(boulder::GeneratorWrapper::new(|| Strawberry6 { c6: 66 }))
-            .v7(boulder::GeneratorWrapper::new(|| Strawberry7 { c7: 77 }))
-            .v8(boulder::GeneratorWrapper::new(|| Strawberry8 { c8: 88 }))
-            .v9(boulder::GeneratorWrapper::new(|| Strawberry9 { c9: 99 }))
-            .s1(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry1 { c1: 11 }]
-            }))
-            .s2(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry2 { c2: 22 }]
-            }))
-            .s3(boulder::GeneratorWrapper::new(|| {
+            .v6(GeneratorWrapper::new(|| Strawberry6 { c6: 66 }))
+            .v7(GeneratorWrapper::new(|| Strawberry7 { c7: 77 }))
+            .v8(GeneratorWrapper::new(|| Strawberry8 { c8: 88 }))
+            .v9(GeneratorWrapper::new(|| Strawberry9 { c9: 99 }))
+            .s1(GeneratorWrapper::new(|| vec![Strawberry1 { c1: 11 }]))
+            .s2(GeneratorWrapper::new(|| vec![Strawberry2 { c2: 22 }]))
+            .s3(GeneratorWrapper::new(|| {
                 vec![Strawberry3 {
                     c3: 33,
                     _marker: Default::default(),
                 }]
             }))
-            .s4(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry4 { c4: 44 }]
-            }))
-            .s5(boulder::GeneratorWrapper::new(|| {
+            .s4(GeneratorWrapper::new(|| vec![Strawberry4 { c4: 44 }]))
+            .s5(GeneratorWrapper::new(|| {
                 vec![Strawberry5 {
                     c5: 55,
                     _marker: Default::default(),
                 }]
             }))
-            .s6(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry6 { c6: 66 }]
-            }))
-            .s7(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry7 { c7: 77 }]
-            }))
-            .s8(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry8 { c8: 88 }]
-            }))
-            .s9(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry9 { c9: 99 }]
-            }))
-            .p1(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry1 { c1: 11 }]
-            }))
-            .p2(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry2 { c2: 22 }]
-            }))
-            .p3(boulder::GeneratorWrapper::new(|| {
+            .s6(GeneratorWrapper::new(|| vec![Strawberry6 { c6: 66 }]))
+            .s7(GeneratorWrapper::new(|| vec![Strawberry7 { c7: 77 }]))
+            .s8(GeneratorWrapper::new(|| vec![Strawberry8 { c8: 88 }]))
+            .s9(GeneratorWrapper::new(|| vec![Strawberry9 { c9: 99 }]))
+            .p1(GeneratorWrapper::new(|| vec![Strawberry1 { c1: 11 }]))
+            .p2(GeneratorWrapper::new(|| vec![Strawberry2 { c2: 22 }]))
+            .p3(GeneratorWrapper::new(|| {
                 vec![Strawberry3 {
                     c3: 33,
                     _marker: Default::default(),
                 }]
             }))
-            .p4(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry4 { c4: 44 }]
-            }))
-            .p5(boulder::GeneratorWrapper::new(|| {
+            .p4(GeneratorWrapper::new(|| vec![Strawberry4 { c4: 44 }]))
+            .p5(GeneratorWrapper::new(|| {
                 vec![Strawberry5 {
                     c5: 55,
                     _marker: Default::default(),
                 }]
             }))
-            .p6(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry6 { c6: 66 }]
-            }))
-            .p7(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry7 { c7: 77 }]
-            }))
-            .p8(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry8 { c8: 88 }]
-            }))
-            .p9(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry9 { c9: 99 }]
-            }))
-            .t1(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry1 { c1: 11 }]
-            }))
-            .t2(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry2 { c2: 22 }]
-            }))
-            .t3(boulder::GeneratorWrapper::new(|| {
+            .p6(GeneratorWrapper::new(|| vec![Strawberry6 { c6: 66 }]))
+            .p7(GeneratorWrapper::new(|| vec![Strawberry7 { c7: 77 }]))
+            .p8(GeneratorWrapper::new(|| vec![Strawberry8 { c8: 88 }]))
+            .p9(GeneratorWrapper::new(|| vec![Strawberry9 { c9: 99 }]))
+            .t1(GeneratorWrapper::new(|| vec![Strawberry1 { c1: 11 }]))
+            .t2(GeneratorWrapper::new(|| vec![Strawberry2 { c2: 22 }]))
+            .t3(GeneratorWrapper::new(|| {
                 vec![Strawberry3 {
                     c3: 33,
                     _marker: Default::default(),
                 }]
             }))
-            .t4(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry4 { c4: 44 }]
-            }))
-            .t5(boulder::GeneratorWrapper::new(|| {
+            .t4(GeneratorWrapper::new(|| vec![Strawberry4 { c4: 44 }]))
+            .t5(GeneratorWrapper::new(|| {
                 vec![Strawberry5 {
                     c5: 55,
                     _marker: Default::default(),
                 }]
             }))
-            .t6(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry6 { c6: 66 }]
-            }))
-            .t7(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry7 { c7: 77 }]
-            }))
-            .t8(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry8 { c8: 88 }]
-            }))
-            .t9(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry9 { c9: 99 }]
-            }))
-            .q1(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry1 { c1: 11 }]
-            }))
-            .q2(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry2 { c2: 22 }]
-            }))
-            .q3(boulder::GeneratorWrapper::new(|| {
+            .t6(GeneratorWrapper::new(|| vec![Strawberry6 { c6: 66 }]))
+            .t7(GeneratorWrapper::new(|| vec![Strawberry7 { c7: 77 }]))
+            .t8(GeneratorWrapper::new(|| vec![Strawberry8 { c8: 88 }]))
+            .t9(GeneratorWrapper::new(|| vec![Strawberry9 { c9: 99 }]))
+            .q1(GeneratorWrapper::new(|| vec![Strawberry1 { c1: 11 }]))
+            .q2(GeneratorWrapper::new(|| vec![Strawberry2 { c2: 22 }]))
+            .q3(GeneratorWrapper::new(|| {
                 vec![Strawberry3 {
                     c3: 33,
                     _marker: Default::default(),
                 }]
             }))
-            .q4(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry4 { c4: 44 }]
-            }))
-            .q5(boulder::GeneratorWrapper::new(|| {
+            .q4(GeneratorWrapper::new(|| vec![Strawberry4 { c4: 44 }]))
+            .q5(GeneratorWrapper::new(|| {
                 vec![Strawberry5 {
                     c5: 55,
                     _marker: Default::default(),
                 }]
             }))
-            .q6(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry6 { c6: 66 }]
-            }))
-            .q7(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry7 { c7: 77 }]
-            }))
-            .q8(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry8 { c8: 88 }]
-            }))
-            .q9(boulder::GeneratorWrapper::new(|| {
-                vec![Strawberry9 { c9: 99 }]
-            }));
+            .q6(GeneratorWrapper::new(|| vec![Strawberry6 { c6: 66 }]))
+            .q7(GeneratorWrapper::new(|| vec![Strawberry7 { c7: 77 }]))
+            .q8(GeneratorWrapper::new(|| vec![Strawberry8 { c8: 88 }]))
+            .q9(GeneratorWrapper::new(|| vec![Strawberry9 { c9: 99 }]));
 
         let (d, _) = g.generate(&mut s);
 
@@ -2931,7 +2822,10 @@ mod generator_coverage_no_generics {
 mod generator_wrappers {
     use super::*;
 
-    use boulder::{GeneratableWithPersianRug, GeneratorWithPersianRug, GeneratorWrapper};
+    use boulder::{
+        GeneratableWithPersianRug, GeneratorToGeneratorWithPersianRugWrapper as GeneratorWrapper,
+        GeneratorWithPersianRug,
+    };
     use persian_rug::Proxy;
     use std::any::Any;
     use std::cell::{Cell, RefCell};

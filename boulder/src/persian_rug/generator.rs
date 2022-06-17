@@ -349,11 +349,11 @@ where
 
 /// Convert a [`Generator`](crate::Generator) into a [`GeneratorWithPersianRug`].
 #[cfg_attr(docsrs, doc(cfg(feature = "persian-rug")))]
-pub struct GeneratorWrapper<T> {
+pub struct GeneratorToGeneratorWithPersianRugWrapper<T> {
     gen: Box<dyn crate::Generator<Output = T>>,
 }
 
-impl<T> GeneratorWrapper<T> {
+impl<T> GeneratorToGeneratorWithPersianRugWrapper<T> {
     pub fn new<U: crate::Generator<Output = T>>(value: U) -> Self {
         Self {
             gen: Box::new(value),
@@ -361,7 +361,7 @@ impl<T> GeneratorWrapper<T> {
     }
 }
 
-impl<C, T> GeneratorWithPersianRug<C> for GeneratorWrapper<T>
+impl<C, T> GeneratorWithPersianRug<C> for GeneratorToGeneratorWithPersianRugWrapper<T>
 where
     C: persian_rug::Context,
     T: 'static,
@@ -372,6 +372,337 @@ where
         B: 'b + persian_rug::Mutator<Context = C>,
     {
         (self.gen.generate(), context)
+    }
+}
+
+/// Cycle through the existing [`Proxy<T>`](persian_rug::Proxy) items
+/// in the context.
+///
+/// Each proxy will be yielded in turn, in insertion order, and then
+/// the sequence will repeat.  It is safe to insert more values to
+/// yield, and they will occur in their natural position when they are
+/// reached.
+///
+/// [`generate`](RepeatFromPersianRug::generate) routine will panic if
+/// there are no available items.
+///
+/// Example:
+/// ```rust
+/// use boulder::{GeneratorWithPersianRug, RepeatFromPersianRug};
+/// use persian_rug::{contextual, persian_rug, Context, Proxy};
+///
+/// #[contextual(Rug)]
+/// struct Foo {
+///   a: i32
+/// }
+///
+/// #[persian_rug]
+/// struct Rug(#[table] Foo);
+///
+/// let mut r = Rug(Default::default());
+/// r.add(Foo { a: 0 });
+/// r.add(Foo { a: 1 });
+///
+/// let mut g = RepeatFromPersianRug::<Foo>::new();
+/// let (f1, _) = g.generate(&mut r);
+/// assert_eq!(r.get(&f1).a, 0);
+/// let (f2, _) = g.generate(&mut r);
+/// assert_eq!(r.get(&f2).a, 1);
+/// let (f3, _) = g.generate(&mut r);
+/// assert_eq!(f1, f3);
+///
+/// r.add(Foo { a: 2} );
+/// let (f4, _) = g.generate(&mut r);
+/// assert_eq!(f2, f4);
+/// let (f5, _) = g.generate(&mut r);
+/// assert_eq!(r.get(&f5).a, 2);
+/// ```
+#[cfg_attr(docsrs, doc(cfg(feature = "persian-rug")))]
+pub struct RepeatFromPersianRug<T> {
+    _marker: core::marker::PhantomData<T>,
+    index: u64,
+}
+
+impl<T> Default for RepeatFromPersianRug<T> {
+    fn default() -> Self {
+        Self {
+            _marker: Default::default(),
+            index: 0u64,
+        }
+    }
+}
+
+impl<T> RepeatFromPersianRug<T> {
+    pub fn new() -> Self {
+        Default::default()
+    }
+}
+
+#[persian_rug::constraints(context=C, access(T))]
+impl<C, T> GeneratorWithPersianRug<C> for RepeatFromPersianRug<T> {
+    type Output = persian_rug::Proxy<T>;
+
+    fn generate<'b, B>(&mut self, context: B) -> (Self::Output, B)
+    where
+        B: 'b + persian_rug::Mutator<Context = C>,
+    {
+        let proxies = context.get_proxy_iter().collect::<Vec<_>>();
+        if proxies.is_empty() {
+            panic!(
+                "Failing to generate from rug {} for type {}: no available objects",
+                std::any::type_name::<C>(),
+                std::any::type_name::<T>()
+            );
+        }
+        let res = proxies[self.index as usize];
+        self.index = (self.index + 1) % (proxies.len() as u64);
+        (*res, context)
+    }
+}
+
+/// Cycle through the existing [`Proxy<T>`](persian_rug::Proxy) items
+/// in the context.
+///
+/// Each proxy will be yielded in turn, in insertion order, and then
+/// the sequence will repeat.  It is safe to insert more values to
+/// yield, and they will occur in their natural position when they are
+/// reached.
+///
+/// If there are no available items,
+/// [`generate`](TryRepeatFromPersianRug::generate) returns `None`.
+///
+/// Example:
+/// ```rust
+/// use boulder::{GeneratorWithPersianRug, TryRepeatFromPersianRug};
+/// use persian_rug::{contextual, persian_rug, Context, Proxy};
+///
+/// #[contextual(Rug)]
+/// struct Foo {
+///   a: i32
+/// }
+///
+/// #[persian_rug]
+/// struct Rug(#[table] Foo);
+///
+/// let mut r = Rug(Default::default());
+///
+/// let mut g = TryRepeatFromPersianRug::<Foo>::new();
+///
+/// let (f0, _) = g.generate(&mut r);
+/// assert!(f0.is_none());
+///
+/// r.add(Foo { a: 0 });
+/// r.add(Foo { a: 1 });
+///
+/// let (f1, _) = g.generate(&mut r);
+/// assert_eq!(r.get(&f1.unwrap()).a, 0);
+/// let (f2, _) = g.generate(&mut r);
+/// assert_eq!(r.get(&f2.unwrap()).a, 1);
+/// let (f3, _) = g.generate(&mut r);
+/// assert_eq!(f1, f3);
+///
+/// r.add(Foo { a: 2} );
+/// let (f4, _) = g.generate(&mut r);
+/// assert_eq!(f2, f4);
+/// let (f5, _) = g.generate(&mut r);
+/// assert_eq!(r.get(&f5.unwrap()).a, 2);
+/// ```
+#[cfg_attr(docsrs, doc(cfg(feature = "persian-rug")))]
+pub struct TryRepeatFromPersianRug<T> {
+    _marker: core::marker::PhantomData<T>,
+    index: u64,
+}
+
+impl<T> Default for TryRepeatFromPersianRug<T> {
+    fn default() -> Self {
+        Self {
+            _marker: Default::default(),
+            index: 0u64,
+        }
+    }
+}
+
+impl<T> TryRepeatFromPersianRug<T> {
+    pub fn new() -> Self {
+        Default::default()
+    }
+}
+
+#[persian_rug::constraints(context=C, access(T))]
+impl<C, T> GeneratorWithPersianRug<C> for TryRepeatFromPersianRug<T> {
+    type Output = Option<persian_rug::Proxy<T>>;
+
+    fn generate<'b, B>(&mut self, context: B) -> (Self::Output, B)
+    where
+        B: 'b + persian_rug::Mutator<Context = C>,
+    {
+        let proxies = context.get_proxy_iter().collect::<Vec<_>>();
+        if proxies.is_empty() {
+            (None, context)
+        } else {
+            let res = proxies[self.index as usize];
+            self.index = (self.index + 1) % (proxies.len() as u64);
+            (Some(*res), context)
+        }
+    }
+}
+
+/// Produce subsets of the existing [`Proxy<T>`](persian_rug::Proxy)
+/// items in the context.
+///
+/// The yield pattern is the same as the regular
+/// [`Subsets`](crate::Subsets) generator. It is safe to add more
+/// items, and they will occur in their natural place in future items
+/// yielded by the generator.
+///
+/// Example:
+/// ```rust
+/// use boulder::{GeneratorWithPersianRug, SubsetsFromPersianRug};
+/// use persian_rug::{contextual, persian_rug, Context, Proxy};
+///
+/// #[contextual(Rug)]
+/// struct Foo {
+///   a: i32
+/// }
+///
+/// #[persian_rug]
+/// struct Rug(#[table] Foo);
+///
+/// let mut r = Rug(Default::default());
+/// let f1 = r.add(Foo { a: 0 });
+/// let f2 = r.add(Foo { a: 1 });
+///
+/// let mut g = SubsetsFromPersianRug::<Foo>::new();
+/// let (s1, _) = g.generate(&mut r);
+/// assert_eq!(s1, Vec::new());
+/// let (s2, _) = g.generate(&mut r);
+/// assert_eq!(s2, vec![ f1 ]);
+/// let (s3, _) = g.generate(&mut r);
+/// assert_eq!(s3, vec![ f2 ]);
+/// let (s4, _) = g.generate(&mut r);
+/// assert_eq!(s4, vec![ f1, f2 ]);
+/// ```
+#[cfg_attr(docsrs, doc(cfg(feature = "persian-rug")))]
+pub struct SubsetsFromPersianRug<T> {
+    _marker: core::marker::PhantomData<T>,
+    index: u64,
+}
+
+impl<T> Default for SubsetsFromPersianRug<T> {
+    fn default() -> Self {
+        Self {
+            _marker: Default::default(),
+            index: 0u64,
+        }
+    }
+}
+
+impl<T> SubsetsFromPersianRug<T> {
+    pub fn new() -> Self {
+        Default::default()
+    }
+}
+
+#[persian_rug::constraints(context=C, access(T))]
+impl<C, T> GeneratorWithPersianRug<C> for SubsetsFromPersianRug<T> {
+    type Output = Vec<persian_rug::Proxy<T>>;
+
+    fn generate<'b, B>(&mut self, context: B) -> (Self::Output, B)
+    where
+        B: 'b + persian_rug::Mutator<Context = C>,
+    {
+        let mut res = Vec::new();
+        let proxies = context.get_proxy_iter().collect::<Vec<_>>();
+        for i in 0..std::cmp::min(64, proxies.len()) {
+            if (self.index & (1u64 << i)) != 0 {
+                res.push(*proxies[i as usize]);
+            }
+        }
+        self.index += 1;
+        (res, context)
+    }
+}
+
+/// Produce collections of the existing
+/// [`Proxy<T>`](persian_rug::Proxy) items in the context.
+///
+/// It is safe to add more items, and they will occur in their natural
+/// place in future items yielded by the generator. The generator
+/// argument controls the maximum number of items in each yielded
+/// collection. [`SampleFromPersianRug`] will always return this
+/// maximum if it is possible to do so without duplicating elements.
+///
+/// Example:
+/// ```rust
+/// use boulder::{GeneratorWithPersianRug, Inc, SampleFromPersianRug};
+/// use persian_rug::{contextual, persian_rug, Context, Proxy};
+///
+/// #[contextual(Rug)]
+/// struct Foo {
+///   a: i32
+/// }
+///
+/// #[persian_rug]
+/// struct Rug(#[table] Foo);
+///
+/// let mut r = Rug(Default::default());
+/// let f1 = r.add(Foo { a: 0 });
+/// let f2 = r.add(Foo { a: 1 });
+///
+/// let mut g = SampleFromPersianRug::<Foo, _, Vec<_>>::new(Inc(0));
+/// let (s1, _) = g.generate(&mut r);
+/// assert_eq!(s1, Vec::new());
+/// let (s2, _) = g.generate(&mut r);
+/// assert_eq!(s2, vec![ f1 ]);
+/// let (s3, _) = g.generate(&mut r);
+/// assert_eq!(s3, vec![ f2, f1 ]);
+/// let (s4, _) = g.generate(&mut r);
+/// assert_eq!(s4, vec![ f2, f1 ]);
+/// ```
+#[cfg_attr(docsrs, doc(cfg(feature = "persian-rug")))]
+pub struct SampleFromPersianRug<T, U, V> {
+    index: u64,
+    count: U,
+    _type_marker: core::marker::PhantomData<T>,
+    _result_marker: core::marker::PhantomData<V>,
+}
+
+#[persian_rug::constraints(context = C, access(T))]
+impl<C, T, U, V> SampleFromPersianRug<T, U, V>
+where
+    U: GeneratorWithPersianRug<C, Output = usize>,
+    V: FromIterator<persian_rug::Proxy<T>> + 'static,
+{
+    pub fn new(count: U) -> Self {
+        Self {
+            index: 0u64,
+            count,
+            _type_marker: Default::default(),
+            _result_marker: Default::default(),
+        }
+    }
+}
+
+#[persian_rug::constraints(context = C, access(T))]
+impl<C, T, U, V> GeneratorWithPersianRug<C> for SampleFromPersianRug<T, U, V>
+where
+    U: GeneratorWithPersianRug<C, Output = usize>,
+    V: FromIterator<persian_rug::Proxy<T>> + 'static,
+{
+    type Output = V;
+    fn generate<'b, B>(&mut self, context: B) -> (Self::Output, B)
+    where
+        B: 'b + persian_rug::Mutator<Context = C>,
+    {
+        let (count, context) = self.count.generate(context);
+
+        let mut res = Vec::new();
+        let proxies = context.get_proxy_iter().collect::<Vec<_>>();
+        for _ in 0..std::cmp::min(proxies.len(), count) {
+            res.push(*proxies[self.index as usize]);
+            self.index = (self.index + 1) % (proxies.len() as u64);
+        }
+        (res.into_iter().collect(), context)
     }
 }
 

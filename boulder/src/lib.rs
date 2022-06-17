@@ -149,8 +149,10 @@ mod persian_rug;
 #[cfg_attr(docsrs, doc(cfg(feature = "persian-rug")))]
 pub use self::persian_rug::{
     BuildableWithPersianRug, BuilderWithPersianRug, GeneratableWithPersianRug,
-    GeneratorWithPersianRug, GeneratorWithPersianRugIterator, GeneratorWithPersianRugMutIterator,
-    GeneratorWrapper, SequenceGeneratorWithPersianRug,
+    GeneratorToGeneratorWithPersianRugWrapper, GeneratorWithPersianRug,
+    GeneratorWithPersianRugIterator, GeneratorWithPersianRugMutIterator, RepeatFromPersianRug,
+    SampleFromPersianRug, SequenceGeneratorWithPersianRug, SubsetsFromPersianRug,
+    TryRepeatFromPersianRug,
 };
 
 #[doc(hidden)]
